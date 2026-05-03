@@ -7,232 +7,645 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Meal Planner">
 <meta name="theme-color" content="#E07A5F">
+<meta name="description" content="Smart weekly dinner planner — seasonal, no repeats, kid-friendly.">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon.svg">
 <title>Weekly Dinner Planner</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body { font-family: 'DM Sans', 'Helvetica Neue', sans-serif; background: #FAFAF7; color: #2D3436; min-height: 100vh; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  .fade-in { animation: fadeIn 0.4s ease forwards; }
-  button { -webkit-appearance: none; }
-  button:active { transform: scale(0.97); }
-  textarea:focus { border-color: #E07A5F !important; outline: none; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:'DM Sans','Helvetica Neue',sans-serif;background:#FAFAF7;color:#2D3436;min-height:100vh}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .fade-in{animation:fadeIn 0.35s ease forwards}
+  @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  button{-webkit-appearance:none}
+  button:active{transform:scale(0.96);transition:transform 0.1s}
+  textarea:focus,input:focus{outline:none}
+  ::-webkit-scrollbar{display:none}
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#2D3436;color:#fff;
+    padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;z-index:999;
+    animation:slideUp 0.25s ease;white-space:nowrap;pointer-events:none;
+    box-shadow:0 4px 20px rgba(0,0,0,0.25)}
 </style>
 </head>
 <body>
-
-<div id="app"></div>
+<div id="app">
+  <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#FAFAF7">
+    <div style="text-align:center">
+      <div style="font-size:48px;margin-bottom:12px">🍽️</div>
+      <div style="font-family:sans-serif;color:#636E72;font-size:14px">Loading…</div>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
 
 <script type="text/babel">
-const { useState, useEffect } = React;
+const { useState, useEffect, useCallback } = React;
 
+// ── Storage ──────────────────────────────────────────────────────────────────
+const SK = { HISTORY:'mp_history', FAVS:'mp_favs', DISLIKES:'mp_dislikes', PANTRY:'mp_pantry', STATE:'mp_state' };
+function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+
+// ── Design tokens ─────────────────────────────────────────────────────────────
+const P = {
+  bg:"#FAFAF7", card:"#FFF", accent:"#E07A5F", accentLight:"#F4D1C7", accentDark:"#C25B3F",
+  green:"#81B29A", greenLight:"#D4EDDA", greenDark:"#5A8A6E",
+  gold:"#D4A017", goldLight:"#FEF3DC",
+  text:"#2D3436", muted:"#636E72", border:"#E8E4DF",
+  shadow:"0 2px 16px rgba(0,0,0,0.06)", shadowMd:"0 4px 24px rgba(0,0,0,0.10)",
+};
+
+// ── Constants ─────────────────────────────────────────────────────────────────
+const DAYS   = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const WEEKEND = ["Saturday","Sunday"];
+const EMOJIS  = {Monday:"🍝",Tuesday:"🥘",Wednesday:"🐟",Thursday:"🍗",Friday:"🌮",Saturday:"🥩",Sunday:"🍕"};
+const SEASON_INFO = {
+  spring:{label:"🌸 Spring",tip:"lighter meals & spring veg"},
+  summer:{label:"☀️ Summer",tip:"fresh, quick & colourful"},
+  autumn:{label:"🍂 Autumn",tip:"hearty bakes & warming bowls"},
+  winter:{label:"❄️ Winter",tip:"comfort food season"},
+};
+
+// ── Meal data ─────────────────────────────────────────────────────────────────
+// protein: chicken | fish | beef | pork | lamb | seafood | eggs | veggie
+// cuisine: italian | british | mexican | asian | indian | american | middleeastern
+// seasons: [] = all year; otherwise list seasons when it shines
 const WEEKDAY_MEALS = [
-  { name: "Mini Meatball Pasta", time: "12 min", description: "Pre-made meatballs warmed in passata, tossed with penne.", kidNote: "Soft, saucy, easy to eat", ingredients: ["400g penne pasta", "12 pre-made beef meatballs", "400g passata", "1 tsp dried oregano", "30g parmesan cheese"] },
-  { name: "Chicken & Sweetcorn Rice", time: "15 min", description: "Diced chicken with peas, sweetcorn and soy sauce over rice.", kidNote: "Colourful and great finger food", ingredients: ["2 chicken breasts", "250g microwave rice", "150g frozen sweetcorn", "100g frozen peas", "2 tbsp soy sauce", "1 tbsp vegetable oil"] },
-  { name: "Fish Finger Wraps", time: "15 min", description: "Oven fish fingers in soft tortillas with cucumber and cheese.", kidNote: "Fun to hold and dip", ingredients: ["10 fish fingers", "4 soft tortillas", "1 cucumber", "80g cheddar cheese", "3 tbsp mayonnaise"] },
-  { name: "One-Pot Cheesy Pasta", time: "15 min", description: "Pasta cooked with cream cheese, sweetcorn and ham.", kidNote: "Creamy and mild", ingredients: ["300g fusilli pasta", "150g cream cheese", "150g frozen sweetcorn", "150g ham slices", "50g cheddar cheese"] },
-  { name: "Chicken Quesadillas", time: "12 min", description: "Tortillas stuffed with shredded chicken, cheese and peppers.", kidNote: "Crispy, cheesy, easy to cut into triangles", ingredients: ["2 cooked chicken breasts", "4 flour tortillas", "100g cheddar cheese", "1 red pepper", "2 tbsp vegetable oil"] },
-  { name: "Salmon & Noodle Stir Fry", time: "15 min", description: "Flaked salmon with egg noodles and vegetables in teriyaki sauce.", kidNote: "Soft noodles are easy for little ones", ingredients: ["2 salmon fillets", "300g egg noodles", "150g frozen stir fry veg", "3 tbsp teriyaki sauce", "1 tbsp sesame oil"] },
-  { name: "Ham & Cheese Pitta Pizzas", time: "10 min", description: "Pitta breads topped with passata, mozzarella and ham.", kidNote: "Fun to make together", ingredients: ["4 pitta breads", "4 tbsp passata", "125g mozzarella", "100g ham slices", "1 tsp dried oregano"] },
-  { name: "Pesto Pasta with Peas", time: "12 min", description: "Quick pasta with green pesto, peas and parmesan.", kidNote: "Green pasta is fun!", ingredients: ["300g pasta shells", "4 tbsp green pesto", "200g frozen peas", "30g parmesan cheese", "1 tbsp olive oil"] },
-  { name: "Egg Fried Rice", time: "15 min", description: "Microwave rice stir fried with eggs, peas, sweetcorn and soy.", kidNote: "A gentle, familiar flavour", ingredients: ["2 packs microwave rice", "3 eggs", "150g frozen peas", "150g frozen sweetcorn", "2 tbsp soy sauce", "1 tbsp vegetable oil"] },
-  { name: "Tuna Pasta Bake", time: "18 min", description: "Tuna mixed with pasta and a quick cheese sauce, grilled to crisp.", kidNote: "Comforting and creamy", ingredients: ["300g penne pasta", "2 tins tuna", "200ml crème fraîche", "80g cheddar cheese", "100g frozen sweetcorn"] },
-  { name: "Sausage & Bean One-Pot", time: "15 min", description: "Sliced sausages with baked beans and toast.", kidNote: "Classic comfort food", ingredients: ["6 pork sausages", "1 tin baked beans", "4 slices bread", "1 tbsp vegetable oil", "1 tbsp ketchup"] },
-  { name: "Chicken Goujons & Chips", time: "20 min", description: "Crispy chicken strips with oven chips and peas.", kidNote: "Always a winner", ingredients: ["400g chicken breast goujons", "400g frozen oven chips", "200g frozen peas", "2 tbsp ketchup"] },
-  { name: "Veggie Omelette", time: "10 min", description: "Fluffy eggs with cheese, tomatoes and whatever veg you have.", kidNote: "Soft, mild, and protein-packed", ingredients: ["6 eggs", "60g cheddar cheese", "4 cherry tomatoes", "1 small courgette", "1 tbsp butter", "4 slices bread"] },
-  { name: "Speedy Bolognese", time: "20 min", description: "Quick beef mince ragu with spaghetti.", kidNote: "A family classic, chop spaghetti for the little one", ingredients: ["400g beef mince", "400g tin chopped tomatoes", "300g spaghetti", "1 onion", "1 carrot", "1 tbsp olive oil", "1 tsp dried mixed herbs"] },
-  { name: "Prawn Stir Fry", time: "12 min", description: "King prawns with noodles and vegetables in sweet chilli sauce.", kidNote: "Use mild sauce for kids' portions", ingredients: ["250g cooked king prawns", "300g egg noodles", "200g stir fry vegetables", "2 tbsp sweet chilli sauce", "1 tbsp soy sauce", "1 tbsp vegetable oil"] },
-  { name: "Cheesy Beans on Toast", time: "8 min", description: "Baked beans topped with melted cheese on thick toast.", kidNote: "Simple, warm, filling", ingredients: ["1 tin baked beans", "80g cheddar cheese", "4 thick slices bread", "1 tbsp butter"] },
-  { name: "Chicken Wraps", time: "15 min", description: "Pan-fried chicken strips with lettuce, cucumber and mayo in wraps.", kidNote: "Mild and easy to hold", ingredients: ["2 chicken breasts", "4 soft tortillas", "1 little gem lettuce", "1 cucumber", "3 tbsp mayonnaise", "1 tbsp vegetable oil"] },
-  { name: "Mac & Cheese", time: "18 min", description: "Quick stovetop macaroni cheese with a touch of mustard.", kidNote: "The ultimate kid crowd-pleaser", ingredients: ["300g macaroni", "40g butter", "40g plain flour", "500ml milk", "150g cheddar cheese", "1 tsp mustard"] },
+  {name:"Mini Meatball Pasta",      time:"12 min",protein:"beef",   cuisine:"italian",
+   description:"Pre-made meatballs warmed in passata, tossed with penne.",
+   kidNote:"Soft, saucy, easy to eat",
+   ingredients:["400g penne pasta","12 pre-made beef meatballs","400g passata","1 tsp dried oregano","30g parmesan cheese"]},
+  {name:"Chicken & Sweetcorn Rice", time:"15 min",protein:"chicken",cuisine:"asian",
+   description:"Diced chicken with peas, sweetcorn and soy sauce over rice.",
+   kidNote:"Colourful and great finger food",
+   ingredients:["2 chicken breasts","250g microwave rice","150g frozen sweetcorn","100g frozen peas","2 tbsp soy sauce","1 tbsp vegetable oil"]},
+  {name:"Fish Finger Wraps",        time:"15 min",protein:"fish",   cuisine:"british",seasons:["spring","summer"],
+   description:"Oven fish fingers in soft tortillas with cucumber and cheese.",
+   kidNote:"Fun to hold and dip",
+   ingredients:["10 fish fingers","4 soft tortillas","1 cucumber","80g cheddar cheese","3 tbsp mayonnaise"]},
+  {name:"One-Pot Cheesy Pasta",     time:"15 min",protein:"pork",   cuisine:"british",seasons:["autumn","winter"],
+   description:"Pasta cooked with cream cheese, sweetcorn and ham.",
+   kidNote:"Creamy and mild",
+   ingredients:["300g fusilli pasta","150g cream cheese","150g frozen sweetcorn","150g ham slices","50g cheddar cheese"]},
+  {name:"Chicken Quesadillas",      time:"12 min",protein:"chicken",cuisine:"mexican",
+   description:"Tortillas stuffed with shredded chicken, cheese and peppers.",
+   kidNote:"Crispy, cheesy, easy to cut into triangles",
+   ingredients:["2 cooked chicken breasts","4 flour tortillas","100g cheddar cheese","1 red pepper","2 tbsp vegetable oil"]},
+  {name:"Salmon & Noodle Stir Fry", time:"15 min",protein:"fish",   cuisine:"asian",  seasons:["spring","summer"],
+   description:"Flaked salmon with egg noodles and vegetables in teriyaki sauce.",
+   kidNote:"Soft noodles are easy for little ones",
+   ingredients:["2 salmon fillets","300g egg noodles","150g frozen stir fry veg","3 tbsp teriyaki sauce","1 tbsp sesame oil"]},
+  {name:"Ham & Cheese Pitta Pizzas",time:"10 min",protein:"pork",   cuisine:"italian",
+   description:"Pitta breads topped with passata, mozzarella and ham.",
+   kidNote:"Fun to make together",
+   ingredients:["4 pitta breads","4 tbsp passata","125g mozzarella","100g ham slices","1 tsp dried oregano"]},
+  {name:"Pesto Pasta with Peas",    time:"12 min",protein:"veggie", cuisine:"italian",seasons:["spring","summer"],
+   description:"Quick pasta with green pesto, peas and parmesan.",
+   kidNote:"Green pasta is fun!",
+   ingredients:["300g pasta shells","4 tbsp green pesto","200g frozen peas","30g parmesan cheese","1 tbsp olive oil"]},
+  {name:"Egg Fried Rice",           time:"15 min",protein:"eggs",   cuisine:"asian",
+   description:"Microwave rice stir fried with eggs, peas, sweetcorn and soy.",
+   kidNote:"A gentle, familiar flavour",
+   ingredients:["2 packs microwave rice","3 eggs","150g frozen peas","150g frozen sweetcorn","2 tbsp soy sauce","1 tbsp vegetable oil"]},
+  {name:"Tuna Pasta Bake",          time:"18 min",protein:"fish",   cuisine:"british",seasons:["autumn","winter"],
+   description:"Tuna mixed with pasta and a quick cheese sauce, grilled to crisp.",
+   kidNote:"Comforting and creamy",
+   ingredients:["300g penne pasta","2 tins tuna","200ml crème fraîche","80g cheddar cheese","100g frozen sweetcorn"]},
+  {name:"Sausage & Bean One-Pot",   time:"15 min",protein:"pork",   cuisine:"british",seasons:["autumn","winter"],
+   description:"Sliced sausages with baked beans and toast.",
+   kidNote:"Classic comfort food",
+   ingredients:["6 pork sausages","1 tin baked beans","4 slices bread","1 tbsp vegetable oil","1 tbsp ketchup"]},
+  {name:"Chicken Goujons & Chips",  time:"20 min",protein:"chicken",cuisine:"british",
+   description:"Crispy chicken strips with oven chips and peas.",
+   kidNote:"Always a winner",
+   ingredients:["400g chicken breast goujons","400g frozen oven chips","200g frozen peas","2 tbsp ketchup"]},
+  {name:"Veggie Omelette",          time:"10 min",protein:"eggs",   cuisine:"british",
+   description:"Fluffy eggs with cheese, tomatoes and whatever veg you have.",
+   kidNote:"Soft, mild, and protein-packed",
+   ingredients:["6 eggs","60g cheddar cheese","4 cherry tomatoes","1 small courgette","1 tbsp butter","4 slices bread"]},
+  {name:"Speedy Bolognese",         time:"20 min",protein:"beef",   cuisine:"italian",
+   description:"Quick beef mince ragu with spaghetti.",
+   kidNote:"A family classic, chop spaghetti for the little one",
+   ingredients:["400g beef mince","400g tin chopped tomatoes","300g spaghetti","1 onion","1 carrot","1 tbsp olive oil","1 tsp dried mixed herbs"]},
+  {name:"Prawn Stir Fry",           time:"12 min",protein:"seafood",cuisine:"asian",  seasons:["spring","summer"],
+   description:"King prawns with noodles and vegetables in sweet chilli sauce.",
+   kidNote:"Use mild sauce for kids' portions",
+   ingredients:["250g cooked king prawns","300g egg noodles","200g stir fry vegetables","2 tbsp sweet chilli sauce","1 tbsp soy sauce","1 tbsp vegetable oil"]},
+  {name:"Cheesy Beans on Toast",    time:"8 min", protein:"veggie", cuisine:"british",
+   description:"Baked beans topped with melted cheese on thick toast.",
+   kidNote:"Simple, warm, filling",
+   ingredients:["1 tin baked beans","80g cheddar cheese","4 thick slices bread","1 tbsp butter"]},
+  {name:"Chicken Wraps",            time:"15 min",protein:"chicken",cuisine:"british",seasons:["spring","summer"],
+   description:"Pan-fried chicken strips with lettuce, cucumber and mayo in wraps.",
+   kidNote:"Mild and easy to hold",
+   ingredients:["2 chicken breasts","4 soft tortillas","1 little gem lettuce","1 cucumber","3 tbsp mayonnaise","1 tbsp vegetable oil"]},
+  {name:"Mac & Cheese",             time:"18 min",protein:"veggie", cuisine:"american",seasons:["autumn","winter"],
+   description:"Quick stovetop macaroni cheese with a touch of mustard.",
+   kidNote:"The ultimate kid crowd-pleaser",
+   ingredients:["300g macaroni","40g butter","40g plain flour","500ml milk","150g cheddar cheese","1 tsp mustard"]},
 ];
 
 const WEEKEND_MEALS = [
-  { name: "One-Pot Roast Chicken Orzo", time: "40 min", description: "Chicken thighs roasted on orzo with cherry tomatoes and spinach.", kidNote: "Like a Sunday roast with zero effort", ingredients: ["6 chicken thighs", "300g orzo pasta", "200g cherry tomatoes", "100g spinach", "500ml chicken stock", "1 tbsp olive oil", "1 tsp smoked paprika"] },
-  { name: "Chicken Fajitas", time: "30 min", description: "Sliced chicken with peppers and onions, served mild for kids.", kidNote: "Let the 3yo build their own", ingredients: ["3 chicken breasts", "2 peppers", "1 onion", "1 pack fajita seasoning", "8 soft tortillas", "100g cheddar cheese", "4 tbsp sour cream", "1 tbsp vegetable oil"] },
-  { name: "Homemade Pizzas", time: "35 min", description: "Quick dough or flatbread bases with everyone's favourite toppings.", kidNote: "Kids love choosing their own toppings", ingredients: ["2 naan breads or pizza bases", "4 tbsp passata", "200g mozzarella", "100g ham", "1 pepper", "sweetcorn"] },
-  { name: "Fish Pie", time: "40 min", description: "Creamy fish pie with a cheesy mash topping.", kidNote: "Soft, creamy, easy to eat", ingredients: ["400g fish pie mix", "500g potatoes", "200ml milk", "30g butter", "80g cheddar cheese", "1 tbsp plain flour", "100g frozen peas"] },
-  { name: "Sausage Pasta Bake", time: "35 min", description: "Sausages with pasta in a rich tomato sauce, topped with cheese.", kidNote: "Hearty and warming", ingredients: ["6 pork sausages", "300g penne", "400g tin chopped tomatoes", "100g cheddar cheese", "1 onion", "1 tsp dried mixed herbs", "1 tbsp olive oil"] },
-  { name: "Lamb Kofta Pittas", time: "30 min", description: "Mild spiced lamb koftas in pittas with yoghurt and cucumber.", kidNote: "Soft meatballs in bread — easy to eat", ingredients: ["400g lamb mince", "4 pitta breads", "1 tsp ground cumin", "1 tsp ground coriander", "4 tbsp natural yoghurt", "1 cucumber", "1 tbsp olive oil"] },
-  { name: "Jacket Potatoes", time: "45 min", description: "Fluffy jackets with cheese, beans, or tuna mayo.", kidNote: "Soft inside, everyone picks their filling", ingredients: ["4 large baking potatoes", "1 tin baked beans", "1 tin tuna", "100g cheddar cheese", "3 tbsp mayonnaise", "knob of butter"] },
-  { name: "Chicken & Veg Traybake", time: "35 min", description: "Chicken drumsticks roasted with potatoes, peppers and courgette.", kidNote: "Everything in one tray, easy finger food", ingredients: ["8 chicken drumsticks", "500g baby potatoes", "2 peppers", "1 courgette", "2 tbsp olive oil", "1 tsp garlic granules", "1 tsp smoked paprika"] },
-  { name: "Beef Tacos", time: "25 min", description: "Seasoned beef mince in taco shells with cheese, lettuce and salsa.", kidNote: "Crunchy shells are fun for kids", ingredients: ["400g beef mince", "8 taco shells", "1 pack taco seasoning", "1 little gem lettuce", "80g cheddar cheese", "4 tbsp salsa", "4 tbsp sour cream"] },
-  { name: "Veggie Curry & Naan", time: "30 min", description: "Mild chickpea and sweet potato curry with naan bread.", kidNote: "Sweet, mild, great with naan for dipping", ingredients: ["1 tin chickpeas", "1 sweet potato", "400g tin coconut milk", "2 tbsp korma paste", "100g spinach", "4 naan breads", "250g rice"] },
-  { name: "Pasta al Forno", time: "40 min", description: "Baked rigatoni with a rich meat sauce and bubbly mozzarella.", kidNote: "Cheesy, saucy pasta — always a hit", ingredients: ["400g rigatoni", "400g beef mince", "400g tin chopped tomatoes", "125g mozzarella", "1 onion", "1 tsp dried oregano", "1 tbsp olive oil"] },
-  { name: "Sticky Chicken Drumsticks", time: "35 min", description: "Honey-soy drumsticks with rice and steamed broccoli.", kidNote: "Sweet glaze kids love, great for messy hands", ingredients: ["8 chicken drumsticks", "2 tbsp honey", "2 tbsp soy sauce", "1 tbsp ketchup", "250g rice", "1 head broccoli"] },
+  {name:"One-Pot Roast Chicken Orzo",time:"40 min",protein:"chicken",cuisine:"italian",seasons:["autumn","winter"],
+   description:"Chicken thighs roasted on orzo with cherry tomatoes and spinach.",
+   kidNote:"Like a Sunday roast with zero effort",
+   ingredients:["6 chicken thighs","300g orzo pasta","200g cherry tomatoes","100g spinach","500ml chicken stock","1 tbsp olive oil","1 tsp smoked paprika"]},
+  {name:"Chicken Fajitas",          time:"30 min",protein:"chicken",cuisine:"mexican",
+   description:"Sliced chicken with peppers and onions, served mild for kids.",
+   kidNote:"Let them build their own",
+   ingredients:["3 chicken breasts","2 peppers","1 onion","1 pack fajita seasoning","8 soft tortillas","100g cheddar cheese","4 tbsp sour cream","1 tbsp vegetable oil"]},
+  {name:"Homemade Pizzas",          time:"35 min",protein:"pork",   cuisine:"italian",
+   description:"Flatbread bases with everyone's favourite toppings.",
+   kidNote:"Kids love choosing their own toppings",
+   ingredients:["2 naan breads or pizza bases","4 tbsp passata","200g mozzarella","100g ham","1 pepper","sweetcorn"]},
+  {name:"Fish Pie",                 time:"40 min",protein:"fish",   cuisine:"british",seasons:["autumn","winter"],
+   description:"Creamy fish pie with a cheesy mash topping.",
+   kidNote:"Soft, creamy, easy to eat",
+   ingredients:["400g fish pie mix","500g potatoes","200ml milk","30g butter","80g cheddar cheese","1 tbsp plain flour","100g frozen peas"]},
+  {name:"Sausage Pasta Bake",       time:"35 min",protein:"pork",   cuisine:"italian",seasons:["autumn","winter"],
+   description:"Sausages with pasta in a rich tomato sauce, topped with cheese.",
+   kidNote:"Hearty and warming",
+   ingredients:["6 pork sausages","300g penne","400g tin chopped tomatoes","100g cheddar cheese","1 onion","1 tsp dried mixed herbs","1 tbsp olive oil"]},
+  {name:"Lamb Kofta Pittas",        time:"30 min",protein:"lamb",   cuisine:"middleeastern",seasons:["spring","summer"],
+   description:"Mild spiced lamb koftas in pittas with yoghurt and cucumber.",
+   kidNote:"Soft meatballs in bread — easy to eat",
+   ingredients:["400g lamb mince","4 pitta breads","1 tsp ground cumin","1 tsp ground coriander","4 tbsp natural yoghurt","1 cucumber","1 tbsp olive oil"]},
+  {name:"Jacket Potatoes",          time:"45 min",protein:"veggie", cuisine:"british",seasons:["autumn","winter"],
+   description:"Fluffy jackets with cheese, beans, or tuna mayo.",
+   kidNote:"Soft inside, everyone picks their filling",
+   ingredients:["4 large baking potatoes","1 tin baked beans","1 tin tuna","100g cheddar cheese","3 tbsp mayonnaise","knob of butter"]},
+  {name:"Chicken & Veg Traybake",   time:"35 min",protein:"chicken",cuisine:"british",seasons:["autumn","winter"],
+   description:"Chicken drumsticks roasted with potatoes, peppers and courgette.",
+   kidNote:"Everything in one tray, easy finger food",
+   ingredients:["8 chicken drumsticks","500g baby potatoes","2 peppers","1 courgette","2 tbsp olive oil","1 tsp garlic granules","1 tsp smoked paprika"]},
+  {name:"Beef Tacos",               time:"25 min",protein:"beef",   cuisine:"mexican",
+   description:"Seasoned beef mince in taco shells with cheese, lettuce and salsa.",
+   kidNote:"Crunchy shells are fun for kids",
+   ingredients:["400g beef mince","8 taco shells","1 pack taco seasoning","1 little gem lettuce","80g cheddar cheese","4 tbsp salsa","4 tbsp sour cream"]},
+  {name:"Veggie Curry & Naan",      time:"30 min",protein:"veggie", cuisine:"indian",  seasons:["autumn","winter"],
+   description:"Mild chickpea and sweet potato curry with naan bread.",
+   kidNote:"Sweet, mild, great with naan for dipping",
+   ingredients:["1 tin chickpeas","1 sweet potato","400g tin coconut milk","2 tbsp korma paste","100g spinach","4 naan breads","250g rice"]},
+  {name:"Pasta al Forno",           time:"40 min",protein:"beef",   cuisine:"italian",seasons:["autumn","winter"],
+   description:"Baked rigatoni with a rich meat sauce and bubbly mozzarella.",
+   kidNote:"Cheesy, saucy pasta — always a hit",
+   ingredients:["400g rigatoni","400g beef mince","400g tin chopped tomatoes","125g mozzarella","1 onion","1 tsp dried oregano","1 tbsp olive oil"]},
+  {name:"Sticky Chicken Drumsticks",time:"35 min",protein:"chicken",cuisine:"asian",
+   description:"Honey-soy drumsticks with rice and steamed broccoli.",
+   kidNote:"Sweet glaze kids love, great for messy hands",
+   ingredients:["8 chicken drumsticks","2 tbsp honey","2 tbsp soy sauce","1 tbsp ketchup","250g rice","1 head broccoli"]},
 ];
 
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-const WEEKEND = ["Saturday", "Sunday"];
-const EMOJIS = { Monday: "🍝", Tuesday: "🥘", Wednesday: "🐟", Thursday: "🍗", Friday: "🌮", Saturday: "🥩", Sunday: "🍕" };
-
-const P = {
-  bg: "#FAFAF7", card: "#FFF", accent: "#E07A5F", accentLight: "#F4D1C7",
-  accentDark: "#C25B3F", green: "#81B29A", greenLight: "#D4EDDA", greenDark: "#5A8A6E",
-  text: "#2D3436", muted: "#636E72", border: "#E8E4DF", shadow: "0 2px 16px rgba(0,0,0,0.06)",
-};
-
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
-  return a;
+// ── Smart selection ───────────────────────────────────────────────────────────
+function getSeason() {
+  const m = new Date().getMonth();
+  if (m >= 2 && m <= 4) return 'spring';
+  if (m >= 5 && m <= 7) return 'summer';
+  if (m >= 8 && m <= 10) return 'autumn';
+  return 'winter';
 }
 
+function smartPick(pool, count, { history, favourites, dislikes }) {
+  if (count <= 0) return [];
+  const season = getSeason();
+  const now = Date.now();
+  const WEEK = 7 * 24 * 60 * 60 * 1000;
+
+  const available = pool.filter(m => !dislikes.includes(m.name));
+  const source = available.length >= count ? available : pool; // fall back if all disliked
+
+  const scored = source.map(m => {
+    let s = 1;
+    const uses = history.filter(h => h.name === m.name);
+    if (uses.length) {
+      const weeksAgo = (now - Math.max(...uses.map(h => h.date))) / WEEK;
+      if      (weeksAgo < 1.5) s *= 0.02; // very recently used — nearly excluded
+      else if (weeksAgo < 3)   s *= 0.2;
+      else if (weeksAgo < 5)   s *= 0.55;
+    }
+    if (favourites.includes(m.name))           s *= 2.5;  // boost favourites
+    if (m.seasons && m.seasons.includes(season)) s *= 1.4; // boost seasonal
+    return { m, s };
+  });
+
+  const selected = [];
+  const usedP = {}; // protein type counts
+  const usedC = {}; // cuisine counts
+
+  for (let i = 0; i < count; i++) {
+    const remaining = scored.filter(x => !selected.some(s => s.name === x.m.name));
+    if (!remaining.length) break;
+
+    const adjusted = remaining.map(({ m, s }) => {
+      let w = Math.max(s, 0.001);
+      const pc = usedP[m.protein] || 0;
+      const cc = usedC[m.cuisine]  || 0;
+      if (pc >= 2) w *= 0.08; else if (pc === 1) w *= 0.5;  // protein balance
+      if (cc >= 2) w *= 0.12; else if (cc === 1) w *= 0.6;  // cuisine variety
+      return { m, w: Math.max(w, 0.001) };
+    });
+
+    const total = adjusted.reduce((a, x) => a + x.w, 0);
+    let rand = Math.random() * total;
+    let chosen = adjusted[adjusted.length - 1].m;
+    for (const { m, w } of adjusted) { rand -= w; if (rand <= 0) { chosen = m; break; } }
+
+    selected.push(chosen);
+    usedP[chosen.protein] = (usedP[chosen.protein] || 0) + 1;
+    usedC[chosen.cuisine]  = (usedC[chosen.cuisine]  || 0) + 1;
+  }
+
+  return selected;
+}
+
+// ── App ───────────────────────────────────────────────────────────────────────
 function App() {
-  const [step, setStep] = useState("nights");
-  const [numGousto, setNumGousto] = useState(null);
+  const [step,       setStep]       = useState("nights");
+  const [numGousto,  setNumGousto]  = useState(null);
   const [goustoDays, setGoustoDays] = useState([]);
-  const [pantry, setPantry] = useState("");
-  const [plan, setPlan] = useState(null);
-  const [shopList, setShopList] = useState(null);
-  const [checked, setChecked] = useState({});
+  const [pantry,     setPantry]     = useState(() => load(SK.PANTRY, ""));
+  const [plan,       setPlan]       = useState(null);
+  const [shopList,   setShopList]   = useState(null);
+  const [checked,    setChecked]    = useState({});
+  const [history,    setHistory]    = useState(() => load(SK.HISTORY, []));
+  const [favourites, setFavourites] = useState(() => load(SK.FAVS, []));
+  const [dislikes,   setDislikes]   = useState(() => load(SK.DISLIKES, []));
+  const [savedState, setSavedState] = useState(() => load(SK.STATE, null));
+  const [toast,      setToast]      = useState(null);
+  const [showPrefs,  setShowPrefs]  = useState(false);
 
-  const scrollTop = () => setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100);
-  const mealDays = DAYS.filter(d => !goustoDays.includes(d));
+  const scrollTop = () => setTimeout(() => window.scrollTo({ top:0, behavior:"smooth" }), 50);
 
-  const generate = () => {
-    const wkday = mealDays.filter(d => !WEEKEND.includes(d));
-    const wkend = mealDays.filter(d => WEEKEND.includes(d));
-    const meals = [];
-    shuffle(WEEKDAY_MEALS).slice(0, wkday.length).forEach((m, i) => meals.push({ ...m, day: wkday[i] }));
-    shuffle(WEEKEND_MEALS).slice(0, wkend.length).forEach((m, i) => meals.push({ ...m, day: wkend[i] }));
-    const p = { meals };
-    setPlan(p);
-    buildShop(p);
-    setStep("plan");
-    scrollTop();
+  const showToast = msg => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2500);
   };
 
   const buildShop = (p) => {
-    const all = {};
     const pw = pantry.toLowerCase().split(/[,\n]/).map(s => s.trim()).filter(Boolean);
+    const all = {};
     p.meals.forEach(m => m.ingredients.forEach(ing => {
       const k = ing.toLowerCase().trim();
       if (!pw.some(w => k.includes(w)) && !all[k]) all[k] = { name: ing };
     }));
-    setShopList(Object.values(all));
-    setChecked({});
+    return Object.values(all);
   };
 
-  const swap = (day) => {
+  const mealDays = DAYS.filter(d => !goustoDays.includes(d));
+
+  const generate = () => {
+    const wkday = mealDays.filter(d => !WEEKEND.includes(d));
+    const wkend = mealDays.filter(d =>  WEEKEND.includes(d));
+
+    const wkdayPicks = smartPick(WEEKDAY_MEALS, wkday.length, { history, favourites, dislikes });
+    const wkendPicks = smartPick(WEEKEND_MEALS, wkend.length, { history, favourites, dislikes });
+
+    const meals = [
+      ...wkdayPicks.map((m, i) => ({ ...m, day: wkday[i] })),
+      ...wkendPicks.map((m, i) => ({ ...m, day: wkend[i] })),
+    ];
+    const newPlan = { meals };
+    const newShop = buildShop(newPlan);
+
+    setPlan(newPlan);
+    setShopList(newShop);
+    setChecked({});
+    setStep("plan");
+
+    // Record history — trim to last 60 days
+    const now = Date.now();
+    const newHistory = [
+      ...history,
+      ...meals.map(m => ({ name: m.name, date: now })),
+    ].filter(h => now - h.date < 60 * 24 * 60 * 60 * 1000);
+    setHistory(newHistory);
+    save(SK.HISTORY, newHistory);
+    save(SK.PANTRY, pantry);
+
+    const ns = { numGousto, goustoDays, plan: newPlan, shopList: newShop };
+    setSavedState(ns);
+    save(SK.STATE, ns);
+
+    scrollTop();
+  };
+
+  const swap = (day, extraDislikes = []) => {
     const pool = WEEKEND.includes(day) ? WEEKEND_MEALS : WEEKDAY_MEALS;
     const used = plan.meals.map(m => m.name);
-    const avail = pool.filter(m => !used.includes(m.name));
-    if (!avail.length) return;
+    const allD = [...dislikes, ...extraDislikes];
+    const avail = pool.filter(m => !used.includes(m.name) && !allD.includes(m.name));
+    if (!avail.length) { showToast("No more meals to swap to!"); return; }
     const r = avail[Math.floor(Math.random() * avail.length)];
     const newPlan = { meals: plan.meals.map(m => m.day === day ? { ...r, day } : m) };
+    const newShop = buildShop(newPlan);
     setPlan(newPlan);
-    buildShop(newPlan);
+    setShopList(newShop);
+    const ns = { ...savedState, plan: newPlan, shopList: newShop };
+    setSavedState(ns);
+    save(SK.STATE, ns);
+    showToast(`Swapped to ${r.name}`);
   };
 
-  const reset = () => { setStep("nights"); setNumGousto(null); setGoustoDays([]); setPantry(""); setPlan(null); setShopList(null); setChecked({}); scrollTop(); };
+  const toggleFav = name => {
+    const isFav = favourites.includes(name);
+    const nf = isFav ? favourites.filter(f => f !== name) : [...favourites, name];
+    setFavourites(nf);
+    save(SK.FAVS, nf);
+    showToast(isFav ? "Removed from favourites" : "Added to favourites ⭐");
+  };
 
+  const addDislike = name => {
+    const nd = [...dislikes, name];
+    setDislikes(nd);
+    save(SK.DISLIKES, nd);
+    showToast("Won't suggest this again");
+    const mealDay = plan?.meals.find(m => m.name === name)?.day;
+    if (mealDay) swap(mealDay, [name]);
+  };
+
+  const removeDislike = name => {
+    const nd = dislikes.filter(d => d !== name);
+    setDislikes(nd);
+    save(SK.DISLIKES, nd);
+    showToast("Restored ✓");
+  };
+
+  const restoreSaved = () => {
+    if (!savedState) return;
+    setNumGousto(savedState.numGousto);
+    setGoustoDays(savedState.goustoDays || []);
+    setPlan(savedState.plan);
+    setShopList(savedState.shopList);
+    setChecked({});
+    setStep("plan");
+    scrollTop();
+  };
+
+  const reset = () => {
+    setSavedState(null);
+    save(SK.STATE, null);
+    setStep("nights");
+    setNumGousto(null);
+    setGoustoDays([]);
+    setPantry(load(SK.PANTRY, ""));
+    setPlan(null);
+    setShopList(null);
+    setChecked({});
+    scrollTop();
+  };
+
+  // ── Shared UI atoms ──────────────────────────────────────────────────────
   const Btn = ({ sel, children, onClick }) => (
-    <button onClick={onClick} style={{ background: sel ? P.accent : P.card, color: sel ? "#fff" : P.text, border: `2px solid ${sel ? P.accent : P.border}`, borderRadius: "14px", padding: "16px 12px", fontSize: "15px", fontWeight: 600, fontFamily: "'DM Sans', sans-serif", cursor: "pointer", textAlign: "center", boxShadow: sel ? "0 4px 24px rgba(0,0,0,0.10)" : "none" }}>{children}</button>
-  );
-  const Primary = ({ disabled, children, onClick }) => (
-    <button disabled={disabled} onClick={onClick} style={{ background: disabled ? P.border : `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`, color: disabled ? P.muted : "#fff", border: "none", borderRadius: "14px", padding: "16px 32px", fontSize: "16px", fontWeight: 700, fontFamily: "'DM Sans', sans-serif", cursor: disabled ? "not-allowed" : "pointer", width: "100%", marginTop: "8px", boxShadow: disabled ? "none" : P.shadow }}>{children}</button>
-  );
-  const Secondary = ({ muted, children, onClick }) => (
-    <button onClick={onClick} style={{ background: "transparent", color: muted ? P.muted : P.accent, border: `2px solid ${muted ? P.border : P.accent}`, borderRadius: "14px", padding: "14px 24px", fontSize: "15px", fontWeight: 700, fontFamily: "'DM Sans', sans-serif", cursor: "pointer", width: "100%", marginTop: "10px" }}>{children}</button>
-  );
-  const Tag = ({ bg, color, children }) => (
-    <span style={{ display: "inline-block", background: bg, color, borderRadius: "8px", padding: "4px 10px", fontSize: "12px", fontWeight: 700, marginRight: "6px", marginBottom: "4px" }}>{children}</span>
+    <button onClick={onClick} style={{
+      background: sel ? P.accent : P.card, color: sel ? "#fff" : P.text,
+      border: `2px solid ${sel ? P.accent : P.border}`, borderRadius:"14px",
+      padding:"16px 12px", fontSize:"15px", fontWeight:600,
+      fontFamily:"'DM Sans',sans-serif", cursor:"pointer", textAlign:"center",
+      boxShadow: sel ? P.shadowMd : "none",
+    }}>{children}</button>
   );
 
-  const STEPS = ["nights", "gousto", "pantry", "plan", "shopping"];
+  const Primary = ({ disabled, children, onClick }) => (
+    <button disabled={disabled} onClick={onClick} style={{
+      background: disabled ? P.border : `linear-gradient(135deg,${P.accent},${P.accentDark})`,
+      color: disabled ? P.muted : "#fff", border:"none", borderRadius:"14px",
+      padding:"16px 32px", fontSize:"16px", fontWeight:700,
+      fontFamily:"'DM Sans',sans-serif", cursor: disabled ? "not-allowed" : "pointer",
+      width:"100%", marginTop:"8px", boxShadow: disabled ? "none" : P.shadow,
+    }}>{children}</button>
+  );
+
+  const Secondary = ({ muted, children, onClick }) => (
+    <button onClick={onClick} style={{
+      background:"transparent", color: muted ? P.muted : P.accent,
+      border:`2px solid ${muted ? P.border : P.accent}`, borderRadius:"14px",
+      padding:"14px 24px", fontSize:"15px", fontWeight:700,
+      fontFamily:"'DM Sans',sans-serif", cursor:"pointer", width:"100%", marginTop:"10px",
+    }}>{children}</button>
+  );
+
+  const Tag = ({ bg, color, children }) => (
+    <span style={{
+      display:"inline-block", background:bg, color, borderRadius:"8px",
+      padding:"4px 10px", fontSize:"12px", fontWeight:700, marginRight:"6px", marginBottom:"4px",
+    }}>{children}</span>
+  );
+
+  const season = getSeason();
+  const si = SEASON_INFO[season];
+  const STEPS = ["nights","gousto","pantry","plan","shopping"];
   const ci = STEPS.indexOf(step);
 
+  // ── Preferences screen ───────────────────────────────────────────────────
+  if (showPrefs) {
+    const ALL = [...WEEKDAY_MEALS, ...WEEKEND_MEALS];
+    const allFavs    = ALL.filter(m => favourites.includes(m.name));
+    const allDislikes = ALL.filter(m => dislikes.includes(m.name));
+    return (
+      <div>
+        <div style={{ background:`linear-gradient(135deg,${P.accent},${P.accentDark})`, color:"#fff", padding:"48px 24px 24px" }}>
+          <div style={{ maxWidth:"480px", margin:"0 auto", display:"flex", alignItems:"center", gap:"12px" }}>
+            <button onClick={() => setShowPrefs(false)} style={{ background:"rgba(255,255,255,0.2)", border:"none", color:"white", borderRadius:"10px", padding:"8px 14px", cursor:"pointer", fontSize:"15px", fontWeight:700 }}>← Back</button>
+            <h1 style={{ fontFamily:"'DM Serif Display',Georgia,serif", fontSize:"24px", margin:0 }}>Preferences</h1>
+          </div>
+        </div>
+        <div style={{ maxWidth:"480px", margin:"0 auto", padding:"24px 16px 100px" }}>
+
+          <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"18px", marginBottom:"10px" }}>⭐ Favourites ({allFavs.length})</div>
+          {allFavs.length === 0
+            ? <p style={{ color:P.muted, fontSize:"14px", marginBottom:"24px" }}>Tap ☆ on any meal to add it as a favourite. Favourites are picked more often.</p>
+            : allFavs.map(m => (
+              <div key={m.name} style={{ background:P.card, borderRadius:"12px", padding:"12px 16px", marginBottom:"8px", boxShadow:P.shadow, border:`1px solid ${P.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                <div>
+                  <div style={{ fontWeight:700, fontSize:"15px" }}>{m.name}</div>
+                  <div style={{ fontSize:"12px", color:P.muted }}>{m.time} · {m.cuisine} · {m.protein}</div>
+                </div>
+                <button onClick={() => { toggleFav(m.name); }} style={{ background:"none", border:"none", fontSize:"22px", cursor:"pointer", color:P.gold }}>★</button>
+              </div>
+          ))}
+
+          <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"18px", marginBottom:"10px", marginTop:"32px" }}>👎 Skipped ({allDislikes.length})</div>
+          {allDislikes.length === 0
+            ? <p style={{ color:P.muted, fontSize:"14px" }}>Tap 👎 on any meal to stop it from being suggested.</p>
+            : allDislikes.map(m => (
+              <div key={m.name} style={{ background:P.card, borderRadius:"12px", padding:"12px 16px", marginBottom:"8px", boxShadow:P.shadow, border:`1px solid ${P.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                <div>
+                  <div style={{ fontWeight:700, fontSize:"15px" }}>{m.name}</div>
+                  <div style={{ fontSize:"12px", color:P.muted }}>{m.time} · {m.cuisine} · {m.protein}</div>
+                </div>
+                <button onClick={() => removeDislike(m.name)} style={{ background:"none", border:`2px solid ${P.accent}`, color:P.accent, borderRadius:"8px", padding:"6px 12px", fontSize:"13px", cursor:"pointer", fontWeight:700 }}>Restore</button>
+              </div>
+          ))}
+
+          {(allFavs.length > 0 || allDislikes.length > 0) && (
+            <button onClick={() => {
+              if (window.confirm("Clear all favourites and skipped meals?")) {
+                setFavourites([]); setDislikes([]);
+                save(SK.FAVS,[]); save(SK.DISLIKES,[]);
+                showToast("Preferences cleared");
+              }
+            }} style={{ marginTop:"40px", color:P.muted, background:"none", border:"none", fontSize:"14px", cursor:"pointer", width:"100%", textAlign:"center" }}>
+              Clear all preferences
+            </button>
+          )}
+
+          <div style={{ marginTop:"48px", padding:"16px", background:P.card, borderRadius:"12px", border:`1px solid ${P.border}` }}>
+            <div style={{ fontSize:"13px", fontWeight:700, marginBottom:"6px" }}>About smart suggestions</div>
+            <div style={{ fontSize:"13px", color:P.muted, lineHeight:1.6 }}>
+              Meals used in the last 2 weeks are deprioritised. Favourites appear 2.5× more often. {si.label} meals get a seasonal boost. Protein types and cuisines are balanced across the week automatically.
+            </div>
+          </div>
+        </div>
+        {toast && <div className="toast">{toast}</div>}
+      </div>
+    );
+  }
+
+  // ── Main screens ─────────────────────────────────────────────────────────
   return (
     <div>
       {/* Header */}
-      <div style={{ background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`, color: "#fff", padding: "48px 24px 28px", textAlign: "center" }}>
-        <h1 style={{ fontFamily: "'DM Serif Display', Georgia, serif", fontSize: "28px", margin: 0 }}>Weekly Dinner Planner</h1>
-        <div style={{ fontSize: "14px", opacity: 0.85, marginTop: "6px" }}>Quick, kid-friendly meals for the family</div>
+      <div style={{ background:`linear-gradient(135deg,${P.accent},${P.accentDark})`, color:"#fff", padding:"48px 24px 24px" }}>
+        <div style={{ maxWidth:"480px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+          <div>
+            <h1 style={{ fontFamily:"'DM Serif Display',Georgia,serif", fontSize:"28px", margin:0, lineHeight:1.2 }}>Weekly Dinner Planner</h1>
+            <div style={{ fontSize:"14px", opacity:0.85, marginTop:"6px" }}>Quick, kid-friendly meals for the family</div>
+          </div>
+          <button onClick={() => setShowPrefs(true)} style={{ background:"rgba(255,255,255,0.2)", border:"none", color:"white", borderRadius:"10px", padding:"8px 10px", cursor:"pointer", fontSize:"18px", flexShrink:0, lineHeight:1 }}>⚙️</button>
+        </div>
       </div>
 
-      {/* Progress */}
-      <div style={{ display: "flex", gap: "6px", padding: "16px 24px", maxWidth: "480px", margin: "0 auto" }}>
-        {STEPS.map((s, i) => <div key={s} style={{ flex: 1, height: "4px", borderRadius: "2px", background: i < ci ? P.accent : i === ci ? P.accentLight : P.border }} />)}
-      </div>
+      {/* Progress bar — setup steps only */}
+      {ci < 3 && (
+        <div style={{ display:"flex", gap:"6px", padding:"16px 24px", maxWidth:"480px", margin:"0 auto" }}>
+          {[0,1,2].map(i => (
+            <div key={i} style={{ flex:1, height:"4px", borderRadius:"2px", background: i < ci ? P.accent : i === ci ? P.accentLight : P.border }} />
+          ))}
+        </div>
+      )}
 
-      <div style={{ maxWidth: "480px", margin: "0 auto", padding: "20px 16px 100px" }}>
+      <div style={{ maxWidth:"480px", margin:"0 auto", padding:"20px 16px 100px" }}>
 
+        {/* ── Step: nights ── */}
         {step === "nights" && (
           <div className="fade-in">
-            <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "1.5px", color: P.accent, fontWeight: 700, marginBottom: "6px" }}>Step 1 of 4</div>
-            <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: "22px", lineHeight: 1.3, marginBottom: "8px" }}>How many Gousto nights this week?</div>
-            <p style={{ fontSize: "14px", color: P.muted, marginBottom: "16px" }}>We'll plan the remaining {numGousto !== null ? 7 - numGousto : "..."} dinners for you.</p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "16px" }}>
-              {[0,1,2,3,4].map(n => <Btn key={n} sel={numGousto === n} onClick={() => setNumGousto(n)}>{n === 0 ? "None this week" : `${n} night${n > 1 ? "s" : ""}`}</Btn>)}
+            {/* Season banner */}
+            <div style={{ background:P.accentLight, borderRadius:"12px", padding:"12px 16px", marginBottom:"16px", fontSize:"13px", color:P.accentDark, fontWeight:600 }}>
+              {si.label} — {si.tip}
             </div>
-            <Primary disabled={numGousto === null} onClick={() => { numGousto === 0 ? (setGoustoDays([]), setStep("pantry")) : setStep("gousto"); scrollTop(); }}>Next</Primary>
+
+            {/* Resume card */}
+            {savedState?.plan && (
+              <div onClick={restoreSaved} style={{ background:P.card, borderRadius:"16px", padding:"16px 18px", marginBottom:"16px", boxShadow:P.shadow, border:`2px solid ${P.accent}`, cursor:"pointer" }}>
+                <div style={{ fontSize:"11px", color:P.accent, fontWeight:700, textTransform:"uppercase", letterSpacing:"1px", marginBottom:"4px" }}>Resume</div>
+                <div style={{ fontWeight:700, fontSize:"16px" }}>Continue last week's plan →</div>
+                <div style={{ fontSize:"13px", color:P.muted, marginTop:"2px" }}>{savedState.plan.meals.length} meals planned</div>
+              </div>
+            )}
+
+            <div style={{ fontSize:"11px", textTransform:"uppercase", letterSpacing:"1.5px", color:P.accent, fontWeight:700, marginBottom:"6px" }}>Step 1 of 3</div>
+            <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"22px", lineHeight:1.3, marginBottom:"8px" }}>How many Gousto nights this week?</div>
+            <p style={{ fontSize:"14px", color:P.muted, marginBottom:"16px" }}>We'll plan the remaining {numGousto !== null ? 7 - numGousto : "…"} dinners for you.</p>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginBottom:"16px" }}>
+              {[0,1,2,3,4].map(n => (
+                <Btn key={n} sel={numGousto === n} onClick={() => setNumGousto(n)}>
+                  {n === 0 ? "None this week" : `${n} night${n > 1 ? "s" : ""}`}
+                </Btn>
+              ))}
+            </div>
+            <Primary disabled={numGousto === null} onClick={() => {
+              if (numGousto === 0) { setGoustoDays([]); setStep("pantry"); }
+              else setStep("gousto");
+              scrollTop();
+            }}>Next</Primary>
           </div>
         )}
 
+        {/* ── Step: gousto days ── */}
         {step === "gousto" && (
           <div className="fade-in">
-            <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "1.5px", color: P.accent, fontWeight: 700, marginBottom: "6px" }}>Step 2 of 4</div>
-            <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: "22px", lineHeight: 1.3, marginBottom: "8px" }}>Which nights are Gousto?</div>
-            <p style={{ fontSize: "14px", color: P.muted, marginBottom: "16px" }}>Pick {numGousto} day{numGousto > 1 ? "s" : ""}. We'll plan meals for the other {7 - numGousto}.</p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "16px" }}>
-              {DAYS.map(d => <Btn key={d} sel={goustoDays.includes(d)} onClick={() => setGoustoDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : prev.length < numGousto ? [...prev, d] : prev)}>{d}</Btn>)}
+            <div style={{ fontSize:"11px", textTransform:"uppercase", letterSpacing:"1.5px", color:P.accent, fontWeight:700, marginBottom:"6px" }}>Step 2 of 3</div>
+            <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"22px", lineHeight:1.3, marginBottom:"8px" }}>Which nights are Gousto?</div>
+            <p style={{ fontSize:"14px", color:P.muted, marginBottom:"16px" }}>Pick {numGousto} day{numGousto > 1 ? "s" : ""}. We'll plan meals for the other {7 - numGousto}.</p>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginBottom:"16px" }}>
+              {DAYS.map(d => (
+                <Btn key={d} sel={goustoDays.includes(d)} onClick={() => setGoustoDays(prev =>
+                  prev.includes(d) ? prev.filter(x => x !== d) : prev.length < numGousto ? [...prev, d] : prev
+                )}>{d}</Btn>
+              ))}
             </div>
             <Primary disabled={goustoDays.length !== numGousto} onClick={() => { setStep("pantry"); scrollTop(); }}>Next</Primary>
             <Secondary onClick={() => { setStep("nights"); scrollTop(); }}>Back</Secondary>
           </div>
         )}
 
+        {/* ── Step: pantry ── */}
         {step === "pantry" && (
           <div className="fade-in">
-            <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "1.5px", color: P.accent, fontWeight: 700, marginBottom: "6px" }}>Step 3 of 4</div>
-            <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: "22px", lineHeight: 1.3, marginBottom: "8px" }}>What do you already have at home?</div>
-            <p style={{ fontSize: "14px", color: P.muted, marginBottom: "16px" }}>We'll leave these off the shopping list. Or just skip this.</p>
-            <textarea style={{ width: "100%", padding: "14px 16px", border: `2px solid ${P.border}`, borderRadius: "14px", fontSize: "15px", fontFamily: "'DM Sans', sans-serif", boxSizing: "border-box", marginBottom: "8px", resize: "vertical", minHeight: "80px", outline: "none" }}
-              placeholder="e.g. chicken, pasta, rice, tinned tomatoes, onions, cheese..."
-              value={pantry} onChange={e => setPantry(e.target.value)} />
+            <div style={{ fontSize:"11px", textTransform:"uppercase", letterSpacing:"1.5px", color:P.accent, fontWeight:700, marginBottom:"6px" }}>Step 3 of 3</div>
+            <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"22px", lineHeight:1.3, marginBottom:"8px" }}>What do you already have at home?</div>
+            <p style={{ fontSize:"14px", color:P.muted, marginBottom:"16px" }}>We'll leave these off the shopping list. Or just skip this.</p>
+            <textarea
+              style={{ width:"100%", padding:"14px 16px", border:`2px solid ${P.border}`, borderRadius:"14px", fontSize:"15px", fontFamily:"'DM Sans',sans-serif", marginBottom:"8px", resize:"vertical", minHeight:"80px" }}
+              placeholder="e.g. chicken, pasta, rice, tinned tomatoes, onions, cheese…"
+              value={pantry}
+              onChange={e => setPantry(e.target.value)}
+            />
             <Primary onClick={generate}>Generate Meal Plan</Primary>
             <Secondary onClick={() => { setStep(numGousto === 0 ? "nights" : "gousto"); scrollTop(); }}>Back</Secondary>
           </div>
         )}
 
+        {/* ── Step: plan ── */}
         {step === "plan" && plan && (
           <div className="fade-in">
-            <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "1.5px", color: P.accent, fontWeight: 700, marginBottom: "6px" }}>Your week</div>
-            <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: "22px", lineHeight: 1.3, marginBottom: "8px" }}>Here's the plan</div>
-            <p style={{ fontSize: "13px", color: P.muted, marginBottom: "16px" }}>Tap 🔄 on any meal to swap it.</p>
+            <div style={{ fontSize:"11px", textTransform:"uppercase", letterSpacing:"1.5px", color:P.accent, fontWeight:700, marginBottom:"6px" }}>Your week</div>
+            <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"22px", lineHeight:1.3, marginBottom:"4px" }}>Here's the plan</div>
+            <p style={{ fontSize:"13px", color:P.muted, marginBottom:"16px" }}>☆ favourite &nbsp;·&nbsp; 🔄 swap &nbsp;·&nbsp; 👎 skip forever</p>
 
             {DAYS.map(day => {
               if (goustoDays.includes(day)) return (
-                <div key={day} style={{ background: P.card, borderRadius: "16px", padding: "16px 18px", marginBottom: "10px", boxShadow: P.shadow, border: `1px solid ${P.border}`, display: "flex", gap: "14px", opacity: 0.6 }}>
-                  <div style={{ fontSize: "28px" }}>📦</div>
+                <div key={day} style={{ background:P.card, borderRadius:"16px", padding:"16px 18px", marginBottom:"10px", boxShadow:P.shadow, border:`1px solid ${P.border}`, display:"flex", gap:"14px", opacity:0.55 }}>
+                  <div style={{ fontSize:"28px" }}>📦</div>
                   <div>
-                    <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: "13px", color: P.accent, textTransform: "uppercase", marginBottom: "4px" }}>{day}</div>
-                    <div style={{ fontWeight: 700, fontSize: "16px", marginBottom: "4px" }}>Gousto</div>
-                    <div style={{ fontSize: "13px", color: P.muted }}>Meal kit — sorted!</div>
+                    <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"13px", color:P.accent, textTransform:"uppercase", marginBottom:"4px" }}>{day}</div>
+                    <div style={{ fontWeight:700, fontSize:"16px", marginBottom:"2px" }}>Gousto</div>
+                    <div style={{ fontSize:"13px", color:P.muted }}>Meal kit — sorted!</div>
                   </div>
                 </div>
               );
+
               const meal = plan.meals.find(m => m.day === day);
               if (!meal) return null;
+              const isFav      = favourites.includes(meal.name);
+              const isSeasonal = meal.seasons && meal.seasons.includes(season);
+
               return (
-                <div key={day} style={{ background: P.card, borderRadius: "16px", padding: "16px 18px", marginBottom: "10px", boxShadow: P.shadow, border: `1px solid ${P.border}`, display: "flex", gap: "14px" }}>
-                  <div style={{ fontSize: "28px", flexShrink: 0 }}>{EMOJIS[day] || "🍽️"}</div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: "13px", color: P.accent, textTransform: "uppercase" }}>{day}</div>
-                      <button onClick={() => swap(day)} style={{ background: "none", border: "none", fontSize: "18px", cursor: "pointer", padding: "4px" }}>🔄</button>
-                    </div>
-                    <div style={{ fontWeight: 700, fontSize: "16px", lineHeight: 1.3, marginBottom: "4px" }}>{meal.name}</div>
-                    <div style={{ fontSize: "13px", color: P.muted, lineHeight: 1.4 }}>{meal.description}</div>
-                    <div style={{ marginTop: "6px" }}>
-                      <Tag bg={P.accentLight} color={P.accentDark}>{meal.time}</Tag>
-                      {meal.kidNote && <Tag bg={P.greenLight} color={P.greenDark}>👶 {meal.kidNote}</Tag>}
+                <div key={day} style={{ background:P.card, borderRadius:"16px", padding:"16px 18px", marginBottom:"10px", boxShadow:P.shadow, border:`2px solid ${isFav ? P.gold : P.border}`, transition:"border-color 0.2s" }}>
+                  <div style={{ display:"flex", gap:"14px" }}>
+                    <div style={{ fontSize:"28px", flexShrink:0 }}>{EMOJIS[day] || "🍽️"}</div>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"2px" }}>
+                        <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"13px", color:P.accent, textTransform:"uppercase" }}>{day}</div>
+                        <div style={{ display:"flex", gap:"0px" }}>
+                          <button onClick={() => toggleFav(meal.name)} style={{ background:"none", border:"none", fontSize:"20px", cursor:"pointer", padding:"4px 6px", lineHeight:1, color: isFav ? P.gold : P.muted }} title="Favourite">{isFav ? "★" : "☆"}</button>
+                          <button onClick={() => swap(day)}            style={{ background:"none", border:"none", fontSize:"18px", cursor:"pointer", padding:"4px 6px", lineHeight:1 }} title="Swap">🔄</button>
+                          <button onClick={() => addDislike(meal.name)} style={{ background:"none", border:"none", fontSize:"18px", cursor:"pointer", padding:"4px 6px", lineHeight:1 }} title="Don't suggest again">👎</button>
+                        </div>
+                      </div>
+                      <div style={{ fontWeight:700, fontSize:"16px", lineHeight:1.3, marginBottom:"4px" }}>{meal.name}</div>
+                      <div style={{ fontSize:"13px", color:P.muted, lineHeight:1.5 }}>{meal.description}</div>
+                      <div style={{ marginTop:"8px" }}>
+                        <Tag bg={P.accentLight}  color={P.accentDark}>{meal.time}</Tag>
+                        {isSeasonal && <Tag bg="#EDF7ED" color="#2E7D32">{si.label}</Tag>}
+                        {isFav      && <Tag bg={P.goldLight} color={P.gold}>⭐ Favourite</Tag>}
+                        {meal.kidNote && <Tag bg={P.greenLight} color={P.greenDark}>👶 {meal.kidNote}</Tag>}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -245,34 +658,58 @@ function App() {
           </div>
         )}
 
+        {/* ── Step: shopping ── */}
         {step === "shopping" && shopList && (
           <div className="fade-in">
-            <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "1.5px", color: P.accent, fontWeight: 700, marginBottom: "6px" }}>Shopping list</div>
-            <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: "22px", lineHeight: 1.3, marginBottom: "16px" }}>
+            <div style={{ fontSize:"11px", textTransform:"uppercase", letterSpacing:"1.5px", color:P.accent, fontWeight:700, marginBottom:"6px" }}>Shopping list</div>
+            <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"22px", lineHeight:1.3, marginBottom:"16px" }}>
               {Object.keys(checked).filter(k => checked[k]).length} of {shopList.length} items
             </div>
-            <div style={{ background: P.card, borderRadius: "16px", padding: "8px 20px", marginBottom: "12px", boxShadow: P.shadow, border: `1px solid ${P.border}` }}>
+
+            <div style={{ background:P.card, borderRadius:"16px", padding:"8px 20px", marginBottom:"12px", boxShadow:P.shadow, border:`1px solid ${P.border}` }}>
               {shopList.map((item, i) => (
-                <div key={i} onClick={() => setChecked(prev => ({ ...prev, [i]: !prev[i] }))}
-                  style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 0", borderBottom: i < shopList.length - 1 ? `1px solid ${P.border}` : "none", cursor: "pointer" }}>
-                  <div style={{ width: "26px", height: "26px", borderRadius: "8px", border: `2px solid ${checked[i] ? P.green : P.border}`, background: checked[i] ? P.greenLight : "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: "14px", color: P.greenDark, fontWeight: 700 }}>
+                <div key={i}
+                  onClick={() => setChecked(prev => ({ ...prev, [i]: !prev[i] }))}
+                  style={{ display:"flex", alignItems:"center", gap:"12px", padding:"12px 0", borderBottom: i < shopList.length - 1 ? `1px solid ${P.border}` : "none", cursor:"pointer" }}>
+                  <div style={{ width:"26px", height:"26px", borderRadius:"8px", border:`2px solid ${checked[i] ? P.green : P.border}`, background: checked[i] ? P.greenLight : "#fff", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:"14px", color:P.greenDark, fontWeight:700 }}>
                     {checked[i] ? "✓" : ""}
                   </div>
-                  <div style={{ fontSize: "15px", textDecoration: checked[i] ? "line-through" : "none", color: checked[i] ? P.muted : P.text, flex: 1 }}>{item.name}</div>
+                  <div style={{ fontSize:"15px", textDecoration: checked[i] ? "line-through" : "none", color: checked[i] ? P.muted : P.text, flex:1 }}>{item.name}</div>
                 </div>
               ))}
             </div>
-            <Primary onClick={() => { const u = shopList.filter((_, i) => !checked[i]).map(x => x.name); navigator.clipboard && navigator.clipboard.writeText(u.join("\n")).then(() => alert("Shopping list copied!")); }}>Copy Remaining Items</Primary>
+
+            <Primary onClick={() => {
+              const remaining = shopList.filter((_,i) => !checked[i]).map(x => x.name);
+              if (navigator.share) {
+                navigator.share({ title:"Shopping List", text: remaining.join("\n") }).catch(() => {});
+              } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(remaining.join("\n")).then(() => showToast("Copied to clipboard!"));
+              } else {
+                showToast("Copy not supported on this browser");
+              }
+            }}>Share / Copy Remaining</Primary>
             <Secondary onClick={() => { setStep("plan"); scrollTop(); }}>Back to Meals</Secondary>
             <Secondary muted onClick={reset}>Plan Another Week</Secondary>
           </div>
         )}
+
       </div>
+
+      {toast && <div className="toast">{toast}</div>}
     </div>
   );
 }
 
 ReactDOM.createRoot(document.getElementById("app")).render(<App />);
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
 </script>
 </body>
 </html>

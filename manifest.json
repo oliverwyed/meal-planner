@@ -1,0 +1,14 @@
+{
+  "name": "Weekly Dinner Planner",
+  "short_name": "Meal Planner",
+  "description": "Smart weekly dinner planner for families — seasonal, no repeats, kid-friendly.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FAFAF7",
+  "theme_color": "#E07A5F",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
