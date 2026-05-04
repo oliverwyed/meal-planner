@@ -839,6 +839,10 @@ function App() {
   useEffect(()=>{ save(SK.FAMILY, familySize); }, [familySize]);
   useEffect(()=>{ save(SK.FILTER, timeFilter); }, [timeFilter]);
   useEffect(()=>{ save(SK.KIDS_CFG, kidsConfig); }, [kidsConfig]);
+  useEffect(()=>{
+    document.body.style.overflow = cookNow ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [cookNow]);
 
   const scrollTop = () => setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}), 50);
   const showToast = msg => { setToast(msg); setTimeout(()=>setToast(null), 2600); };
