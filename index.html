@@ -972,16 +972,17 @@ function HelpScreen({ onClose }) {
   );
 }
 
-function PrefsScreen({ favourites, dislikes, customMeals, mealHistory, familySize, pantry,
+function PrefsScreen({ favourites, dislikes, customMeals, mealHistory, savedState, familySize, pantry,
                        onToggleFav, onRemoveDislike, onAddDislike, onAddCustom, onDeleteCustom,
-                       onClearAll, onImport, onClose, showToast }) {
+                       onClearAll, onClearHistory, onImport, onClose, showToast }) {
   const [adding, setAdding] = useState(false);
   const [search, setSearch] = useState('');
   const [importCode, setImportCode] = useState('');
+  const [expandedMeal, setExpandedMeal] = useState(null);
 
   const handleExport = () => {
     const data = JSON.stringify({ v:1, exported:new Date().toISOString(),
-      favourites, dislikes, pantry, familySize, customMeals });
+      favourites, dislikes, pantry, familySize, customMeals, savedState, mealHistory });
     const code = btoa(encodeURIComponent(data));
     if(navigator.share) {
       navigator.share({ title:'My Meal Planner Profile', text:code })
@@ -1002,8 +1003,10 @@ function PrefsScreen({ favourites, dislikes, customMeals, mealHistory, familySiz
       if(data.dislikes&&data.dislikes.length) parts.push(data.dislikes.length+' skipped meal'+(data.dislikes.length===1?'':'s'));
       if(data.customMeals&&data.customMeals.length) parts.push(data.customMeals.length+' custom meal'+(data.customMeals.length===1?'':'s'));
       if(data.pantry) parts.push('pantry list');
+      if(data.mealHistory&&data.mealHistory.length) parts.push(data.mealHistory.length+' history entries');
+      if(data.savedState) parts.push('current week plan');
       const summary = parts.length ? parts.join(', ') : 'an empty profile';
-      if(window.confirm('Import '+summary+'?\n\nThis will replace your current favourites, skipped meals, pantry and custom recipes.')) {
+      if(window.confirm('Import '+summary+'?\n\nThis will replace your current favourites, skipped meals, pantry, custom recipes, cook history and plan.')) {
         onImport(data);
         setImportCode('');
       }
@@ -1064,28 +1067,52 @@ function PrefsScreen({ favourites, dislikes, customMeals, mealHistory, familySiz
         {q.length>0 && q.length<2 && <p style={{ color:P.muted, fontSize:"13px", margin:"4px 0 8px" }}>Keep typing…</p>}
         {searchResults.length>0 && searchResults.map(m=>{
           const isFav=favourites.includes(m.name), isSkipped=dislikes.includes(m.name);
+          const isOpen=expandedMeal===m.name;
+          const scale=familySize/(m.serves||4);
+          const ing=scaledIngredients(m.ingredients,scale);
           return (
-            <div key={m.name} style={{ background:P.card, borderRadius:"12px", padding:"11px 14px", marginBottom:"6px",
-              boxShadow:P.shadow, border:`1px solid ${isSkipped?P.border:isFav?P.gold:P.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-              <div style={{ flex:1, minWidth:0, marginRight:"10px" }}>
-                <div style={{ fontWeight:700, fontSize:"14px", lineHeight:1.3 }}>{m.name}</div>
-                <div style={{ fontSize:"12px", color:P.muted, marginTop:"2px" }}>{m.time} · {m.cuisine} · {m.protein}{m.adult?" · adults":"" }</div>
+            <div key={m.name} style={{ background:P.card, borderRadius:"12px", marginBottom:"6px",
+              boxShadow:P.shadow, border:`1px solid ${isFav?P.gold:P.border}`, overflow:"hidden" }}>
+              <div style={{ padding:"11px 14px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                <div style={{ flex:1, minWidth:0, marginRight:"10px", cursor:"pointer" }} onClick={()=>setExpandedMeal(isOpen?null:m.name)}>
+                  <div style={{ fontWeight:700, fontSize:"14px", lineHeight:1.3 }}>{m.name}</div>
+                  <div style={{ fontSize:"12px", color:P.muted, marginTop:"2px" }}>{m.time} · {m.cuisine} · {m.protein}{m.adult?" · adults":""}</div>
+                  <div style={{ fontSize:"11px", color:P.accent, fontWeight:600, marginTop:"3px" }}>{isOpen?"▲ Hide recipe":"▼ View recipe"}</div>
+                </div>
+                <div style={{ display:"flex", gap:"6px", flexShrink:0 }}>
+                  <button onClick={()=>onToggleFav(m.name)}
+                    aria-label={isFav?"Remove from favourites":"Add to favourites"}
+                    style={{ background:isFav?P.goldLight:"transparent", border:`1.5px solid ${isFav?P.gold:P.border}`,
+                      borderRadius:"8px", padding:"5px 10px", fontSize:"16px", cursor:"pointer", color:isFav?P.gold:P.muted }}>
+                    {isFav?"★":"☆"}
+                  </button>
+                  <button onClick={()=>isSkipped?onRemoveDislike(m.name):onAddDislike(m.name)}
+                    aria-label={isSkipped?"Restore meal":"Skip this meal"}
+                    style={{ background:isSkipped?P.accentLight:"transparent", border:`1.5px solid ${isSkipped?P.accent:P.border}`,
+                      borderRadius:"8px", padding:"5px 10px", fontSize:"14px", cursor:"pointer",
+                      color:isSkipped?P.accentDark:P.muted, fontWeight:isSkipped?700:400 }}>
+                    {isSkipped?"✕ Skipped":"👎"}
+                  </button>
+                </div>
               </div>
-              <div style={{ display:"flex", gap:"6px", flexShrink:0 }}>
-                <button onClick={()=>onToggleFav(m.name)}
-                  aria-label={isFav?"Remove from favourites":"Add to favourites"}
-                  style={{ background:isFav?P.goldLight:"transparent", border:`1.5px solid ${isFav?P.gold:P.border}`,
-                    borderRadius:"8px", padding:"5px 10px", fontSize:"16px", cursor:"pointer", color:isFav?P.gold:P.muted }}>
-                  {isFav?"★":"☆"}
-                </button>
-                <button onClick={()=>isSkipped?onRemoveDislike(m.name):onAddDislike(m.name)}
-                  aria-label={isSkipped?"Restore meal":"Skip this meal"}
-                  style={{ background:isSkipped?P.accentLight:"transparent", border:`1.5px solid ${isSkipped?P.accent:P.border}`,
-                    borderRadius:"8px", padding:"5px 10px", fontSize:"14px", cursor:"pointer",
-                    color:isSkipped?P.accentDark:P.muted, fontWeight:isSkipped?700:400 }}>
-                  {isSkipped?"✕ Skipped":"👎"}
-                </button>
-              </div>
+              {isOpen && (
+                <div style={{ borderTop:`1px solid ${P.border}`, padding:"12px 14px 14px", background:P.bg }}>
+                  <div style={{ fontSize:"11px", fontWeight:700, color:P.muted, letterSpacing:"1.2px", textTransform:"uppercase", marginBottom:"6px" }}>Ingredients — serves {familySize}</div>
+                  <ul style={{ paddingLeft:"18px", marginBottom:"14px" }}>
+                    {ing.map((x,i)=>{var cn=getCookedNote(x.label,x.qty);return<li key={i} style={{ fontSize:"13px", lineHeight:1.6 }}>{x.display}{cn&&<span style={{ fontSize:"11px", color:P.muted, marginLeft:"4px" }}>({cn})</span>}</li>;})}
+                  </ul>
+                  {m.steps&&m.steps.length>0&&<>
+                    <div style={{ fontSize:"11px", fontWeight:700, color:P.muted, letterSpacing:"1.2px", textTransform:"uppercase", marginBottom:"6px" }}>Recipe</div>
+                    <ol style={{ paddingLeft:"18px" }}>
+                      {m.steps.map((s,i)=><li key={i} style={{ fontSize:"13px", lineHeight:1.6, marginBottom:"5px" }}>{s}</li>)}
+                    </ol>
+                  </>}
+                  {m.tip&&<div style={{ marginTop:"12px", background:P.goldLight, borderRadius:"8px", padding:"10px 12px", display:"flex", gap:"8px", alignItems:"flex-start" }}>
+                    <span style={{ fontSize:"14px", flexShrink:0 }}>👨‍🍳</span>
+                    <div style={{ fontSize:"12px", lineHeight:1.5, color:"#5a4200" }}>{m.tip}</div>
+                  </div>}
+                </div>
+              )}
             </div>
           );
         })}
@@ -1326,6 +1353,8 @@ function App() {
     if(data.pantry!==undefined){setPantry(data.pantry);save(SK.PANTRY,data.pantry);}
     if(data.familySize){setFamilySize(data.familySize);save(SK.FAMILY,data.familySize);}
     if(data.customMeals){setCustomMeals(data.customMeals);save(SK.CUSTOM,data.customMeals);}
+    if(data.mealHistory){setMealHistory(data.mealHistory);save(SK.HISTORY,data.mealHistory);}
+    if(data.savedState){setSavedState(data.savedState);save(SK.STATE,data.savedState);}
     showToast("Profile imported ✓");
   };
   const pickCookNow = () => {
@@ -1407,10 +1436,11 @@ function App() {
   if(showPrefs) return (
     <>
       <PrefsScreen favourites={favourites} dislikes={dislikes} customMeals={customMeals}
-        mealHistory={mealHistory} familySize={familySize} pantry={pantry}
+        mealHistory={mealHistory} savedState={savedState} familySize={familySize} pantry={pantry}
         onToggleFav={toggleFav} onRemoveDislike={removeDislike} onAddDislike={addDislike}
         onAddCustom={addCustom} onDeleteCustom={deleteCustom}
         onClearAll={()=>{setFavourites([]);setDislikes([]);save(SK.FAVS,[]);save(SK.DISLIKES,[]);showToast("Cleared");}}
+        onClearHistory={()=>{setMealHistory([]);save(SK.HISTORY,[]);showToast("History cleared");}}
         onImport={importProfile} onClose={()=>setShowPrefs(false)} showToast={showToast} />
       {toast&&<div className="toast">{toast}</div>}
     </>
