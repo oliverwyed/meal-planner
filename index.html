@@ -45,7 +45,7 @@ textarea,input,select{font-family:'DM Sans',sans-serif}
 <script>
 /* ── Data & Utilities (plain JS, not Babel-compiled) ─────────────────────── */
 var SK={HISTORY:'mp_history',FAVS:'mp_favs',DISLIKES:'mp_dislikes',PANTRY:'mp_pantry',
-        STATE:'mp_state',CUSTOM:'mp_custom',FAMILY:'mp_family',FILTER:'mp_filter',DAYS_CFG:'mp_days_cfg'};
+        STATE:'mp_state',CUSTOM:'mp_custom',FAMILY:'mp_family',FILTER:'mp_filter',DAYS_CFG:'mp_days_cfg',KIDS_CFG:'mp_kids_cfg'};
 function load(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 
@@ -223,7 +223,25 @@ var WEEKDAY_MEALS=[
  description:"Tender strips of chicken and creamy butter beans simmered in a smoky, paprika-rich tomato broth — a one-pan stew that tastes like it's been slow-cooking all afternoon. Brilliant with crusty bread for mopping.",kidNote:"Butter beans are soft and mild — most children enjoy them once they're part of a saucy, familiar-tasting dish",
  ingredients:["3 chicken breasts","2 tins butter beans","400g tin chopped tomatoes","2 tsp smoked paprika","1 onion","1 tbsp olive oil","1 tsp garlic granules","bread for serving"],
  steps:["Finely dice the onion. Heat olive oil in a wide, deep pan over medium heat and cook the onion, stirring, for 3–4 min until soft and translucent.","Slice chicken breasts into thin strips (about 1cm). Add to the pan with the paprika and garlic granules; stir to coat, then cook over medium-high heat for 3–4 min until lightly golden.","Pour in the chopped tomatoes and drain and rinse the butter beans, then add them too. Season generously with salt and pepper.","Stir well and simmer over medium heat for 8–10 min until the chicken is cooked through and the sauce has thickened into a rich, deep-red broth.","Taste and adjust seasoning — it may want a pinch more salt or paprika. Serve in bowls with crusty bread for dipping."],
- tip:"Letting the stew simmer uncovered for the full 8–10 minutes concentrates the sauce into something rich and intense — covering the pan traps steam and keeps it thin and watery."}
+ tip:"Letting the stew simmer uncovered for the full 8–10 minutes concentrates the sauce into something rich and intense — covering the pan traps steam and keeps it thin and watery."},
+
+{name:"Pan-Seared Sirloin Steak with Garlic Butter & Watercress",time:"20 min",minutes:20,protein:"beef",cuisine:"british",serves:4,adult:true,
+ description:"Four sizzling sirloins — deeply charred at the edges and blushing pink within — finished in foaming garlic butter with thyme and served over peppery watercress. The kind of dinner that rewards a long day without asking much in return.",kidNote:"",
+ ingredients:["4 sirloin steaks (about 220g each)","40g butter","3 garlic cloves","2 sprigs fresh thyme","2 tbsp vegetable oil","80g watercress","1 lemon","1 tsp flaky sea salt"],
+ steps:["Take steaks from the fridge 15 minutes before cooking. Pat both sides completely dry — surface moisture is the enemy of a crust. Season very generously with flaky salt and pepper on both sides; more than feels right.","Heat a large heavy-based pan over the highest heat until it begins to smoke. Add oil and lay the steaks away from you. Do not move them — cook 2–3 min until a deep mahogany crust has formed underneath.","Flip and cook 2 min more for medium-rare. The flesh should spring back firmly with a little give. Cook 1 min longer per side for medium. Adjust timings for thickness.","Reduce heat to medium. Add butter, crushed garlic cloves and thyme. As the butter foams, tilt the pan and baste the steaks continuously with the garlicky butter for 1 full minute.","Rest on a warm plate, uncovered, for at least 5 min. Place over watercress, pour the pan butter over generously, squeeze lemon all over and serve."],
+ tip:"Season the steaks far more heavily than you think — the thick salt crust on the surface is what forms the deeply savoury bark in the pan; an under-seasoned steak always tastes flat regardless of its quality."},
+
+{name:"Seared King Scallops with Crushed Peas & Crispy Pancetta",time:"20 min",minutes:20,protein:"seafood",cuisine:"british",serves:4,adult:true,seasons:["spring","summer"],
+ description:"Plump, caramel-crusted king scallops over a vibrant minty crushed pea base with shards of crispy pancetta — a restaurant-calibre dish that takes under 20 minutes. Everything about it is designed for grown-up palates.",kidNote:"",
+ ingredients:["500g king scallops (3-4 per person)","12 slices pancetta","400g frozen peas","30g butter","2 tbsp olive oil","1 shallot","1 lemon","handful fresh mint"],
+ steps:["Cook peas in boiling salted water for 3 min. Finely dice the shallot. Drain peas and crush roughly in a pan with the shallot, half the butter, a squeeze of lemon, the mint leaves, salt and pepper — aim for a textured smash, not a smooth purée. Keep warm.","Lay pancetta in a cold frying pan. Turn heat to medium-high and cook until deeply golden and crisp on both sides, about 3–4 min. Drain on kitchen paper. Do not discard the fat in the pan.","Pat scallops bone-dry on both sides and season generously with salt and pepper. Any moisture prevents caramelisation.","Increase heat under the pancetta pan to very high. Add remaining butter and olive oil. When foaming, add scallops flat-side down with space between each. Cook completely undisturbed for 90 seconds until deep golden.","Flip and cook 45–60 seconds more — they should feel firm with a little give. Serve immediately over the crushed peas, broken pancetta scattered over, with lemon wedges."],
+ tip:"The first 30 seconds after scallops hit the pan determines the outcome — if the pan is hot enough and they are dry enough, caramelisation begins immediately; if either condition isn't met, they steam and no amount of additional cooking recovers the crust."},
+
+{name:"Nduja, Cherry Tomato & Burrata Tagliatelle",time:"15 min",minutes:15,protein:"pork",cuisine:"italian",serves:4,adult:true,
+ description:"Silky ribbons of tagliatelle through a vivid, fiery nduja and burst cherry tomato sauce, finished with torn creamy burrata that melts into the heat. Deeply flavoured, unashamedly rich, and ready in the time it takes the water to boil.",kidNote:"",
+ ingredients:["400g tagliatelle","80g nduja","400g cherry tomatoes","2 balls burrata (about 250g total)","3 garlic cloves","3 tbsp olive oil","handful fresh basil","1 tsp chilli flakes"],
+ steps:["Cook tagliatelle in well-salted, vigorously boiling water per pack instructions. Reserve a large mugful of pasta water before draining.","Heat olive oil in a wide pan over medium heat. Add thinly sliced garlic and chilli flakes; cook gently for 1 min until fragrant but not coloured.","Add nduja and break apart with a spoon — it melts into the oil, turning it a vivid, spicy red. Cook 1–2 min until the oil is richly coloured and the nduja has dissolved completely.","Add cherry tomatoes and a good pinch of salt. Cook over high heat, pressing occasionally, for 3–4 min until the tomatoes have burst and collapsed into a jammy sauce.","Add the drained pasta to the sauce with a generous splash of pasta water; toss vigorously until every strand is coated and the liquid emulsifies into a glossy sauce. Tear burrata over the top, scatter basil, drizzle with olive oil and serve immediately."],
+ tip:"Nduja's fat is where all the flavour lives — melt it into the oil completely before any tomatoes go in, so the spiced fat coats the pasta directly and carries heat and smoke into every mouthful."}
 ];
 
 var WEEKEND_MEALS=[
@@ -351,7 +369,25 @@ var WEEKEND_MEALS=[
  description:"Thick udon noodles tossed with caramelised pork strips in a sticky, tangy-sweet tamarind and soy glaze, finished with crunchy spring onions and toasted sesame seeds. A bowl that tastes as exciting as it looks.",kidNote:"Tamarind is gently sweet-sour rather than sharp — reduce the quantity by half and taste before serving for young children",
  ingredients:["400g pork tenderloin or loin steaks","300g udon noodles","2 tbsp tamarind paste","2 tbsp soy sauce","1 tbsp honey","1 tbsp sesame oil","1 tbsp vegetable oil","4 spring onions","1 tbsp sesame seeds","1 tsp garlic granules"],
  steps:["Mix tamarind paste, soy sauce, honey and garlic granules in a small bowl until smooth — taste it and adjust: it should be boldly sweet, sour and salty in balance. Set aside.","Slice pork into thin strips, about 5mm thick and 5cm long. Pat completely dry with kitchen paper — any surface moisture creates steam in the pan and prevents caramelisation.","Cook udon noodles per pack instructions (usually 2 min in boiling water). Drain and toss immediately with the sesame oil to prevent sticking. Set aside.","Heat vegetable oil in a wok over the highest heat possible until just starting to smoke. Add pork strips in a single layer — do not stir for 90 seconds so they sear and caramelise. Toss and cook 2 min more until cooked through and golden at the edges.","Pour the tamarind sauce over the pork; toss vigorously for 1 min until the sauce reduces and coats every strip in a glossy lacquer. Add udon noodles and toss over high heat for 1 min until evenly coated and steaming. Serve topped with sliced spring onions and sesame seeds."],
- tip:"Letting the pork sit untouched for 90 seconds before tossing creates the caramelised surface that the tamarind glaze grips onto — stir immediately and you get pale, steamed pork with no crust for the sauce to cling to."}
+ tip:"Letting the pork sit untouched for 90 seconds before tossing creates the caramelised surface that the tamarind glaze grips onto — stir immediately and you get pale, steamed pork with no crust for the sauce to cling to."},
+
+{name:"Steamed Mussels in White Wine, Garlic & Cream with Sourdough",time:"25 min",minutes:25,protein:"seafood",cuisine:"british",serves:4,adult:true,seasons:["spring","summer"],
+ description:"A pot of glistening, just-opened mussels in a fragrant broth of white wine, cream, garlic and shallots — brought to the table with thick sourdough for mopping every last drop. Communal, convivial, and effortlessly impressive.",kidNote:"",
+ ingredients:["2kg fresh mussels","250ml dry white wine","150ml double cream","4 shallots","4 garlic cloves","40g butter","small bunch flat-leaf parsley","1 lemon","1 sourdough loaf"],
+ steps:["Rinse mussels under cold running water. Pull away any beards. Tap any open mussels firmly — discard those that stay open and any with cracked shells.","Finely slice the shallots and garlic. Melt butter in a very large, heavy pan or stockpot over medium heat. Cook shallots and garlic for 3–4 min until completely soft and translucent but not coloured.","Increase heat to high and pour in the wine — it should sizzle hard. Cook for 2 min until the sharpness has cooked off and it smells mellow and fragrant.","Add the mussels and cream. Cover immediately with a tight-fitting lid. Cook for 3–5 min, shaking the pan once halfway through, until all mussels have opened. Discard any that remain firmly closed.","Scatter roughly chopped parsley over the pan. Squeeze over lemon, taste the broth and season. Bring the pot to the table with torn sourdough alongside."],
+ tip:"Once the lid goes on, resist opening it — the mussels cook in concentrated steam and every time you lift the lid you release heat and extend cooking time, making the mussels tough and rubbery."},
+
+{name:"Lamb Cutlets with Herby Salsa Verde & Roasted Cherry Tomatoes",time:"30 min",minutes:30,protein:"lamb",cuisine:"middleeastern",serves:4,adult:true,seasons:["spring","summer"],
+ description:"French-trimmed lamb cutlets with their fat rendered to a crisp golden edge, served alongside sweet, collapsing roasted cherry tomatoes and a punchy, herb-heavy salsa verde. The kind of dinner that makes a Tuesday evening feel like a summer holiday.",kidNote:"",
+ ingredients:["12 French-trimmed lamb cutlets","400g cherry tomatoes","large bunch flat-leaf parsley","small bunch mint","2 tbsp capers","2 anchovy fillets","3 garlic cloves","1 lemon","6 tbsp olive oil","1 tbsp red wine vinegar"],
+ steps:["Preheat oven to 200°C / 180°C fan. Toss cherry tomatoes in a roasting tin with 1 tbsp olive oil, salt and pepper. Roast for 20 min until collapsing and caramelised at the edges.","Make the salsa verde: finely chop parsley leaves, mint, capers, anchovies and 2 garlic cloves together until rough and green-flecked. Stir in 4 tbsp olive oil, red wine vinegar and lemon juice; season firmly. It should be assertive, punchy and bright.","Pat lamb cutlets completely dry and season generously on both sides.","Heat remaining olive oil in a heavy pan over very high heat. Stand the cutlets fat-side down in the pan and press for 2 min until the fat is rendered and golden. Lay flat and cook 2–3 min per side for medium-rare, basting with the rendered fat.","Rest 4 min before plating. Serve with roasted tomatoes and a generous spoonful of salsa verde, the rest in a bowl alongside."],
+ tip:"Rendering the fat cap first — by standing cutlets fat-side down — is the step that takes lamb from pale and fatty to crisp-edged and deeply flavoured; rush this step and the fat stays chewy and unpleasant."},
+
+{name:"Roast Pork Tenderloin with Wholegrain Mustard Cream & Wilted Spinach",time:"30 min",minutes:30,protein:"pork",cuisine:"british",serves:4,adult:true,
+ description:"A whole pork tenderloin — golden outside, blush-pink within — rested and sliced through a silky wholegrain mustard cream sauce with wilted spinach to cut through the richness. Elegant enough for a dinner party, simple enough for a Wednesday.",kidNote:"",
+ ingredients:["2 pork tenderloins (about 400g each)","200ml double cream","2 tbsp wholegrain mustard","1 tbsp Dijon mustard","2 shallots","150ml chicken stock","2 tbsp vegetable oil","30g butter","200g spinach"],
+ steps:["Preheat oven to 200°C / 180°C fan. Pat tenderloins completely dry and season all over. Heat oil in an oven-safe pan over high heat; sear on all sides until deeply golden all over, about 6 min total. Transfer to the oven and roast for 12–14 min until the centre is barely pink or an internal thermometer reads 63°C.","Transfer pork to a warm plate and rest uncovered for at least 8 min — the temperature continues to rise and the juices redistribute.","Finely slice the shallots. In the same pan over medium heat, melt butter and cook shallots for 3–4 min until soft. Add chicken stock and reduce by half, scraping up any browned bits.","Stir in both mustards and the cream. Simmer for 3–4 min, stirring, until the sauce coats the back of a spoon. Season well.","Wilt spinach in a separate pan with a splash of water for 1–2 min; season. Slice the pork into medallions and serve over spinach with the mustard cream poured over generously."],
+ tip:"Pork tenderloin continues cooking after it leaves the oven — pull it at 63°C internal (or the moment the centre is barely pink) and the rest does the work; wait for it to look done before resting and it will be dry by the time it's sliced."}
 ];
 
 /* ── Utilities ────────────────────────────────────────────────────────────── */
@@ -428,11 +464,12 @@ function buildShop(plan,pantry,familySize){
   return out;
 }
 
-function getPool(type,timeFilter,customMeals){
+function getPool(type,timeFilter,customMeals,kids){
+  if(kids===undefined)kids=true;
   var base=type==='weekend'?WEEKEND_MEALS:WEEKDAY_MEALS;
   var custom=(customMeals||[]).filter(function(m){return type==='weekday'?m.pool!=='weekend':m.pool!=='weekday'});
   var limit=timeFilter==='15'?15:timeFilter==='25'?25:Infinity;
-  return[].concat(base,custom).filter(function(m){return m.minutes<=limit});
+  return[].concat(base,custom).filter(function(m){return m.minutes<=limit&&(!m.adult||!kids)});
 }
 
 function nextDateForDayName(dayName){
@@ -726,6 +763,9 @@ function App() {
   const [showPrefs,   setShowPrefs]  = useState(false);
   const [expandedDay, setExpandedDay]= useState(null);
   const [sharedPlan,  setSharedPlan] = useState(null);
+  const [kidsConfig, setKidsConfig] = useState(()=>load(SK.KIDS_CFG, {}));
+  const [cookNow,    setCookNow]    = useState(null);
+  const [cookNowExp, setCookNowExp] = useState(false);
 
   useEffect(()=>{
     const hash = window.location.hash;
@@ -738,6 +778,7 @@ function App() {
   useEffect(()=>{ save(SK.DAYS_CFG, dayConfig); }, [dayConfig]);
   useEffect(()=>{ save(SK.FAMILY, familySize); }, [familySize]);
   useEffect(()=>{ save(SK.FILTER, timeFilter); }, [timeFilter]);
+  useEffect(()=>{ save(SK.KIDS_CFG, kidsConfig); }, [kidsConfig]);
 
   const scrollTop = () => setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}), 50);
   const showToast = msg => { setToast(msg); setTimeout(()=>setToast(null), 2600); };
@@ -747,13 +788,21 @@ function App() {
   const homeDays  = DAYS.filter(d=>dayConfig[d]==="home");
   const goustoDays = DAYS.filter(d=>dayConfig[d]==="gousto");
 
+  const getKids = day => kidsConfig[day] !== false;
+  const toggleKids = day => setKidsConfig(prev=>({...prev,[day]:!getKids(day)}));
+
   const generate = () => {
-    const wkday = homeDays.filter(d=>!WEEKEND.includes(d));
-    const wkend = homeDays.filter(d=> WEEKEND.includes(d));
     const opts = { history:mealHistory, favourites, dislikes };
-    const wkdayPicks = smartPick(getPool("weekday", timeFilter, customMeals), wkday.length, opts);
-    const wkendPicks = smartPick(getPool("weekend", timeFilter, customMeals), wkend.length, opts);
-    const meals = [...wkdayPicks.map((m,i)=>({...m,day:wkday[i]})), ...wkendPicks.map((m,i)=>({...m,day:wkend[i]}))];
+    const selected = [];
+    const meals = homeDays.map(day => {
+      const type = WEEKEND.includes(day) ? "weekend" : "weekday";
+      const pool = getPool(type, timeFilter, customMeals, getKids(day));
+      const usedNames = selected.map(m=>m.name);
+      const avail = pool.filter(m=>!usedNames.includes(m.name));
+      const [pick] = smartPick(avail.length ? avail : pool, 1, opts);
+      if(pick){ selected.push(pick); return {...pick, day}; }
+      return null;
+    }).filter(Boolean);
     const newPlan = { meals };
     const newShop = buildShop(newPlan, pantry, familySize);
     const now = Date.now();
@@ -765,7 +814,7 @@ function App() {
   };
 
   const swap = (day, extraDislikes=[]) => {
-    const pool = getPool(WEEKEND.includes(day)?"weekend":"weekday", timeFilter, customMeals);
+    const pool = getPool(WEEKEND.includes(day)?"weekend":"weekday", timeFilter, customMeals, getKids(day));
     const used = plan.meals.map(m=>m.name);
     const allD = [...dislikes, ...extraDislikes];
     const avail = pool.filter(m=>!used.includes(m.name)&&!allD.includes(m.name));
@@ -794,6 +843,12 @@ function App() {
   const removeDislike = name => {
     const nd=dislikes.filter(d=>d!==name); setDislikes(nd); save(SK.DISLIKES, nd);
     showToast("Restored ✓");
+  };
+  const pickCookNow = () => {
+    const all=[...getPool("weekday","any",customMeals,true),...getPool("weekend","any",customMeals,true)];
+    const unique=all.filter((m,i)=>all.findIndex(x=>x.name===m.name)===i);
+    const [pick]=smartPick(unique,1,{history:mealHistory,favourites,dislikes});
+    setCookNow(pick||null); setCookNowExp(true);
   };
   const addCustom = meal => { const nc=[...customMeals,meal]; setCustomMeals(nc); save(SK.CUSTOM,nc); };
   const deleteCustom = name => { const nc=customMeals.filter(m=>m.name!==name); setCustomMeals(nc); save(SK.CUSTOM,nc); showToast("Meal removed"); };
@@ -945,7 +1000,7 @@ function App() {
             {/* Day grid */}
             <div style={{ background:P.card, borderRadius:"14px", padding:"14px 18px", boxShadow:P.shadow, border:`1px solid ${P.border}`, marginBottom:"16px" }}>
               <div style={{ fontWeight:700, fontSize:"15px", marginBottom:"3px" }}>Days this week</div>
-              <div style={{ fontSize:"13px", color:P.muted, marginBottom:"12px" }}>Tap to cycle: Home cooked → Gousto → Day off</div>
+              <div style={{ fontSize:"13px", color:P.muted, marginBottom:"12px" }}>Tap to cycle: Home → Gousto → Day off · tap 👶/🍷 to toggle kids</div>
               {DAYS.map((day,idx)=>{
                 const val = dayConfig[day]||"home";
                 const cycle = {home:"gousto",gousto:"off",off:"home"};
@@ -961,10 +1016,21 @@ function App() {
                       <span style={{ fontSize:"20px" }}>{icons[val]}</span>
                       <span style={{ fontWeight:600, fontSize:"15px" }}>{day}</span>
                     </div>
-                    <span style={{ background:colors[val][0], color:colors[val][1],
-                      borderRadius:"8px", padding:"4px 12px", fontSize:"13px", fontWeight:700 }}>
-                      {labels[val]}
-                    </span>
+                    <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                      {val==="home" && (
+                        <button onClick={e=>{e.stopPropagation();toggleKids(day);}}
+                          style={{ background:getKids(day)?P.greenLight:"#EDE7F6",
+                            color:getKids(day)?P.greenDark:"#6D28D9",
+                            border:"none", borderRadius:"8px", padding:"4px 10px",
+                            fontSize:"12px", fontWeight:700, cursor:"pointer" }}>
+                          {getKids(day)?"👶 Kids":"🍷 Adults"}
+                        </button>
+                      )}
+                      <span style={{ background:colors[val][0], color:colors[val][1],
+                        borderRadius:"8px", padding:"4px 12px", fontSize:"13px", fontWeight:700 }}>
+                        {labels[val]}
+                      </span>
+                    </div>
                   </div>
                 );
               })}
@@ -1080,6 +1146,57 @@ function App() {
           </div>
         )}
       </div>
+      {/* Cook Tonight modal */}
+      {cookNow && (
+        <div style={{ position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",zIndex:500,
+          overflowY:"auto",padding:"24px 0 40px",WebkitOverflowScrolling:"touch" }}
+          onClick={()=>setCookNow(null)}>
+          <div style={{ maxWidth:"480px",margin:"0 auto",padding:"0 16px" }}
+            onClick={e=>e.stopPropagation()}>
+            <div style={{ background:P.bg,borderRadius:"20px",overflow:"hidden",
+              boxShadow:"0 8px 40px rgba(0,0,0,0.22)" }}>
+              <div style={{ background:`linear-gradient(135deg,${P.accent},${P.accentDark})`,
+                padding:"20px 20px 16px",color:"#fff",
+                display:"flex",justifyContent:"space-between",alignItems:"center" }}>
+                <div>
+                  <div style={{ fontSize:"11px",opacity:0.85,fontWeight:700,letterSpacing:"1.2px",textTransform:"uppercase" }}>Cook tonight</div>
+                  <div style={{ fontFamily:"'DM Serif Display',serif",fontSize:"22px",marginTop:"3px" }}>What shall we make?</div>
+                </div>
+                <button onClick={()=>setCookNow(null)}
+                  style={{ background:"rgba(255,255,255,0.2)",border:"none",color:"#fff",
+                    borderRadius:"10px",padding:"8px 12px",cursor:"pointer",fontSize:"18px",fontWeight:700 }}>✕</button>
+              </div>
+              <div style={{ padding:"16px" }}>
+                <MealCard meal={cookNow} day="Tonight" isFav={favourites.includes(cookNow.name)}
+                  isSeasonal={!!(cookNow.seasons&&cookNow.seasons.includes(season))}
+                  seasonLabel={si.label} expanded={cookNowExp} familySize={familySize}
+                  onExpand={()=>setCookNowExp(x=>!x)}
+                  onFav={()=>toggleFav(cookNow.name)} onSwap={pickCookNow}
+                  onDislike={()=>{addDislike(cookNow.name);pickCookNow();}} readOnly={false} />
+              </div>
+              <div style={{ padding:"0 16px 20px" }}>
+                <button onClick={pickCookNow}
+                  style={{ width:"100%",background:`linear-gradient(135deg,${P.accent},${P.accentDark})`,
+                    color:"#fff",border:"none",borderRadius:"14px",
+                    padding:"15px 24px",fontSize:"15px",fontWeight:700,
+                    cursor:"pointer",boxShadow:P.shadow }}>
+                  🔀 Suggest something else
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Floating Cook Tonight button */}
+      <button onClick={pickCookNow}
+        style={{ position:"fixed",bottom:"24px",right:"20px",zIndex:200,
+          background:`linear-gradient(135deg,${P.accent},${P.accentDark})`,
+          color:"#fff",border:"none",borderRadius:"28px",
+          padding:"14px 20px",fontSize:"15px",fontWeight:700,
+          cursor:"pointer",boxShadow:"0 4px 20px rgba(224,122,95,0.45)",
+          display:"flex",alignItems:"center",gap:"8px",whiteSpace:"nowrap" }}>
+        🍴 Cook tonight
+      </button>
       {toast&&<div className="toast">{toast}</div>}
     </div>
   );
