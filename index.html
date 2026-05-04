@@ -1386,6 +1386,7 @@ function App() {
   const [invalidShare, setInvalidShare] = useState(false);
   const [pendingDislike, setPendingDislike] = useState(null);
   const [addToPlanOpen,  setAddToPlanOpen]  = useState(false);
+  const [cookNowOpts,    setCookNowOpts]    = useState({kids:true,size:4,dietary:"none",time:"any"});
   const [sizeOverrides,  setSizeOverrides]  = useState(()=>load(SK.SIZE_OVR, {}));
   const dislikeTimerRef = useRef(null);
 
@@ -1544,12 +1545,26 @@ function App() {
     if(data.savedState){setSavedState(data.savedState);save(SK.STATE,data.savedState);}
     showToast("Profile imported ✓");
   };
-  const pickCookNow = () => {
+  const pickCookNowWith = (opts) => {
     const allDis = pendingDislike ? [...dislikes, pendingDislike] : dislikes;
-    const all=[...getPool("weekday","any",customMeals,true,dietaryMode),...getPool("weekend","any",customMeals,true,dietaryMode)];
+    const all=[...getPool("weekday",opts.time,customMeals,opts.kids,opts.dietary),
+               ...getPool("weekend",opts.time,customMeals,opts.kids,opts.dietary)];
     const unique=all.filter((m,i)=>all.findIndex(x=>x.name===m.name)===i);
-    const [pick]=smartPick(unique,1,{history:mealHistory,favourites,dislikes:allDis});
-    setCookNow(pick||null); setCookNowExp(true);
+    if(!unique.length){showToast("No meals match these filters");return;}
+    const [pick]=smartPick(unique,1,{history:mealHistory,favourites,dislikes:allDis,preferAdult:!opts.kids});
+    if(pick){setCookNow(pick);setCookNowExp(true);}
+    else showToast("No more meals available!");
+  };
+  const pickCookNow = () => pickCookNowWith(cookNowOpts);
+  const openCookNow = () => {
+    const opts={kids:true,size:familySize,dietary:dietaryMode,time:"any"};
+    setCookNowOpts(opts);
+    pickCookNowWith(opts);
+  };
+  const updateCookNowFilter = (patch) => {
+    const newOpts={...cookNowOpts,...patch};
+    setCookNowOpts(newOpts);
+    if(patch.size===undefined) pickCookNowWith(newOpts);
   };
   const allMeals = [...WEEKDAY_MEALS,...WEEKEND_MEALS,...customMeals].filter((m,i,a)=>a.findIndex(x=>x.name===m.name)===i);
   const handlePickerSelect = (meal) => {
@@ -1967,13 +1982,61 @@ function App() {
                   style={{ background:"rgba(255,255,255,0.2)",border:"none",color:"#fff",
                     borderRadius:"10px",padding:"8px 12px",cursor:"pointer",fontSize:"18px",fontWeight:700 }}>✕</button>
               </div>
+              {/* Cook Tonight filters */}
+              <div style={{ padding:"12px 16px",borderBottom:`1px solid ${P.border}`,background:P.card }}>
+                <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"8px" }}>
+                  <div style={{ display:"flex",gap:"5px" }}>
+                    {[["Kids",true,"👶"],["Adults",false,"🍷"]].map(([label,val,icon])=>(
+                      <button key={label} onClick={()=>updateCookNowFilter({kids:val})}
+                        style={{ background:cookNowOpts.kids===val?P.accentLight:"transparent",
+                          border:`1.5px solid ${cookNowOpts.kids===val?P.accent:P.border}`,
+                          borderRadius:"20px",padding:"4px 10px",fontSize:"12px",fontWeight:700,
+                          color:cookNowOpts.kids===val?P.accentDark:P.muted,cursor:"pointer" }}>
+                        {icon} {label}
+                      </button>
+                    ))}
+                  </div>
+                  <div style={{ display:"flex",alignItems:"center",gap:"4px" }}>
+                    <button onClick={()=>updateCookNowFilter({size:Math.max(1,cookNowOpts.size-1)})}
+                      style={{ background:P.border,border:"none",borderRadius:"6px",width:"22px",height:"22px",
+                        fontSize:"15px",cursor:"pointer",color:P.muted,display:"flex",alignItems:"center",justifyContent:"center" }}>−</button>
+                    <span style={{ fontSize:"12px",fontWeight:600,color:P.muted,minWidth:"52px",textAlign:"center" }}>{cookNowOpts.size} people</span>
+                    <button onClick={()=>updateCookNowFilter({size:Math.min(20,cookNowOpts.size+1)})}
+                      style={{ background:P.border,border:"none",borderRadius:"6px",width:"22px",height:"22px",
+                        fontSize:"15px",cursor:"pointer",color:P.muted,display:"flex",alignItems:"center",justifyContent:"center" }}>+</button>
+                  </div>
+                </div>
+                <div style={{ display:"flex",gap:"5px",marginBottom:"7px" }}>
+                  {[["any","Any time"],["25","≤25 min"],["15","≤15 min"]].map(([v,l])=>(
+                    <button key={v} onClick={()=>updateCookNowFilter({time:v})}
+                      style={{ background:cookNowOpts.time===v?P.accentLight:"transparent",
+                        border:`1.5px solid ${cookNowOpts.time===v?P.accent:P.border}`,
+                        borderRadius:"20px",padding:"3px 9px",fontSize:"11px",fontWeight:700,
+                        color:cookNowOpts.time===v?P.accentDark:P.muted,cursor:"pointer" }}>
+                      {l}
+                    </button>
+                  ))}
+                </div>
+                <div style={{ display:"flex",gap:"5px",flexWrap:"wrap" }}>
+                  {[["none","All"],["noFish","No fish"],["noPork","No pork"],["noRed","No red meat"],["veggie","🌱 Veggie"]].map(([v,l])=>(
+                    <button key={v} onClick={()=>updateCookNowFilter({dietary:v})}
+                      style={{ background:cookNowOpts.dietary===v?P.greenLight:"transparent",
+                        border:`1.5px solid ${cookNowOpts.dietary===v?P.greenDark:P.border}`,
+                        borderRadius:"20px",padding:"3px 9px",fontSize:"11px",fontWeight:700,
+                        color:cookNowOpts.dietary===v?P.greenDark:P.muted,cursor:"pointer" }}>
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div style={{ padding:"16px" }}>
                 {(()=>{const clu=mealHistory.filter(h=>h.name===cookNow.name);const cookNowLastUsed=clu.length?Math.max(...clu.map(h=>h.date)):null;return(
                 <MealCard meal={cookNow} day="Tonight" isFav={favourites.includes(cookNow.name)}
                   isSeasonal={!!(cookNow.seasons&&cookNow.seasons.includes(season))}
-                  seasonLabel={si.label} expanded={cookNowExp} familySize={familySize}
+                  seasonLabel={si.label} expanded={cookNowExp} familySize={cookNowOpts.size}
                   onExpand={()=>setCookNowExp(x=>!x)}
                   onFav={()=>toggleFav(cookNow.name)} onSwap={pickCookNow}
+                  onChangeMealSize={(d)=>updateCookNowFilter({size:Math.max(1,Math.min(20,cookNowOpts.size+d))})}
                   onDislike={()=>{addDislike(cookNow.name);pickCookNow();}} readOnly={false}
                   lastUsed={cookNowLastUsed} />
                 );})()}
