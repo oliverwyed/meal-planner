@@ -1737,7 +1737,14 @@ ReactDOM.createRoot(document.getElementById("app")).render(<App />);
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('./sw.js').catch(function(){});
+    navigator.serviceWorker.register('./sw.js').then(function(reg){
+      reg.addEventListener('updatefound',function(){
+        var sw=reg.installing;
+        sw.addEventListener('statechange',function(){
+          if(sw.state==='activated')window.location.reload();
+        });
+      });
+    }).catch(function(){});
   });
 }
 </script>
