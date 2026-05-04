@@ -537,18 +537,31 @@ function nextDateForDayName(dayName){
   var d=new Date(today);d.setDate(today.getDate()+diff);return d;
 }
 function toICSDate(d){return''+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');}
-function generateICS(plan){
-  var uid=Date.now(),lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Family Meal Planner//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
-  plan.meals.forEach(function(meal,i){
-    var d=nextDateForDayName(meal.day),ds=toICSDate(d),nd=new Date(d);nd.setDate(d.getDate()+1);
+function generateICS(plan, familySize) {
+  familySize = familySize || 4;
+  var uid = Date.now();
+  var lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Family Meal Planner//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+  plan.meals.forEach(function(meal, i) {
+    var d = nextDateForDayName(meal.day), ds = toICSDate(d), nd = new Date(d);
+    nd.setDate(d.getDate()+1);
+    var desc = [];
+    if(meal.description) desc.push(meal.description);
+    var scale = familySize / (meal.serves||4);
+    var ing = scaledIngredients(meal.ingredients||[], scale);
+    if(ing.length){ desc.push(''); desc.push('INGREDIENTS (serves '+familySize+'):'); ing.forEach(function(x){desc.push('• '+x.display);}); }
+    if(meal.steps&&meal.steps.length){ desc.push(''); desc.push('RECIPE:'); meal.steps.forEach(function(s,n){desc.push((n+1)+'. '+s);}); }
+    if(meal.tip){ desc.push(''); desc.push("CHEF'S TIP: "+meal.tip); }
+    var raw = desc.join('\n').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');
+    var prop = 'DESCRIPTION:'+raw, folded = '';
+    while(prop.length>75){ folded+=prop.slice(0,75)+'\r\n '; prop=prop.slice(75); }
+    folded+=prop;
     lines.push('BEGIN:VEVENT','UID:meal-'+uid+'-'+i+'@mealplanner','SUMMARY:Dinner: '+meal.name,
-      'DTSTART;VALUE=DATE:'+ds,'DTEND;VALUE=DATE:'+toICSDate(nd),
-      'DESCRIPTION:'+(meal.description||'').replace(/,/g,'\\,').slice(0,70),'END:VEVENT');
+      'DTSTART;VALUE=DATE:'+ds,'DTEND;VALUE=DATE:'+toICSDate(nd),folded,'END:VEVENT');
   });
-  lines.push('END:VCALENDAR');return lines.join('\r\n');
+  lines.push('END:VCALENDAR'); return lines.join('\r\n');
 }
-function downloadICS(plan){
-  var content=generateICS(plan),blob=new Blob([content],{type:'text/calendar;charset=utf-8'});
+function downloadICS(plan, familySize){
+  var content=generateICS(plan,familySize),blob=new Blob([content],{type:'text/calendar;charset=utf-8'});
   var url=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=url;a.download='meal-plan.ics';document.body.appendChild(a);a.click();
   document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url)},1000);
@@ -1298,7 +1311,7 @@ function App() {
             })}
             <Primary onClick={()=>{setStep("shopping");scrollTop();}}>View Shopping List</Primary>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginTop:"10px" }}>
-              <button onClick={()=>downloadICS(plan)} style={{ background:P.card, color:P.accent, border:`2px solid ${P.accent}`,
+              <button onClick={()=>downloadICS(plan,familySize)} style={{ background:P.card, color:P.accent, border:`2px solid ${P.accent}`,
                 borderRadius:"14px", padding:"13px 10px", fontSize:"14px", fontWeight:700, cursor:"pointer", textAlign:"center" }}>
                 📅 Calendar
               </button>
