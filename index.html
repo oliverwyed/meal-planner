@@ -1285,9 +1285,11 @@ function App() {
       </div>
       {/* Cook Tonight modal */}
       {cookNow && (
-        <div style={{ position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",zIndex:500,
-          overflowY:"auto",padding:"24px 0 40px",WebkitOverflowScrolling:"touch" }}
-          onClick={()=>setCookNow(null)}>
+        <div style={{ position:"fixed",inset:0,zIndex:500 }}>
+          <div style={{ position:"absolute",inset:0,background:"rgba(0,0,0,0.55)",
+            overflowY:"auto",WebkitOverflowScrolling:"touch",
+            padding:"24px 0 40px" }}
+            onClick={()=>setCookNow(null)}>
           <div style={{ maxWidth:"480px",margin:"0 auto",padding:"0 16px" }}
             onClick={e=>e.stopPropagation()}>
             <div style={{ background:P.bg,borderRadius:"20px",
@@ -1325,6 +1327,7 @@ function App() {
                 </button>
               </div>
             </div>
+          </div>
           </div>
         </div>
       )}
