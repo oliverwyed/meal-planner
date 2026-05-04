@@ -45,7 +45,7 @@ textarea,input,select{font-family:'DM Sans',sans-serif}
 <script>
 /* ── Data & Utilities (plain JS, not Babel-compiled) ─────────────────────── */
 var SK={HISTORY:'mp_history',FAVS:'mp_favs',DISLIKES:'mp_dislikes',PANTRY:'mp_pantry',
-        STATE:'mp_state',CUSTOM:'mp_custom',FAMILY:'mp_family',FILTER:'mp_filter',DAYS_CFG:'mp_days_cfg',KIDS_CFG:'mp_kids_cfg',CHECKED:'mp_checked'};
+        STATE:'mp_state',CUSTOM:'mp_custom',FAMILY:'mp_family',FILTER:'mp_filter',DAYS_CFG:'mp_days_cfg',KIDS_CFG:'mp_kids_cfg',CHECKED:'mp_checked',DIETARY:'mp_dietary'};
 function load(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 
@@ -603,12 +603,20 @@ function formatAgo(ts){
   if(days===1)return'Generated yesterday';
   return'Generated '+days+' days ago';
 }
-function getPool(type,timeFilter,customMeals,kids){
+var DIETARY_EXCLUDE={
+  none:[],
+  noFish:['fish','seafood'],
+  noPork:['pork'],
+  noRed:['beef','lamb'],
+  veggie:['chicken','beef','pork','lamb','fish','seafood'],
+};
+function getPool(type,timeFilter,customMeals,kids,dietaryMode){
   if(kids===undefined)kids=true;
+  var excl=DIETARY_EXCLUDE[dietaryMode]||[];
   var base=type==='weekend'?WEEKEND_MEALS:WEEKDAY_MEALS;
   var custom=(customMeals||[]).filter(function(m){return type==='weekday'?m.pool!=='weekend':m.pool!=='weekday'});
   var limit=timeFilter==='15'?15:timeFilter==='25'?25:Infinity;
-  return[].concat(base,custom).filter(function(m){return m.minutes<=limit&&(!m.adult||!kids)});
+  return[].concat(base,custom).filter(function(m){return m.minutes<=limit&&(!m.adult||!kids)&&!excl.includes(m.protein)});
 }
 
 function nextDateForDayName(dayName){
@@ -1250,6 +1258,7 @@ function App() {
   const [dayConfig,   setDayConfig]  = useState(()=>load(SK.DAYS_CFG, DEFAULT_DAY_CFG));
   const [familySize,  setFamilySize] = useState(()=>load(SK.FAMILY, 4));
   const [timeFilter,  setTimeFilter] = useState(()=>load(SK.FILTER, "any"));
+  const [dietaryMode, setDietaryMode]= useState(()=>load(SK.DIETARY, "none"));
   const [pantry,      setPantry]     = useState(()=>load(SK.PANTRY, ""));
   const [plan,        setPlan]       = useState(null);
   const [shopList,    setShopList]   = useState(null);
@@ -1285,6 +1294,7 @@ function App() {
   useEffect(()=>{ save(SK.DAYS_CFG, dayConfig); }, [dayConfig]);
   useEffect(()=>{ save(SK.FAMILY, familySize); }, [familySize]);
   useEffect(()=>{ save(SK.FILTER, timeFilter); }, [timeFilter]);
+  useEffect(()=>{ save(SK.DIETARY, dietaryMode); }, [dietaryMode]);
   useEffect(()=>{ save(SK.KIDS_CFG, kidsConfig); }, [kidsConfig]);
   useEffect(()=>{
     document.body.style.overflow = (cookNow||pickerFor) ? 'hidden' : '';
@@ -1320,7 +1330,7 @@ function App() {
     const selected = [];
     const meals = homeDays.map(day => {
       const type = WEEKEND.includes(day) ? "weekend" : "weekday";
-      const pool = getPool(type, timeFilter, customMeals, getKids(day));
+      const pool = getPool(type, timeFilter, customMeals, getKids(day), dietaryMode);
       const usedNames = selected.map(m=>m.name);
       const avail = pool.filter(m=>!usedNames.includes(m.name));
       const [pick] = smartPick(avail.length ? avail : pool, 1, opts);
@@ -1338,7 +1348,7 @@ function App() {
   };
 
   const swap = (day, extraDislikes=[]) => {
-    const pool = getPool(WEEKEND.includes(day)?"weekend":"weekday", timeFilter, customMeals, getKids(day));
+    const pool = getPool(WEEKEND.includes(day)?"weekend":"weekday", timeFilter, customMeals, getKids(day), dietaryMode);
     const used = plan.meals.map(m=>m.name);
     const allD = [...dislikes, ...extraDislikes];
     const avail = pool.filter(m=>!used.includes(m.name)&&!allD.includes(m.name));
@@ -1386,7 +1396,7 @@ function App() {
   };
   const pickCookNow = () => {
     const allDis = pendingDislike ? [...dislikes, pendingDislike] : dislikes;
-    const all=[...getPool("weekday","any",customMeals,true),...getPool("weekend","any",customMeals,true)];
+    const all=[...getPool("weekday","any",customMeals,true,dietaryMode),...getPool("weekend","any",customMeals,true,dietaryMode)];
     const unique=all.filter((m,i)=>all.findIndex(x=>x.name===m.name)===i);
     const [pick]=smartPick(unique,1,{history:mealHistory,favourites,dislikes:allDis});
     setCookNow(pick||null); setCookNowExp(true);
@@ -1581,6 +1591,19 @@ function App() {
                   <button key={val} onClick={()=>setTimeFilter(val)} style={{ flex:1, padding:"10px 4px", borderRadius:"10px",
                     border:`2px solid ${timeFilter===val?P.accent:P.border}`,
                     background:timeFilter===val?P.accent:P.card, color:timeFilter===val?"#fff":P.text,
+                    fontSize:"13px", fontWeight:700, cursor:"pointer" }}>{label}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Dietary filter */}
+            <div style={{ background:P.card, borderRadius:"14px", padding:"14px 18px", marginBottom:"10px", boxShadow:P.shadow, border:`1px solid ${P.border}` }}>
+              <div style={{ fontWeight:700, fontSize:"15px", marginBottom:"10px" }}>Dietary</div>
+              <div style={{ display:"flex", gap:"8px", flexWrap:"wrap" }}>
+                {[["none","All meals"],["noFish","No fish"],["noPork","No pork"],["noRed","No red meat"],["veggie","Vegetarian"]].map(([val,label])=>(
+                  <button key={val} onClick={()=>setDietaryMode(val)} style={{ padding:"9px 14px", borderRadius:"10px",
+                    border:`2px solid ${dietaryMode===val?P.accent:P.border}`,
+                    background:dietaryMode===val?P.accent:P.card, color:dietaryMode===val?"#fff":P.text,
                     fontSize:"13px", fontWeight:700, cursor:"pointer" }}>{label}</button>
                 ))}
               </div>
