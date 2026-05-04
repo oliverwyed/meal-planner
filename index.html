@@ -1949,11 +1949,22 @@ function App() {
               </div>
             ))}
             <Primary onClick={()=>{
-              const unchecked=[];
-              Object.entries(shopList).forEach(([cat,items])=>items.forEach(item=>{if(!checked[cat+':'+item.display])unchecked.push(item.display);}));
-              if(navigator.share){navigator.share({title:"Shopping List",text:unchecked.join('\n')}).catch(()=>{});}
-              else if(navigator.clipboard){navigator.clipboard.writeText(unchecked.join('\n')).then(()=>showToast("Copied!"));}
-            }}>Share / Copy remaining</Primary>
+              const EMOJI={["Meat & Fish"]:"🥩",["Dairy & Eggs"]:"🧀",["Frozen"]:"🧊",["Tins & Pantry"]:"🥫",["Pasta, Rice & Grains"]:"🌾",["Bread & Wraps"]:"🍞",["Fresh Produce"]:"🥬"};
+              const mealLines=plan.meals.map(m=>m.day+': '+m.name).join('\n');
+              const listLines=Object.entries(shopList).map(([cat,items])=>{
+                const uncheckedItems=items.filter(item=>!checked[cat+':'+item.display]);
+                if(!uncheckedItems.length)return'';
+                return(EMOJI[cat]||'•')+' '+cat+'\n'+uncheckedItems.map(item=>'  • '+item.display).join('\n');
+              }).filter(Boolean).join('\n\n');
+              const allLines=Object.entries(shopList).map(([cat,items])=>{
+                return(EMOJI[cat]||'•')+' '+cat+'\n'+items.map(item=>'  • '+item.display).join('\n');
+              }).join('\n\n');
+              const hasChecked=Object.values(checked).some(Boolean);
+              const body='🛒 Shopping list'+(hasChecked?' (remaining)':'')+' — serves '+familySize+'\n\n'+
+                '📅 This week\n'+mealLines+'\n\n'+(hasChecked?listLines:allLines);
+              if(navigator.share){navigator.share({title:"Shopping List",text:body}).catch(()=>{});}
+              else if(navigator.clipboard){navigator.clipboard.writeText(body).then(()=>showToast("List copied!"));}
+            }}>🔗 Share list</Primary>
             <Secondary onClick={()=>{setStep("plan");scrollTop();}}>Back to meals</Secondary>
             <Secondary muted onClick={confirmReset}>Plan another week</Secondary>
           </div>
