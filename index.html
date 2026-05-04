@@ -659,10 +659,18 @@ const Secondary = ({ muted, children, onClick }) => (
 
 function MealPickerSheet({ meals, onPick, onClose }) {
   const [search, setSearch] = useState('');
+  const [focusIdx, setFocusIdx] = useState(-1);
   const q = search.trim().toLowerCase();
   const visible = q.length > 0
     ? meals.filter(m => m.name.toLowerCase().includes(q) || m.cuisine.toLowerCase().includes(q) || m.protein.toLowerCase().includes(q))
     : meals;
+  useEffect(()=>setFocusIdx(-1), [search]);
+  const handleKeyDown = e => {
+    if(e.key==='ArrowDown'){e.preventDefault();setFocusIdx(i=>Math.min(i+1,visible.length-1));}
+    else if(e.key==='ArrowUp'){e.preventDefault();setFocusIdx(i=>Math.max(i-1,0));}
+    else if(e.key==='Enter'&&focusIdx>=0&&visible[focusIdx]){onPick(visible[focusIdx]);}
+    else if(e.key==='Escape'){onClose();}
+  };
   return (
     <div style={{ position:"fixed",inset:0,zIndex:700 }}>
       <div style={{ position:"absolute",inset:0,background:"rgba(0,0,0,0.6)",
@@ -685,6 +693,7 @@ function MealPickerSheet({ meals, onPick, onClose }) {
             </div>
             <div style={{ padding:"14px 14px 8px" }}>
               <input value={search} onChange={e=>setSearch(e.target.value)}
+                onKeyDown={handleKeyDown}
                 placeholder="Search by name, cuisine or protein…"
                 aria-label="Search meals"
                 autoFocus
@@ -694,12 +703,13 @@ function MealPickerSheet({ meals, onPick, onClose }) {
             </div>
             <div style={{ padding:"0 14px 14px" }}>
               {visible.length===0 && <div style={{ textAlign:"center",color:P.muted,padding:"20px",fontSize:"14px" }}>No meals found</div>}
-              {visible.map(m=>(
+              {visible.map((m,idx)=>(
                 <div key={m.name} onClick={()=>onPick(m)}
+                  ref={el=>{if(el&&focusIdx===idx)el.scrollIntoView({block:'nearest'});}}
                   role="button" aria-label={`Choose ${m.name}`}
                   style={{ padding:"12px 14px",borderRadius:"12px",cursor:"pointer",
-                    background:P.card,marginBottom:"8px",
-                    border:`1.5px solid ${P.border}` }}>
+                    background:focusIdx===idx?P.accentLight:P.card,marginBottom:"8px",
+                    border:`1.5px solid ${focusIdx===idx?P.accent:P.border}` }}>
                   <div style={{ fontWeight:700,fontSize:"15px",lineHeight:1.3,marginBottom:"3px" }}>{m.name}</div>
                   <div style={{ fontSize:"12px",color:P.muted }}>{m.time} · {m.cuisine} · {m.protein}{m.adult?" · adults only":""}</div>
                 </div>
@@ -846,7 +856,7 @@ function AddMealForm({ onSave, onCancel }) {
   );
 }
 
-function PrefsScreen({ favourites, dislikes, customMeals, onToggleFav, onRemoveDislike,
+function PrefsScreen({ favourites, dislikes, customMeals, mealHistory, onToggleFav, onRemoveDislike,
                        onAddDislike, onAddCustom, onDeleteCustom, onClearAll, onClose, showToast }) {
   const [adding, setAdding] = useState(false);
   const [search, setSearch] = useState('');
@@ -953,6 +963,40 @@ function PrefsScreen({ favourites, dislikes, customMeals, onToggleFav, onRemoveD
                 color:P.accent, borderRadius:"8px", padding:"6px 12px", fontSize:"13px", cursor:"pointer", fontWeight:700 }}>Restore</button>
             </div>
           ))}
+        {mealHistory&&mealHistory.length>0&&(()=>{
+          const counts={};
+          mealHistory.forEach(h=>counts[h.name]=(counts[h.name]||0)+1);
+          const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+          const recent=[...mealHistory].sort((a,b)=>b.date-a.date).slice(0,8);
+          return(
+            <>
+              <div style={{ fontFamily:"'DM Serif Display',serif",fontSize:"18px",marginBottom:"10px",marginTop:"32px" }}>📅 Cook history</div>
+              {top.map(([name,n])=>(
+                <div key={name} style={{ background:P.card,borderRadius:"12px",padding:"11px 16px",marginBottom:"6px",
+                  boxShadow:P.shadow,border:`1px solid ${P.border}`,display:"flex",justifyContent:"space-between",alignItems:"center" }}>
+                  <div style={{ fontWeight:700,fontSize:"14px" }}>{name}</div>
+                  <div style={{ fontSize:"12px",color:P.muted,fontWeight:600 }}>×{n}</div>
+                </div>
+              ))}
+              <div style={{ fontSize:"11px",color:P.muted,fontWeight:700,textTransform:"uppercase",
+                letterSpacing:"1px",marginTop:"16px",marginBottom:"8px" }}>Recent</div>
+              <div style={{ background:P.card,borderRadius:"12px",padding:"4px 14px",
+                boxShadow:P.shadow,border:`1px solid ${P.border}` }}>
+                {recent.map((h,i)=>{
+                  const d=Math.floor((Date.now()-h.date)/(24*60*60*1000));
+                  const when=d===0?'today':d===1?'yesterday':d+' days ago';
+                  return(
+                    <div key={i} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",
+                      padding:"9px 0",borderBottom:i<recent.length-1?`1px solid ${P.border}`:"none",fontSize:"13px" }}>
+                      <span style={{ flex:1,marginRight:"12px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{h.name}</span>
+                      <span style={{ color:P.muted,fontSize:"12px",flexShrink:0 }}>{when}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          );
+        })()}
         <div style={{ marginTop:"36px", background:P.card, borderRadius:"12px", padding:"16px",
           border:`1px solid ${P.border}`, fontSize:"13px", color:P.muted, lineHeight:1.6 }}>
           <strong style={{ color:P.text }}>How smart suggestions work</strong><br/>
@@ -1170,6 +1214,7 @@ function App() {
   if(showPrefs) return (
     <>
       <PrefsScreen favourites={favourites} dislikes={dislikes} customMeals={customMeals}
+        mealHistory={mealHistory}
         onToggleFav={toggleFav} onRemoveDislike={removeDislike} onAddDislike={addDislike}
         onAddCustom={addCustom} onDeleteCustom={deleteCustom}
         onClearAll={()=>{setFavourites([]);setDislikes([]);save(SK.FAVS,[]);save(SK.DISLIKES,[]);showToast("Cleared");}}
