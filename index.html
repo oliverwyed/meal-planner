@@ -851,8 +851,14 @@ function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, familyS
   );
 }
 
-function AddMealForm({ onSave, onCancel }) {
-  const [f, setF] = useState({ name:'', minutes:'15', protein:'chicken', cuisine:'british', carb:'none', pool:'weekday', ingredients:'', steps:'' });
+function AddMealForm({ onSave, onCancel, initialValues }) {
+  const [f, setF] = useState(() => initialValues ? {
+    name: initialValues.name||'', minutes: String(initialValues.minutes||15),
+    protein: initialValues.protein||'chicken', cuisine: initialValues.cuisine||'british',
+    carb: initialValues.carb||'none', pool: initialValues.pool||'weekday',
+    ingredients: (initialValues.ingredients||[]).join('\n'),
+    steps: (initialValues.steps||[]).join('\n'),
+  } : { name:'', minutes:'15', protein:'chicken', cuisine:'british', carb:'none', pool:'weekday', ingredients:'', steps:'' });
   const set = (k,v) => setF(p=>({...p,[k]:v}));
   const valid = f.name.trim().length > 0;
   const handleSave = () => {
@@ -896,7 +902,7 @@ function AddMealForm({ onSave, onCancel }) {
       </select>)}
       {row("Ingredients (one per line)", <textarea value={f.ingredients} onChange={e=>set('ingredients',e.target.value)} placeholder={"400g pasta\n2 chicken breasts\n1 tin tomatoes"} style={ts} />)}
       {row("Recipe steps (one per line)", <textarea value={f.steps} onChange={e=>set('steps',e.target.value)} placeholder={"Cook the pasta.\nFry the chicken until golden.\nAdd the sauce and simmer."} style={{ ...ts, minHeight:"100px" }} />)}
-      <Primary disabled={!valid} onClick={handleSave}>Save meal</Primary>
+      <Primary disabled={!valid} onClick={handleSave}>{initialValues?'Update meal':'Save meal'}</Primary>
       <Secondary muted onClick={onCancel}>Cancel</Secondary>
     </div>
   );
@@ -973,9 +979,10 @@ function HelpScreen({ onClose }) {
 }
 
 function PrefsScreen({ favourites, dislikes, customMeals, mealHistory, savedState, familySize, pantry,
-                       onToggleFav, onRemoveDislike, onAddDislike, onAddCustom, onDeleteCustom,
+                       onToggleFav, onRemoveDislike, onAddDislike, onAddCustom, onDeleteCustom, onEditCustom,
                        onClearAll, onClearHistory, onImport, onClose, showToast }) {
   const [adding, setAdding] = useState(false);
+  const [editing, setEditing] = useState(null);
   const [search, setSearch] = useState('');
   const [importCode, setImportCode] = useState('');
   const [expandedMeal, setExpandedMeal] = useState(null);
@@ -1034,6 +1041,21 @@ function PrefsScreen({ favourites, dislikes, customMeals, mealHistory, savedStat
       </div>
     </div>
   );
+  if (editing) return (
+    <div>
+      <div style={{ background:`linear-gradient(135deg,${P.accent},${P.accentDark})`, color:"#fff", padding:"48px 24px 24px" }}>
+        <div style={{ maxWidth:"480px", margin:"0 auto", display:"flex", alignItems:"center", gap:"12px" }}>
+          <button onClick={()=>setEditing(null)} style={{ background:"rgba(255,255,255,0.2)", border:"none", color:"white", borderRadius:"10px", padding:"8px 14px", cursor:"pointer", fontSize:"15px", fontWeight:700 }}>← Back</button>
+          <h1 style={{ fontFamily:"'DM Serif Display',Georgia,serif", fontSize:"22px", margin:0 }}>Edit meal</h1>
+        </div>
+      </div>
+      <div style={{ maxWidth:"480px", margin:"0 auto", padding:"24px 16px 100px" }}>
+        <AddMealForm initialValues={editing}
+          onSave={m=>{onEditCustom(editing.name,m);setEditing(null);showToast("Meal updated ✓");}}
+          onCancel={()=>setEditing(null)} />
+      </div>
+    </div>
+  );
   return (
     <div>
       <div style={{ background:`linear-gradient(135deg,${P.accent},${P.accentDark})`, color:"#fff", padding:"48px 24px 24px" }}>
@@ -1054,8 +1076,13 @@ function PrefsScreen({ favourites, dislikes, customMeals, mealHistory, savedStat
             boxShadow:P.shadow, border:`1px solid ${P.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
             <div><div style={{ fontWeight:700, fontSize:"15px" }}>{m.name}</div>
             <div style={{ fontSize:"12px", color:P.muted }}>{m.time} · {m.pool} · {m.protein}</div></div>
-            <button onClick={()=>{if(window.confirm('Remove "'+m.name+'"?'))onDeleteCustom(m.name);}}
-              style={{ background:"none", border:"none", color:P.muted, cursor:"pointer", fontSize:"20px" }}>✕</button>
+            <div style={{ display:"flex", gap:"8px" }}>
+              <button onClick={()=>setEditing(m)}
+                style={{ background:"none", border:`1.5px solid ${P.border}`, borderRadius:"8px",
+                  color:P.accent, cursor:"pointer", fontSize:"13px", padding:"5px 10px", fontWeight:600 }}>Edit</button>
+              <button onClick={()=>{if(window.confirm('Remove "'+m.name+'"?'))onDeleteCustom(m.name);}}
+                style={{ background:"none", border:"none", color:P.muted, cursor:"pointer", fontSize:"20px" }}>✕</button>
+            </div>
           </div>
         ))}
         <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"18px", marginBottom:"10px", marginTop:"32px" }}>🔍 Browse all meals</div>
@@ -1390,6 +1417,7 @@ function App() {
   };
   const addCustom = meal => { const nc=[...customMeals,meal]; setCustomMeals(nc); save(SK.CUSTOM,nc); };
   const deleteCustom = name => { const nc=customMeals.filter(m=>m.name!==name); setCustomMeals(nc); save(SK.CUSTOM,nc); showToast("Meal removed"); };
+  const editCustom = (oldName,meal) => { const nc=customMeals.map(m=>m.name===oldName?meal:m); setCustomMeals(nc); save(SK.CUSTOM,nc); };
 
   const restoreSaved = () => {
     if(!savedState)return;
@@ -1438,7 +1466,7 @@ function App() {
       <PrefsScreen favourites={favourites} dislikes={dislikes} customMeals={customMeals}
         mealHistory={mealHistory} savedState={savedState} familySize={familySize} pantry={pantry}
         onToggleFav={toggleFav} onRemoveDislike={removeDislike} onAddDislike={addDislike}
-        onAddCustom={addCustom} onDeleteCustom={deleteCustom}
+        onAddCustom={addCustom} onDeleteCustom={deleteCustom} onEditCustom={editCustom}
         onClearAll={()=>{setFavourites([]);setDislikes([]);save(SK.FAVS,[]);save(SK.DISLIKES,[]);showToast("Cleared");}}
         onClearHistory={()=>{setMealHistory([]);save(SK.HISTORY,[]);showToast("History cleared");}}
         onImport={importProfile} onClose={()=>setShowPrefs(false)} showToast={showToast} />
