@@ -45,7 +45,7 @@ textarea,input,select{font-family:'DM Sans',sans-serif}
 <script>
 /* ── Data & Utilities (plain JS, not Babel-compiled) ─────────────────────── */
 var SK={HISTORY:'mp_history',FAVS:'mp_favs',DISLIKES:'mp_dislikes',PANTRY:'mp_pantry',
-        STATE:'mp_state',CUSTOM:'mp_custom',FAMILY:'mp_family',FILTER:'mp_filter',DAYS_CFG:'mp_days_cfg',KIDS_CFG:'mp_kids_cfg',CHECKED:'mp_checked',DIETARY:'mp_dietary'};
+        STATE:'mp_state',CUSTOM:'mp_custom',FAMILY:'mp_family',FILTER:'mp_filter',DAYS_CFG:'mp_days_cfg',KIDS_CFG:'mp_kids_cfg',CHECKED:'mp_checked',DIETARY:'mp_dietary',SIZE_OVR:'mp_size_ovr'};
 function load(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 
@@ -570,11 +570,12 @@ function categoriseItem(label){
   return'Fresh Produce';
 }
 
-function buildShop(plan,pantry,familySize){
+function buildShop(plan,pantry,familySize,dayConfig,sizeOverrides){
   var pw=(pantry||'').toLowerCase().split(/[,\n]/).map(function(s){return s.trim()}).filter(Boolean);
   var seen=new Map();
-  plan.meals.forEach(function(m){
-    var scale=familySize/(m.serves||4);
+  var meals=dayConfig?plan.meals.filter(function(m){return !dayConfig[m.day]||dayConfig[m.day]==='home';}):plan.meals;
+  meals.forEach(function(m){
+    var scale=((sizeOverrides&&sizeOverrides[m.day])||familySize)/(m.serves||4);
     scaledIngredients(m.ingredients,scale).forEach(function(ing){
       var lc=ing.label.toLowerCase();
       if(pw.some(function(w){var re=new RegExp('(?:^|\\b)'+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?:\\b|$)','i');return re.test(lc)||re.test(ing.display.toLowerCase());}))return;
@@ -599,12 +600,13 @@ function buildShop(plan,pantry,familySize){
   return out;
 }
 
-function countPantryExclusions(plan,pantry,familySize){
+function countPantryExclusions(plan,pantry,familySize,dayConfig,sizeOverrides){
   var pw=(pantry||'').toLowerCase().split(/[,\n]/).map(function(s){return s.trim()}).filter(Boolean);
   if(!pw.length)return 0;
   var excluded=new Set();
-  plan.meals.forEach(function(m){
-    var scale=familySize/(m.serves||4);
+  var meals=dayConfig?plan.meals.filter(function(m){return !dayConfig[m.day]||dayConfig[m.day]==='home';}):plan.meals;
+  meals.forEach(function(m){
+    var scale=((sizeOverrides&&sizeOverrides[m.day])||familySize)/(m.serves||4);
     scaledIngredients(m.ingredients,scale).forEach(function(ing){
       var lc=ing.label.toLowerCase();
       if(pw.some(function(w){var re=new RegExp('(?:^|\\b)'+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?:\\b|$)','i');return re.test(lc)||re.test(ing.display.toLowerCase());}))excluded.add(lc);
@@ -793,7 +795,8 @@ function MealPickerSheet({ meals, onPick, onClose }) {
 }
 
 function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, familySize,
-                    onExpand, onFav, onSwap, onDislike, onChoose, readOnly, lastUsed }) {
+                    onExpand, onFav, onSwap, onDislike, onChoose, readOnly, lastUsed,
+                    onMarkGousto, onMarkOff, onChangeMealSize }) {
   const scale = familySize / (meal.serves || 4);
   const ing = scaledIngredients(meal.ingredients, scale);
   const lastUsedStr = formatLastUsed(lastUsed);
@@ -824,6 +827,12 @@ function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, familyS
                   {onChoose && <button onClick={e=>{e.stopPropagation();onChoose();}}
                     aria-label="Choose a different meal" title="Choose from full list"
                     style={{ background:"none", border:"none", fontSize:"15px", cursor:"pointer", padding:"4px 6px", color:P.muted }}>📋</button>}
+                  {onMarkGousto && <button onClick={e=>{e.stopPropagation();onMarkGousto();}}
+                    aria-label="Mark as Gousto" title="Mark as Gousto"
+                    style={{ background:"none", border:"none", fontSize:"15px", cursor:"pointer", padding:"4px 6px", color:P.muted }}>📦</button>}
+                  {onMarkOff && <button onClick={e=>{e.stopPropagation();onMarkOff();}}
+                    aria-label="Mark as day off" title="Mark as no meal"
+                    style={{ background:"none", border:"none", fontSize:"14px", cursor:"pointer", padding:"4px 5px", color:P.muted, fontWeight:700 }}>—</button>}
                 </div>
               )}
             </div>
@@ -844,8 +853,17 @@ function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, familyS
       </div>
       <div className="expand-body" style={{ maxHeight:expanded?"2400px":"0", opacity:expanded?1:0 }}>
         <div style={{ borderTop:`1px solid ${P.border}`, padding:"14px 16px 18px" }}>
-          <div style={{ fontSize:"11px", fontWeight:700, color:P.muted, letterSpacing:"1.2px", marginBottom:"8px", textTransform:"uppercase" }}>
-            Ingredients — serves {familySize}
+          <div style={{ display:"flex", alignItems:"center", marginBottom:"8px" }}>
+            <div style={{ fontSize:"11px", fontWeight:700, color:P.muted, letterSpacing:"1.2px", textTransform:"uppercase" }}>Ingredients</div>
+            <div style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:"2px" }}>
+              {onChangeMealSize && <button onClick={e=>{e.stopPropagation();onChangeMealSize(-1);}}
+                style={{ background:P.border, border:"none", borderRadius:"6px", width:"24px", height:"24px",
+                  fontSize:"16px", cursor:"pointer", color:P.muted, lineHeight:1, display:"flex", alignItems:"center", justifyContent:"center" }}>−</button>}
+              <span style={{ fontSize:"12px", fontWeight:600, color:P.muted, padding:"0 6px" }}>serves {familySize}</span>
+              {onChangeMealSize && <button onClick={e=>{e.stopPropagation();onChangeMealSize(1);}}
+                style={{ background:P.border, border:"none", borderRadius:"6px", width:"24px", height:"24px",
+                  fontSize:"16px", cursor:"pointer", color:P.muted, lineHeight:1, display:"flex", alignItems:"center", justifyContent:"center" }}>+</button>}
+            </div>
           </div>
           <ul style={{ paddingLeft:"18px", marginBottom:"16px" }}>
             {ing.length>0
@@ -1307,6 +1325,7 @@ function App() {
   const [invalidShare, setInvalidShare] = useState(false);
   const [pendingDislike, setPendingDislike] = useState(null);
   const [addToPlanOpen,  setAddToPlanOpen]  = useState(false);
+  const [sizeOverrides,  setSizeOverrides]  = useState(()=>load(SK.SIZE_OVR, {}));
   const dislikeTimerRef = useRef(null);
 
   useEffect(()=>{
@@ -1319,6 +1338,7 @@ function App() {
   }, []);
 
   useEffect(()=>{ save(SK.DAYS_CFG, dayConfig); }, [dayConfig]);
+  useEffect(()=>{ save(SK.SIZE_OVR, sizeOverrides); }, [sizeOverrides]);
   useEffect(()=>{ save(SK.FAMILY, familySize); }, [familySize]);
   useEffect(()=>{ save(SK.FILTER, timeFilter); }, [timeFilter]);
   useEffect(()=>{ save(SK.DIETARY, dietaryMode); }, [dietaryMode]);
@@ -1333,12 +1353,20 @@ function App() {
   useEffect(()=>{
     if(!_familySizeInit.current){ _familySizeInit.current=true; return; }
     if(plan){
-      const newShop=buildShop(plan,pantry,familySize);
+      const newShop=buildShop(plan,pantry,familySize,dayConfig,sizeOverrides);
       setShopList(newShop);
       const ns={...savedState,familySize,shopList:newShop};
       setSavedState(ns); save(SK.STATE,ns);
     }
   }, [familySize]);
+  const _dayConfigPlanInit = useRef(false);
+  useEffect(()=>{
+    if(!_dayConfigPlanInit.current){ _dayConfigPlanInit.current=true; return; }
+    if(plan && step==='plan'){
+      const newShop=buildShop(plan,pantry,familySize,dayConfig,sizeOverrides);
+      setShopList(newShop);
+    }
+  }, [dayConfig, sizeOverrides]);
 
   const scrollTop = () => setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}), 50);
   const showToast = msg => { setToast(msg); setTimeout(()=>setToast(null), 2600); };
@@ -1347,7 +1375,7 @@ function App() {
   const si = SEASON_INFO[season];
   const homeDays  = DAYS.filter(d=>dayConfig[d]==="home");
   const goustoDays = DAYS.filter(d=>dayConfig[d]==="gousto");
-  const pantryExcluded = plan&&pantry.trim() ? countPantryExclusions(plan,pantry,familySize) : 0;
+  const pantryExcluded = plan&&pantry.trim() ? countPantryExclusions(plan,pantry,familySize,dayConfig,sizeOverrides) : 0;
 
   const getKids = day => kidsConfig[day] !== false;
   const toggleKids = day => setKidsConfig(prev=>({...prev,[day]:!getKids(day)}));
@@ -1365,10 +1393,11 @@ function App() {
       return null;
     }).filter(Boolean);
     const newPlan = { meals, generatedAt: Date.now() };
-    const newShop = buildShop(newPlan, pantry, familySize);
+    const newShop = buildShop(newPlan, pantry, familySize, dayConfig, sizeOverrides);
     const now = Date.now();
     const newHistory = [...mealHistory, ...meals.map(m=>({name:m.name,date:now}))].filter(h=>now-h.date<60*24*60*60*1000);
     setMealHistory(newHistory); save(SK.HISTORY, newHistory); save(SK.PANTRY, pantry);
+    setSizeOverrides({}); save(SK.SIZE_OVR, {});
     setPlan(newPlan); setShopList(newShop); setChecked({}); setExpandedDay(null); setStep("plan");
     const ns={dayConfig,familySize,timeFilter,plan:newPlan,shopList:newShop};
     setSavedState(ns); save(SK.STATE, ns); scrollTop();
@@ -1382,11 +1411,43 @@ function App() {
     if(!avail.length){ showToast("No more meals to swap to!"); return; }
     const r = avail[Math.floor(Math.random()*avail.length)];
     const newPlan = { meals:plan.meals.map(m=>m.day===day?{...r,day}:m) };
-    const newShop = buildShop(newPlan, pantry, familySize);
+    const newShop = buildShop(newPlan, pantry, familySize, dayConfig, sizeOverrides);
     setPlan(newPlan); setShopList(newShop);
     const ns={...savedState,plan:newPlan,shopList:newShop};
     setSavedState(ns); save(SK.STATE, ns);
     showToast("Swapped to "+r.name);
+  };
+
+  const changeDayInPlan = (day, mode) => {
+    const newDC = {...dayConfig, [day]: mode};
+    setDayConfig(newDC);
+    if(mode==='home' && plan && !plan.meals.find(m=>m.day===day)){
+      const type=WEEKEND.includes(day)?"weekend":"weekday";
+      const pool=getPool(type,timeFilter,customMeals,getKids(day),dietaryMode);
+      const used=plan.meals.map(m=>m.name);
+      const avail=pool.filter(m=>!used.includes(m.name)&&!dislikes.includes(m.name));
+      const [pick]=smartPick(avail.length?avail:pool,1,{history:mealHistory,favourites,dislikes});
+      if(pick){
+        const newPlan={...plan,meals:[...plan.meals,{...pick,day}]};
+        setPlan(newPlan);
+        const newShop=buildShop(newPlan,pantry,familySize,newDC,sizeOverrides);
+        setShopList(newShop);
+        const ns={...savedState,plan:newPlan,shopList:newShop};
+        setSavedState(ns); save(SK.STATE,ns);
+        showToast("Added "+pick.name+" for "+day);
+      }
+    }
+  };
+
+  const changeMealSize = (day, delta) => {
+    const current=(sizeOverrides[day]||familySize);
+    const next=Math.max(1,Math.min(20,current+delta));
+    if(next===familySize){
+      const {[day]:_,...rest}=sizeOverrides;
+      setSizeOverrides(rest);
+    } else {
+      setSizeOverrides(prev=>({...prev,[day]:next}));
+    }
   };
 
   const toggleFav = name => {
@@ -1434,7 +1495,7 @@ function App() {
     else if(pickerFor){
       const day=pickerFor;
       const newPlan={meals:plan.meals.map(m=>m.day===day?{...meal,day}:m)};
-      const newShop=buildShop(newPlan,pantry,familySize);
+      const newShop=buildShop(newPlan,pantry,familySize,dayConfig,sizeOverrides);
       setPlan(newPlan); setShopList(newShop);
       const ns={...savedState,plan:newPlan,shopList:newShop};
       setSavedState(ns); save(SK.STATE,ns);
@@ -1445,7 +1506,7 @@ function App() {
   const addToPlan = (day, meal) => {
     if(!plan) return;
     const newPlan={...plan,meals:plan.meals.map(m=>m.day===day?{...meal,day}:m)};
-    const newShop=buildShop(newPlan,pantry,familySize);
+    const newShop=buildShop(newPlan,pantry,familySize,dayConfig,sizeOverrides);
     setPlan(newPlan); setShopList(newShop);
     const ns={...savedState,plan:newPlan,shopList:newShop};
     setSavedState(ns); save(SK.STATE,ns);
@@ -1705,16 +1766,37 @@ function App() {
             {plan.generatedAt&&<div style={{ fontSize:"12px", color:P.muted, marginBottom:"6px" }}>{formatAgo(plan.generatedAt)}</div>}
             <p style={{ fontSize:"13px", color:P.muted, marginBottom:"16px" }}>Tap a card for recipe &amp; ingredients · ☆ favourite · 🔄 swap · 👎 skip forever</p>
             {DAYS.map(day=>{
-              if(dayConfig[day]==="off") return null;
-              if(goustoDays.includes(day)) return (
-                <div key={day} style={{ background:P.card, borderRadius:"16px", padding:"16px 18px", marginBottom:"10px",
-                  boxShadow:P.shadow, border:`1px solid ${P.border}`, display:"flex", gap:"14px", opacity:0.55 }}>
-                  <div style={{ fontSize:"26px" }}>📦</div>
-                  <div>
-                    <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"12px", color:P.accent, textTransform:"uppercase", marginBottom:"3px" }}>{day}</div>
-                    <div style={{ fontWeight:700, fontSize:"16px", marginBottom:"2px" }}>Gousto</div>
-                    <div style={{ fontSize:"13px", color:P.muted }}>Meal kit — sorted!</div>
+              const dayMode=dayConfig[day]||'home';
+              const DayActions = ({onHome, onGousto, onOff}) => (
+                <div style={{ display:"flex", gap:"6px", marginTop:"8px" }}>
+                  {onHome && <button onClick={onHome} style={{ background:P.accentLight, border:"none", borderRadius:"8px",
+                    padding:"5px 10px", fontSize:"12px", fontWeight:700, color:P.accentDark, cursor:"pointer" }}>🍽️ Use a recipe</button>}
+                  {onGousto && <button onClick={onGousto} style={{ background:P.greenLight, border:"none", borderRadius:"8px",
+                    padding:"5px 10px", fontSize:"12px", fontWeight:700, color:P.greenDark, cursor:"pointer" }}>📦 Gousto</button>}
+                  {onOff && <button onClick={onOff} style={{ background:P.border, border:"none", borderRadius:"8px",
+                    padding:"5px 10px", fontSize:"12px", fontWeight:700, color:P.muted, cursor:"pointer" }}>— Day off</button>}
+                </div>
+              );
+              if(dayMode==="off") return (
+                <div key={day} style={{ background:P.card, borderRadius:"16px", padding:"14px 18px", marginBottom:"10px",
+                  boxShadow:P.shadow, border:`1px solid ${P.border}`, opacity:0.5 }}>
+                  <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"12px", color:P.accent, textTransform:"uppercase", marginBottom:"3px" }}>{day}</div>
+                  <div style={{ fontWeight:700, fontSize:"15px", color:P.muted }}>Day off</div>
+                  <DayActions onHome={()=>changeDayInPlan(day,'home')} onGousto={()=>changeDayInPlan(day,'gousto')} />
+                </div>
+              );
+              if(dayMode==="gousto") return (
+                <div key={day} style={{ background:P.card, borderRadius:"16px", padding:"14px 18px", marginBottom:"10px",
+                  boxShadow:P.shadow, border:`1px solid ${P.border}`, opacity:0.6 }}>
+                  <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"12px", color:P.accent, textTransform:"uppercase", marginBottom:"3px" }}>{day}</div>
+                  <div style={{ display:"flex", gap:"12px", alignItems:"center" }}>
+                    <div style={{ fontSize:"26px" }}>📦</div>
+                    <div>
+                      <div style={{ fontWeight:700, fontSize:"16px", marginBottom:"2px" }}>Gousto</div>
+                      <div style={{ fontSize:"13px", color:P.muted }}>Meal kit — sorted!</div>
+                    </div>
                   </div>
+                  <DayActions onHome={()=>changeDayInPlan(day,'home')} onOff={()=>changeDayInPlan(day,'off')} />
                 </div>
               );
               const meal=plan.meals.find(m=>m.day===day);
@@ -1724,11 +1806,15 @@ function App() {
               return <MealCard key={day} meal={meal} day={day}
                 isFav={favourites.includes(meal.name)}
                 isSeasonal={!!(meal.seasons&&meal.seasons.includes(season))}
-                seasonLabel={si.label} expanded={expandedDay===day} familySize={familySize}
+                seasonLabel={si.label} expanded={expandedDay===day}
+                familySize={sizeOverrides[day]||familySize}
                 onExpand={()=>setExpandedDay(expandedDay===day?null:day)}
                 onFav={()=>toggleFav(meal.name)} onSwap={()=>swap(day)}
                 onDislike={()=>addDislike(meal.name)} onChoose={()=>setPickerFor(day)} readOnly={false}
-                lastUsed={lastUsed} />;
+                lastUsed={lastUsed}
+                onMarkGousto={()=>changeDayInPlan(day,'gousto')}
+                onMarkOff={()=>changeDayInPlan(day,'off')}
+                onChangeMealSize={(delta)=>changeMealSize(day,delta)} />;
             })}
             {(()=>{
               const pc={},cb={};
