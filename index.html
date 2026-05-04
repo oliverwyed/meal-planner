@@ -993,6 +993,9 @@ function App() {
   const [cookNowExp,   setCookNowExp]   = useState(false);
   const [pickerFor,    setPickerFor]    = useState(null);
   const [invalidShare, setInvalidShare] = useState(false);
+  const [pendingDislike, setPendingDislike] = useState(null);
+  const [addToPlanOpen,  setAddToPlanOpen]  = useState(false);
+  const dislikeTimerRef = useRef(null);
 
   useEffect(()=>{
     const hash = window.location.hash;
@@ -1011,6 +1014,7 @@ function App() {
     document.body.style.overflow = (cookNow||pickerFor) ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [cookNow, pickerFor]);
+  useEffect(()=>{ if(!cookNow) setAddToPlanOpen(false); }, [cookNow]);
   useEffect(()=>{ save(SK.CHECKED, checked); }, [checked]);
   const _familySizeInit = useRef(false);
   useEffect(()=>{
@@ -1078,9 +1082,15 @@ function App() {
     setFavourites(nf); save(SK.FAVS, nf);
     showToast(isFav?"Removed from favourites":"Added to favourites ⭐");
   };
+  const commitDislike = name => {
+    setDislikes(prev=>{const nd=prev.includes(name)?prev:[...prev,name];save(SK.DISLIKES,nd);return nd;});
+    setPendingDislike(null);
+  };
+  const undoDislike = () => { clearTimeout(dislikeTimerRef.current); setPendingDislike(null); showToast("Restored ✓"); };
   const addDislike = name => {
-    const nd=[...dislikes,name]; setDislikes(nd); save(SK.DISLIKES, nd);
-    showToast("Won't suggest this again");
+    clearTimeout(dislikeTimerRef.current);
+    setPendingDislike(name);
+    dislikeTimerRef.current = setTimeout(()=>commitDislike(name), 4000);
     const mealDay = plan?.meals.find(m=>m.name===name)?.day;
     if(mealDay) swap(mealDay,[name]);
   };
@@ -1089,9 +1099,10 @@ function App() {
     showToast("Restored ✓");
   };
   const pickCookNow = () => {
+    const allDis = pendingDislike ? [...dislikes, pendingDislike] : dislikes;
     const all=[...getPool("weekday","any",customMeals,true),...getPool("weekend","any",customMeals,true)];
     const unique=all.filter((m,i)=>all.findIndex(x=>x.name===m.name)===i);
-    const [pick]=smartPick(unique,1,{history:mealHistory,favourites,dislikes});
+    const [pick]=smartPick(unique,1,{history:mealHistory,favourites,dislikes:allDis});
     setCookNow(pick||null); setCookNowExp(true);
   };
   const allMeals = [...WEEKDAY_MEALS,...WEEKEND_MEALS,...customMeals].filter((m,i,a)=>a.findIndex(x=>x.name===m.name)===i);
@@ -1107,6 +1118,16 @@ function App() {
       showToast("Changed to "+meal.name);
     }
     setPickerFor(null);
+  };
+  const addToPlan = (day, meal) => {
+    if(!plan) return;
+    const newPlan={...plan,meals:plan.meals.map(m=>m.day===day?{...meal,day}:m)};
+    const newShop=buildShop(newPlan,pantry,familySize);
+    setPlan(newPlan); setShopList(newShop);
+    const ns={...savedState,plan:newPlan,shopList:newShop};
+    setSavedState(ns); save(SK.STATE,ns);
+    showToast("Added to "+day+" ✓");
+    setCookNow(null);
   };
   const addCustom = meal => { const nc=[...customMeals,meal]; setCustomMeals(nc); save(SK.CUSTOM,nc); };
   const deleteCustom = name => { const nc=customMeals.filter(m=>m.name!==name); setCustomMeals(nc); save(SK.CUSTOM,nc); showToast("Meal removed"); };
@@ -1473,6 +1494,36 @@ function App() {
                     cursor:"pointer",marginTop:"12px",padding:"4px" }}>
                   📋 Browse all meals
                 </button>
+                {plan && homeDays.length>0 && (<>
+                  <button onClick={()=>setAddToPlanOpen(x=>!x)}
+                    style={{ width:"100%",background:"none",border:"none",
+                      color:P.muted,fontSize:"14px",fontWeight:600,
+                      cursor:"pointer",marginTop:"12px",padding:"4px" }}>
+                    📅 Add to this week's plan
+                  </button>
+                  {addToPlanOpen && (
+                    <div style={{ marginTop:"12px",background:P.card,borderRadius:"14px",
+                      padding:"10px 14px",border:`1px solid ${P.border}` }}>
+                      <div style={{ fontSize:"11px",color:P.muted,fontWeight:700,
+                        textTransform:"uppercase",letterSpacing:"1px",marginBottom:"8px" }}>Replace which day?</div>
+                      {homeDays.map((day,idx)=>{
+                        const existing=plan.meals.find(m=>m.day===day);
+                        return (
+                          <div key={day} onClick={()=>addToPlan(day,cookNow)}
+                            style={{ display:"flex",justifyContent:"space-between",alignItems:"center",
+                              padding:"9px 4px",cursor:"pointer",
+                              borderBottom:idx<homeDays.length-1?`1px solid ${P.border}`:"none" }}>
+                            <div style={{ fontWeight:700,fontSize:"13px",minWidth:"72px" }}>{day}</div>
+                            <div style={{ fontSize:"12px",color:P.muted,textAlign:"right",flex:1,
+                              overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>
+                              {existing?existing.name:'—'}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>)}
               </div>
             </div>
           </div>
@@ -1491,6 +1542,18 @@ function App() {
         🍴 Cook tonight
       </button>
       {toast&&<div className="toast">{toast}</div>}
+      {pendingDislike && (
+        <div style={{ position:"fixed",bottom:"28px",left:"50%",transform:"translateX(-50%)",
+          background:"#2D3436",color:"#fff",padding:"12px 16px 12px 20px",borderRadius:"12px",
+          fontSize:"14px",fontWeight:600,zIndex:9999,animation:"slideUp 0.25s ease",
+          boxShadow:"0 4px 20px rgba(0,0,0,0.25)",display:"flex",alignItems:"center",
+          gap:"12px",whiteSpace:"nowrap" }}>
+          <span>Won't suggest again</span>
+          <button onClick={undoDislike} style={{ background:"rgba(255,255,255,0.2)",border:"none",
+            color:"#fff",padding:"5px 10px",borderRadius:"8px",fontSize:"13px",fontWeight:700,
+            cursor:"pointer" }}>Undo</button>
+        </div>
+      )}
     </div>
   );
 }
