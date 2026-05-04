@@ -45,7 +45,7 @@ textarea,input,select{font-family:'DM Sans',sans-serif}
 <script>
 /* ── Data & Utilities (plain JS, not Babel-compiled) ─────────────────────── */
 var SK={HISTORY:'mp_history',FAVS:'mp_favs',DISLIKES:'mp_dislikes',PANTRY:'mp_pantry',
-        STATE:'mp_state',CUSTOM:'mp_custom',FAMILY:'mp_family',FILTER:'mp_filter',DAYS_CFG:'mp_days_cfg',KIDS_CFG:'mp_kids_cfg'};
+        STATE:'mp_state',CUSTOM:'mp_custom',FAMILY:'mp_family',FILTER:'mp_filter',DAYS_CFG:'mp_days_cfg',KIDS_CFG:'mp_kids_cfg',CHECKED:'mp_checked'};
 function load(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 
@@ -69,13 +69,13 @@ var CATEGORY_ORDER=["Meat & Fish","Dairy & Eggs","Frozen","Tins & Pantry",
 
 /* ── Meal data ────────────────────────────────────────────────────────────── */
 var WEEKDAY_MEALS=[
-{name:"Herby Beef Meatballs in Tomato Passata with Penne",time:"12 min",minutes:12,protein:"beef",cuisine:"italian",serves:4,
+{name:"Herby Beef Meatballs in Tomato Passata with Penne",time:"12 min",minutes:12,protein:"beef",cuisine:"italian",seasons:["autumn","winter"],serves:4,
  description:"Tender meatballs rolled in a deep, herb-scented passata cling to every ridge of penne — the kind of bowl that looks like it took an hour. A weeknight staple that earns its place on repeat.",kidNote:"Halve the meatballs for small children so they're easy to manage",
  ingredients:["400g penne pasta","12 pre-made beef meatballs","400g passata","1 tsp dried oregano","30g parmesan"],
  steps:["Bring a large pot of well-salted water to a boil and cook penne according to pack instructions.","Meanwhile, pour passata into a wide pan, add oregano, and season generously with salt and pepper. Bring to a gentle simmer over medium heat.","Add the meatballs, cover with a lid, and cook 6–8 min, turning once, until heated all the way through and the sauce has deepened in colour.","Reserve a small cup of pasta water, then drain. Add the pasta directly to the sauce pan and toss over the heat for 1 min, adding a splash of pasta water to bring it together.","Serve in warmed bowls with parmesan grated over the top."],
  tip:"A splash of the starchy pasta water is the secret to a glossy, clingy sauce — add it just before serving and toss vigorously so every piece of penne is coated."},
 
-{name:"Soy-Glazed Chicken, Sweetcorn & Pea Rice Bowl",time:"15 min",minutes:15,protein:"chicken",cuisine:"asian",serves:4,
+{name:"Soy-Glazed Chicken, Sweetcorn & Pea Rice Bowl",time:"15 min",minutes:15,protein:"chicken",cuisine:"asian",seasons:["spring","summer"],serves:4,
  description:"Juicy golden chicken with pops of sweetcorn and peas, lifted by a salty-sweet soy glaze and piled onto fluffy rice. Bright, fast, and endlessly satisfying.",kidNote:"Great as finger food — dice the chicken small and let them eat it with a spoon",
  ingredients:["3 chicken breasts","250g microwave rice","150g frozen sweetcorn","100g frozen peas","2 tbsp soy sauce","1 tbsp vegetable oil"],
  steps:["Dice chicken into small, even pieces (about 2cm) and season lightly with salt — even sizing means it all cooks at the same rate.","Heat oil in a wide frying pan or wok over high heat until shimmering. Add chicken in a single layer and leave it alone for 2 min to get a proper golden crust before stirring.","Continue cooking, stirring, for another 3–4 min until cooked through with no pink remaining.","Microwave rice per pack instructions. Add sweetcorn and peas to the chicken pan; stir-fry for 2 min until the veg is heated through and bright.","Add rice and soy sauce; toss everything together over high heat for 1 min. Taste — it may need another splash of soy — and serve."],
@@ -135,19 +135,19 @@ var WEEKDAY_MEALS=[
  steps:["Slice sausages into chunky coins, about 1.5cm thick — this maximises the surface area that can brown.","Heat oil in a wide pan over medium-high heat. Add the sausage pieces in a single layer and cook without moving for 2–3 min until a deep mahogany crust forms underneath. Flip and brown the other side.","Add baked beans and ketchup; stir to combine, scraping up any browned bits from the pan — that's pure flavour.","Reduce heat to medium-low and simmer for 3–4 min, stirring occasionally, until the sauce has thickened slightly and everything is piping hot.","Toast and butter the bread. Serve the sausage and bean mixture spooned generously over the toast."],
  tip:"Leaving the sausage coins undisturbed for a full 2–3 minutes develops a proper caramelised crust — the instinct to stir too soon robs you of the deep brown colour that gives this dish its flavour."},
 
-{name:"Golden Chicken Goujons with Oven Chips & Peas",time:"20 min",minutes:20,protein:"chicken",cuisine:"british",serves:4,
+{name:"Golden Chicken Goujons with Oven Chips & Peas",time:"20 min",minutes:20,protein:"chicken",cuisine:"british",seasons:["autumn","winter"],serves:4,
  description:"Crispy-coated chicken strips and golden chips from the oven — a proper favourite that requires almost no effort. The trick is giving the chips a head start so everything emerges at exactly the same moment.",kidNote:"Always check a goujon is piping hot all the way through before serving to small children",
  ingredients:["400g chicken breast goujons","400g frozen oven chips","200g frozen peas","2 tbsp ketchup"],
  steps:["Preheat oven to 220°C / 200°C fan — a high temperature is essential for chips that are golden on the outside and fluffy inside, not pale and soggy.","Spread chips in a single layer on a large baking tray (don't overcrowd or they steam and go soft). Bake for 10 min until beginning to colour.","Slide the goujons onto the tray alongside the chips, leaving space around each piece. Bake for a further 10–12 min until the chips are deep golden and the goujons are golden-brown and cooked through.","Cook peas in boiling water for 3 min or microwave with a splash of water; drain.","Serve immediately with ketchup. Cut a goujon open and check the inside is white and steaming hot, with no pink, before giving to children."],
  tip:"The chips need to go in 10 minutes before the goujons because they take longer to cook through — adding everything at once means either underdone chips or overdone chicken."},
 
-{name:"Courgette, Tomato & Melted Cheddar Omelette with Toast",time:"10 min",minutes:10,protein:"eggs",cuisine:"british",serves:4,
+{name:"Courgette, Tomato & Melted Cheddar Omelette with Toast",time:"10 min",minutes:10,protein:"eggs",cuisine:"british",seasons:["spring","summer"],serves:4,
  description:"A golden, pillowy omelette with tender courgette, bursting cherry tomatoes and melted cheddar pooling through every fold. One of the fastest, most nourishing things you can put on the table.",kidNote:"Cut into strips or squares for small children — it's soft all the way through and easy to manage",
  ingredients:["6 eggs","60g cheddar cheese","4 cherry tomatoes","1 small courgette","1 tbsp butter","4 slices bread"],
  steps:["Dice the courgette into small cubes (about 1cm). Halve the cherry tomatoes. Grate the cheddar finely — fine grating means it melts into the eggs rather than sitting in clumps.","Melt butter in a wide non-stick pan over medium heat until foaming. Add courgette and cook, stirring, for 2–3 min until just tender and starting to turn golden at the edges.","Beat eggs thoroughly with a generous pinch of salt and plenty of black pepper. Pour over the courgette and let it sit for 30 seconds until the edges just begin to set.","Scatter the halved tomatoes and cheddar evenly over the top. Continue cooking over medium heat until the edges are set and the middle is just barely wobbly — about 2 min.","Fold in half with a spatula and slide onto a board. Toast the bread while the omelette rests for 1 min. Serve cut into strips alongside the toast."],
  tip:"Resist the urge to stir the eggs once they're in the pan — letting them set undisturbed from the bottom up gives you a tender, custardy texture rather than a scrambled mess."},
 
-{name:"Quick Beef Bolognese Ragù with Spaghetti",time:"20 min",minutes:20,protein:"beef",cuisine:"italian",serves:4,
+{name:"Quick Beef Bolognese Ragù with Spaghetti",time:"20 min",minutes:20,protein:"beef",cuisine:"italian",seasons:["autumn","winter"],serves:4,
  description:"A rich, deeply savoury ragu of beef mince and sweet tomatoes that coats every strand of spaghetti — made in 20 minutes, but it tastes like it's been simmering for much longer. The key is getting the mince genuinely brown.",kidNote:"Use short pasta shapes for toddlers and stir the sauce through so it's not in long strings",
  ingredients:["400g beef mince","400g tin chopped tomatoes","300g spaghetti","1 onion","1 carrot","1 tbsp olive oil","1 tsp dried mixed herbs"],
  steps:["Finely dice onion and carrot — small pieces cook faster and disappear into the sauce. Soften in olive oil over medium heat for 3–4 min, stirring, until the onion is translucent and smells sweet.","Turn heat to high, add the mince and spread it flat. Leave it completely untouched for 2 min so the bottom develops a deep brown crust — this is where the flavour lives.","Break up the mince and continue cooking, stirring occasionally, until all the pink is gone and the mince looks genuinely brown, not grey, about 3 more min.","Add tomatoes, herbs, salt and plenty of black pepper. Stir well, scraping up the browned bits from the pan base. Simmer over medium heat for 8–10 min until the sauce thickens and deepens in colour.","Cook spaghetti in well-salted boiling water per pack. Drain and serve topped with the bolognese."],
@@ -177,7 +177,7 @@ var WEEKDAY_MEALS=[
  steps:["Cook macaroni in well-salted boiling water per pack; drain.","Melt butter in the same pan over medium heat until foaming. Add flour and stir constantly with a wooden spoon for 1 full minute — cooking out the flour taste is essential.","Remove from heat and gradually whisk in the milk, a little at a time, making sure each addition is fully incorporated before adding the next — this prevents lumps.","Return to medium heat and stir continuously until the sauce thickens enough to coat the back of a spoon, about 4–5 min. It should be smooth and glossy.","Take off the heat again; stir in three-quarters of the cheddar and all the mustard. Season well with salt, white pepper and a pinch of nutmeg if you have it. Add the macaroni, stir to coat, and serve with the remaining cheese on top."],
  tip:"Adding the milk off the heat and in small increments — whisking fully between each addition — is the technique that prevents a lumpy béchamel; patience here is the difference between a silky sauce and a grainy one."},
 
-{name:"Crispy Bacon, Pea & Cream Penne",time:"12 min",minutes:12,protein:"pork",cuisine:"italian",serves:4,
+{name:"Crispy Bacon, Pea & Cream Penne",time:"12 min",minutes:12,protein:"pork",cuisine:"italian",seasons:["spring","summer"],serves:4,
  description:"Crisp, salty bacon and sweet, yielding peas in a delicate cream sauce that coats every piece of penne — finished with a snow of parmesan. A pasta that feels indulgent but takes less than 15 minutes.",kidNote:"The smoky flavour tends to appeal to children even if they claim not to like bacon",
  ingredients:["300g penne pasta","6 rashers back bacon","200g frozen peas","150ml double cream","30g parmesan","1 tbsp olive oil"],
  steps:["Cook pasta in well-salted boiling water per pack. Add peas in the last 2 min of cooking — they'll be tender and bright green by the time the pasta is ready. Reserve a cup of pasta water before draining.","Meanwhile, dice bacon into rough 1cm pieces. Fry in olive oil over medium-high heat for 3–4 min, tossing occasionally, until the fat has rendered and the pieces are properly crisp at the edges.","Drain pasta and peas, then add directly to the bacon pan over low heat.","Pour in the cream and add a good splash of pasta water. Toss everything together for 1–2 min until the sauce has emulsified into a glossy, clingy coating.","Taste, season with black pepper (salt is likely not needed given the bacon), and serve with parmesan grated over the top."],
@@ -195,7 +195,7 @@ var WEEKDAY_MEALS=[
  steps:["Drain and rinse black beans thoroughly. Defrost sweetcorn (a minute in the microwave or under warm water). Grate cheddar finely — small grating melts faster and ensures even coverage.","Combine beans, sweetcorn, cheese and smoked paprika in a bowl; season generously with salt and pepper. The filling should taste well-seasoned on its own.","Heat a dry frying pan over medium-high heat. Lay a tortilla flat in the pan, spread half the filling across one half, and fold the other half over to form a half-moon.","Cook for 2–3 min until the underside is deep golden and crisp. Flip carefully and cook 2 min more — listen for the sizzle; it should be active and consistent.","Slide onto a board, rest 30 seconds, then slice into 3 wedges with a sharp knife. Repeat with the second tortilla. Serve with salsa."],
  tip:"Mashing about a third of the beans lightly before combining helps the filling hold together inside the quesadilla — whole beans can roll out as you fold the tortilla, and mashed beans act as a natural binder."},
 
-{name:"Herby Turkey Ragù with Rigatoni",time:"18 min",minutes:18,protein:"beef",cuisine:"italian",serves:4,
+{name:"Herby Turkey Ragù with Rigatoni",time:"18 min",minutes:18,protein:"beef",cuisine:"italian",seasons:["autumn","winter"],serves:4,
  description:"Lean turkey mince coaxed into a savoury, herb-scented tomato ragu and tossed through ridged rigatoni. Lighter than a beef bolognese but just as deeply comforting — a brilliant regular.",kidNote:"Rigatoni tubes hold the sauce inside them — cut into pieces for toddlers so they're easier to manage",
  ingredients:["400g turkey mince","400g tin chopped tomatoes","300g rigatoni","1 onion","1 carrot","1 tsp dried mixed herbs","1 tbsp olive oil"],
  steps:["Finely dice onion and carrot into small, even pieces. Heat olive oil in a wide pan over medium heat and cook the onion and carrot, stirring occasionally, for 3–4 min until the onion is soft and translucent.","Add turkey mince, increase heat to medium-high, and cook, breaking it up with a spoon, until no pink remains and the mince starts to colour slightly, about 4–5 min.","Add chopped tomatoes, herbs, salt and pepper. Stir well and simmer over medium heat for 10 min, stirring occasionally, until the sauce reduces and thickens.","Cook rigatoni in well-salted boiling water per pack instructions. Drain, reserving a splash of pasta water.","Add pasta to the sauce with a splash of pasta water and toss to coat. Taste and adjust seasoning before serving."],
@@ -219,13 +219,13 @@ var WEEKDAY_MEALS=[
  steps:["Microwave rice per pack instructions and keep warm. Cook edamame in boiling water for 3 min; drain.","Mix miso paste, butter, soy sauce, honey and sesame oil in a small bowl until combined into a smooth glaze.","Pat salmon fillets completely dry — essential for caramelisation. Season with a little black pepper.","Heat a non-stick pan over medium-high heat. Place salmon skin-side down and cook undisturbed for 3–4 min until the skin is crisp. Flip, spread the miso butter generously over the surface, and cook 2–3 min more until the glaze is caramelised and the salmon is just cooked through.","Serve salmon over rice with edamame alongside, spooning any remaining glaze from the pan over the top."],
  tip:"White miso (shiro miso) is the one to use here — it's sweeter and gentler than red miso, which can be too intense and overpowering in a glaze going directly into a hot pan."},
 
-{name:"Smoky Paprika Chicken & Butter Bean Stew",time:"18 min",minutes:18,protein:"chicken",cuisine:"british",serves:4,
+{name:"Smoky Paprika Chicken & Butter Bean Stew",time:"18 min",minutes:18,protein:"chicken",cuisine:"british",seasons:["autumn","winter"],serves:4,
  description:"Tender strips of chicken and creamy butter beans simmered in a smoky, paprika-rich tomato broth — a one-pan stew that tastes like it's been slow-cooking all afternoon. Brilliant with crusty bread for mopping.",kidNote:"Butter beans are soft and mild — most children enjoy them once they're part of a saucy, familiar-tasting dish",
  ingredients:["3 chicken breasts","2 tins butter beans","400g tin chopped tomatoes","2 tsp smoked paprika","1 onion","1 tbsp olive oil","1 tsp garlic granules","bread for serving"],
  steps:["Finely dice the onion. Heat olive oil in a wide, deep pan over medium heat and cook the onion, stirring, for 3–4 min until soft and translucent.","Slice chicken breasts into thin strips (about 1cm). Add to the pan with the paprika and garlic granules; stir to coat, then cook over medium-high heat for 3–4 min until lightly golden.","Pour in the chopped tomatoes and drain and rinse the butter beans, then add them too. Season generously with salt and pepper.","Stir well and simmer over medium heat for 8–10 min until the chicken is cooked through and the sauce has thickened into a rich, deep-red broth.","Taste and adjust seasoning — it may want a pinch more salt or paprika. Serve in bowls with crusty bread for dipping."],
  tip:"Letting the stew simmer uncovered for the full 8–10 minutes concentrates the sauce into something rich and intense — covering the pan traps steam and keeps it thin and watery."},
 
-{name:"Pan-Seared Sirloin Steak with Garlic Butter & Watercress",time:"20 min",minutes:20,protein:"beef",cuisine:"british",serves:4,adult:true,
+{name:"Pan-Seared Sirloin Steak with Garlic Butter & Watercress",time:"20 min",minutes:20,protein:"beef",cuisine:"british",seasons:["spring","summer"],serves:4,adult:true,
  description:"Four sizzling sirloins — deeply charred at the edges and blushing pink within — finished in foaming garlic butter with thyme and served over peppery watercress. The kind of dinner that rewards a long day without asking much in return.",kidNote:"",
  ingredients:["4 sirloin steaks (about 220g each)","40g butter","3 garlic cloves","2 sprigs fresh thyme","2 tbsp vegetable oil","80g watercress","1 lemon","1 tsp flaky sea salt"],
  steps:["Take steaks from the fridge 15 minutes before cooking. Pat both sides completely dry — surface moisture is the enemy of a crust. Season very generously with flaky salt and pepper on both sides; more than feels right.","Heat a large heavy-based pan over the highest heat until it begins to smoke. Add oil and lay the steaks away from you. Do not move them — cook 2–3 min until a deep mahogany crust has formed underneath.","Flip and cook 2 min more for medium-rare. The flesh should spring back firmly with a little give. Cook 1 min longer per side for medium. Adjust timings for thickness.","Reduce heat to medium. Add butter, crushed garlic cloves and thyme. As the butter foams, tilt the pan and baste the steaks continuously with the garlicky butter for 1 full minute.","Rest on a warm plate, uncovered, for at least 5 min. Place over watercress, pour the pan butter over generously, squeeze lemon all over and serve."],
@@ -237,25 +237,25 @@ var WEEKDAY_MEALS=[
  steps:["Cook peas in boiling salted water for 3 min. Finely dice the shallot. Drain peas and crush roughly in a pan with the shallot, half the butter, a squeeze of lemon, the mint leaves, salt and pepper — aim for a textured smash, not a smooth purée. Keep warm.","Lay pancetta in a cold frying pan. Turn heat to medium-high and cook until deeply golden and crisp on both sides, about 3–4 min. Drain on kitchen paper. Do not discard the fat in the pan.","Pat scallops bone-dry on both sides and season generously with salt and pepper. Any moisture prevents caramelisation.","Increase heat under the pancetta pan to very high. Add remaining butter and olive oil. When foaming, add scallops flat-side down with space between each. Cook completely undisturbed for 90 seconds until deep golden.","Flip and cook 45–60 seconds more — they should feel firm with a little give. Serve immediately over the crushed peas, broken pancetta scattered over, with lemon wedges."],
  tip:"The first 30 seconds after scallops hit the pan determines the outcome — if the pan is hot enough and they are dry enough, caramelisation begins immediately; if either condition isn't met, they steam and no amount of additional cooking recovers the crust."},
 
-{name:"Nduja, Cherry Tomato & Burrata Tagliatelle",time:"15 min",minutes:15,protein:"pork",cuisine:"italian",serves:4,adult:true,
+{name:"Nduja, Cherry Tomato & Burrata Tagliatelle",time:"15 min",minutes:15,protein:"pork",cuisine:"italian",seasons:["spring","summer"],serves:4,adult:true,
  description:"Silky ribbons of tagliatelle through a vivid, fiery nduja and burst cherry tomato sauce, finished with torn creamy burrata that melts into the heat. Deeply flavoured, unashamedly rich, and ready in the time it takes the water to boil.",kidNote:"",
  ingredients:["400g tagliatelle","80g nduja","400g cherry tomatoes","2 balls burrata (about 250g total)","3 garlic cloves","3 tbsp olive oil","handful fresh basil","1 tsp chilli flakes"],
  steps:["Cook tagliatelle in well-salted, vigorously boiling water per pack instructions. Reserve a large mugful of pasta water before draining.","Heat olive oil in a wide pan over medium heat. Add thinly sliced garlic and chilli flakes; cook gently for 1 min until fragrant but not coloured.","Add nduja and break apart with a spoon — it melts into the oil, turning it a vivid, spicy red. Cook 1–2 min until the oil is richly coloured and the nduja has dissolved completely.","Add cherry tomatoes and a good pinch of salt. Cook over high heat, pressing occasionally, for 3–4 min until the tomatoes have burst and collapsed into a jammy sauce.","Add the drained pasta to the sauce with a generous splash of pasta water; toss vigorously until every strand is coated and the liquid emulsifies into a glossy sauce. Tear burrata over the top, scatter basil, drizzle with olive oil and serve immediately."],
  tip:"Nduja's fat is where all the flavour lives — melt it into the oil completely before any tomatoes go in, so the spiced fat coats the pasta directly and carries heat and smoke into every mouthful."},
 
-{name:"Pork & Herb Bangers with Creamy Mash & Onion Gravy",time:"25 min",minutes:25,protein:"pork",cuisine:"british",serves:4,
+{name:"Pork & Herb Bangers with Creamy Mash & Onion Gravy",time:"25 min",minutes:25,protein:"pork",cuisine:"british",seasons:["autumn","winter"],serves:4,
  description:"Fat, herb-flecked sausages resting in a sticky, mahogany-coloured onion gravy, with a cloud of butter-whipped mash underneath that catches and holds every drop. This is the meal that makes a bad week disappear.",kidNote:"Bangers and mash is universally loved by children — slice sausages into rounds for very young ones",
  ingredients:["8 good-quality pork sausages","600g Maris Piper potatoes","2 onions","300ml beef stock","1 tbsp plain flour","1 tbsp Worcestershire sauce","30g butter","50ml whole milk","1 tbsp vegetable oil"],
  steps:["Peel and dice potatoes into even 3cm chunks. Boil in well-salted water for 18–20 min until a knife slides through with no resistance. Drain thoroughly — any water left in the pan makes the mash loose and wet. Return to the hot pan, let the steam escape for 1 min, then mash with the butter and milk until completely smooth. Season very generously with salt and white pepper.","Heat the oil in a wide frying pan over medium heat. Add sausages and cook, turning every 3–4 min, for 12–15 min until deeply golden all over and cooked through. Resist moving them too frequently — each turn should reveal proper colour.","Remove sausages and rest on a plate. Slice the onions into thin half-moons and add to the same pan over medium heat — the sausage fat is enough oil. Cook, stirring frequently, for 8–10 min until very soft, deeply golden and sweet-smelling. This patience is what separates a great onion gravy from a pale, weak one.","Stir in the flour and cook for 1 min. Gradually pour in the beef stock and Worcestershire sauce, stirring constantly to prevent lumps. Bring to a simmer and cook for 3–4 min until the gravy coats the back of a spoon.","Return sausages to the gravy and warm through for 2 min. Taste — the gravy should be deeply savoury with a hint of sweetness from the onions. Serve over a generous mound of mash."],
  tip:"Cooking the onions low and slow in the residual sausage fat for the full 8–10 minutes — not rushing them — is what gives the gravy its depth and colour; pale, quickly cooked onions make a thin, flavourless sauce."},
 
-{name:"Crispy Southern Fried Chicken Caesar Salad",time:"15 min",minutes:15,protein:"chicken",cuisine:"american",serves:4,
+{name:"Crispy Southern Fried Chicken Caesar Salad",time:"15 min",minutes:15,protein:"chicken",cuisine:"american",seasons:["spring","summer"],serves:4,
  description:"Shop-bought Southern fried chicken pieces — hot, crispy and salty — tumbled over crisp cos leaves with a glossy Caesar dressing, generous parmesan shards and golden croutons. Better than it has any right to be, done in 15 minutes.",kidNote:"Serve the dressing on the side for children who prefer things plain — the hot chicken and croutons alone will keep them very happy",
  ingredients:["8 x shop-bought Southern fried chicken pieces","2 cos lettuce hearts","50g parmesan","150ml Caesar dressing","80g croutons","1 lemon"],
  steps:["Cook the Southern fried chicken per pack instructions — usually 15–18 min at 200°C / 180°C fan. They must be piping hot all the way through and properly crispy, not just warm. Timing everything else around the chicken coming out of the oven.","Separate and roughly tear the cos leaves into large pieces — a Caesar should have substance, and big pieces of crisp lettuce are what make it genuinely satisfying rather than flimsy.","Just before serving, toss the lettuce in most of the Caesar dressing, coating every leaf. Taste — it should be punchy, savoury and slightly tangy. Add more dressing if it needs it; an underdressed Caesar is the most common mistake.","Pile the dressed lettuce into bowls. Use a vegetable peeler to shave the parmesan directly over the top in large, generous shards — not the pre-grated dust. Scatter the croutons.","Lay the hot chicken pieces on at the very last moment. Add a final squeeze of lemon and serve immediately while the chicken is blazing hot and crisp."],
  tip:"The chicken must go on top while it's blazing hot and properly crispy — even five minutes of resting makes it soft and disappointing; time everything so the chicken hits the plate the moment it leaves the oven."},
 
-{name:"Chorizo, Cherry Tomato & Mascarpone Pasta",time:"20 min",minutes:20,protein:"pork",cuisine:"italian",serves:4,
+{name:"Chorizo, Cherry Tomato & Mascarpone Pasta",time:"20 min",minutes:20,protein:"pork",cuisine:"italian",seasons:["spring","summer"],serves:4,
  description:"Crispy-edged nuggets of chorizo, sweet burst cherry tomatoes and a generous cloud of mascarpone that melts into the spiced pan juices into an impossibly silky sauce. The pasta you make when you need something extraordinary in 20 minutes.",kidNote:"Chorizo's smokiness works well for children — use half the quantity and omit the chilli flakes for younger ones",
  ingredients:["200g chorizo ring","500g fusilli or rigatoni","400g cherry tomatoes","200g mascarpone","3 garlic cloves","1 tsp chilli flakes","2 tbsp olive oil","small bunch parsley","50g parmesan"],
  steps:["Bring a large pot of heavily salted water to a boil. Cook pasta 2 min less than the packet suggests — it will finish in the sauce. Peel the skin from the chorizo and chop into small cubes.","Heat olive oil in a wide sauté pan over medium-high heat. Add chorizo and cook for 3–4 min until the edges are crispy and a vivid, deep-orange oil has rendered into the pan. Do not drain it — that fat is all the flavour.","Add finely sliced garlic and chilli flakes; cook for 1 min, stirring constantly so the garlic doesn't colour and burn.","Add cherry tomatoes and cook over high heat for 4–5 min, pressing them down with the back of a spoon, until they burst and their juices mingle with the spiced chorizo fat into a rough, glossy sauce.","Stir in the mascarpone until fully melted. Drain the pasta, reserving a large mug of pasta water. Add pasta to the sauce with a generous splash of cooking water and toss vigorously for 1 min until every piece is coated. Roughly chop the parsley and stir through. Serve with finely grated parmesan."],
@@ -281,7 +281,7 @@ var WEEKEND_MEALS=[
  steps:["Preheat oven to 200°C / 180°C fan. Pat the chicken thighs completely dry with kitchen paper, then season generously all over with paprika, salt and pepper — dry skin is the first step to crispness.","Heat an oven-safe, wide pan or casserole over high heat. Add the chicken thighs skin-side down with no oil and leave undisturbed for 3–4 min until the skin is deeply golden. Flip briefly to seal the underside, then remove and set aside. Don't skip this step — the seared skin stays crispy through the oven.","Pour away all but 1 tbsp of fat from the pan. Add orzo, cherry tomatoes, stock and olive oil; stir well, scraping up any browned bits from the base.","Nestle the chicken thighs skin-side up on top of the orzo — they should sit proud of the liquid. Transfer to the oven and roast, uncovered, for 25–30 min until the chicken skin is crisp and golden and the orzo has absorbed the stock.","Remove from the oven, lay spinach over the top, and stir gently until just wilted — about 1 min. Taste the orzo and adjust seasoning. Serve straight from the pan."],
  tip:"Searing the skin in a dry pan (no extra oil) before the oven renders out the fat and creates a golden crust that actually stays crispy — skipping this step gives you pale, flabby skin no matter how hot the oven."},
 
-{name:"Smoky Chicken Fajitas with Charred Peppers & Sour Cream",time:"30 min",minutes:30,protein:"chicken",cuisine:"mexican",serves:4,
+{name:"Smoky Chicken Fajitas with Charred Peppers & Sour Cream",time:"30 min",minutes:30,protein:"chicken",cuisine:"mexican",seasons:["spring","summer"],serves:4,
  description:"Juicy spiced chicken strips, charred sweet peppers and softened onion piled into warm tortillas — the sizzle when it hits the table is half the experience. Everything cooks in one pan and everyone builds their own.",kidNote:"Set a plain portion of chicken aside before adding the full seasoning if cooking for very young children",
  ingredients:["3 chicken breasts","2 peppers","1 onion","1 pack fajita seasoning","8 soft tortillas","100g cheddar cheese","4 tbsp sour cream","1 tbsp vegetable oil"],
  steps:["Slice chicken breasts into long strips, roughly 1cm wide. Slice peppers and peel and halve the onion, then slice into half-moon strips.","Toss the chicken strips with the fajita seasoning until evenly coated. A well-seasoned coating is what gives fajitas their distinctive flavour — don't be shy.","Heat oil in a wide frying pan or griddle pan over high heat until very hot. Add the chicken in a single layer and cook undisturbed for 2–3 min to colour, then toss and continue cooking for 3–4 min until golden and cooked through. Remove and rest on a plate.","Add the peppers and onion to the same pan over high heat. Cook, tossing occasionally, for 4–5 min until the edges have proper char marks and the onion has softened.","Return chicken to the pan, toss everything together for 1 min, and bring the pan to the table. Warm tortillas in the microwave (30 seconds, wrapped in a damp cloth) and serve with grated cheddar and sour cream."],
@@ -347,7 +347,7 @@ var WEEKEND_MEALS=[
  steps:["Preheat oven to 200°C / 180°C fan. Pat drumsticks completely dry with kitchen paper — this is the critical step for crispy skin and a glaze that sticks rather than slides off.","Mix honey, soy sauce and ketchup in a bowl until combined. Season with black pepper (the soy provides the salt). Toss the drumsticks in the marinade until evenly coated.","Arrange drumsticks in a roasting tin with space between each one — touching drumsticks steam each other rather than caramelising. Roast for 20 min.","Spoon any glaze pooled in the tin back over the drumsticks. Return to the oven for 12–15 min more until the glaze is deeply caramelised and the skin is lacquered and sticky. The juices should run clear.","Cook rice per pack. Break broccoli into small florets and steam or boil for 4–5 min until just tender. Serve everything alongside."],
  tip:"Basting the drumsticks halfway through with the pooled glaze in the tin builds up the lacquered, sticky layers — each baste adds another coat of caramelised flavour rather than leaving a thin, watery finish."},
 
-{name:"Thai Green Coconut Chicken Curry with Jasmine Rice",time:"30 min",minutes:30,protein:"chicken",cuisine:"asian",serves:4,
+{name:"Thai Green Coconut Chicken Curry with Jasmine Rice",time:"30 min",minutes:30,protein:"chicken",cuisine:"asian",seasons:["spring","summer"],serves:4,
  description:"Silky coconut milk curry fragrant with lemongrass, galangal and green chilli — with tender chicken and sweet peas, served over jasmine rice that soaks up every drop of the sauce. Light yet deeply satisfying.",kidNote:"Use a mild Thai green paste for young children — the coconut milk tempers the heat but taste before serving",
  ingredients:["3 chicken breasts","400g tin coconut milk","2 tbsp Thai green curry paste","150g frozen peas","250g jasmine rice","1 tbsp vegetable oil","1 lime"],
  steps:["Cook jasmine rice per pack instructions and keep warm.","Slice chicken breasts into bite-sized pieces, roughly 3cm — even sizes mean they cook at the same rate. Season lightly with salt.","Heat oil in a wide pan or wok over medium-high heat. Add the chicken pieces in a single layer and cook for 3–4 min until lightly golden. Remove and set aside.","Add the curry paste to the pan and fry, stirring constantly, for 1–2 min until deeply fragrant — you'll smell the lemongrass and spices bloom. This step is what gives the curry its depth.","Pour in coconut milk, scraping up any paste from the pan base. Add the chicken back and simmer gently for 8–10 min until cooked through. Add peas in the last 3 min. Squeeze in half the lime, taste and adjust seasoning. Serve over rice with remaining lime wedges."],
@@ -359,13 +359,13 @@ var WEEKEND_MEALS=[
  steps:["Preheat oven to 200°C / 180°C fan. Halve new potatoes and toss in a large baking tray with 1 tbsp olive oil, garlic granules, salt and pepper. Roast for 15 min until starting to turn golden.","Dice courgettes into 2cm pieces. Add courgette and cherry tomatoes to the tray, tossing with the potatoes and pan juices.","Pat the salmon fillets dry — dry fish is what gives you a golden, slightly caramelised surface rather than pale, steamed fish. Lay skin-side down on the tray among the vegetables. Drizzle with remaining olive oil and season with salt and pepper.","Squeeze half the lemon over everything. Roast for a further 12–15 min until the salmon is just cooked through — it should be opaque all the way through but still slightly yielding when pressed.","Squeeze over the remaining lemon and serve straight from the tray."],
  tip:"Salmon is done the moment it turns opaque all the way through — a minute or two beyond this and it becomes dry and chalky; check at 12 minutes and remove it the moment it resists slightly when pressed in the thickest part."},
 
-{name:"Smoky Tomato & Pepper Shakshuka with Crusty Bread",time:"25 min",minutes:25,protein:"eggs",cuisine:"middleeastern",serves:4,
+{name:"Smoky Tomato & Pepper Shakshuka with Crusty Bread",time:"25 min",minutes:25,protein:"eggs",cuisine:"middleeastern",seasons:["spring","summer"],serves:4,
  description:"Eggs nestled into a vivid, aromatic sauce of slow-cooked peppers, onion and spiced tomatoes — the whites just set, the yolks still running golden when you break them with bread. A dish that looks spectacular and asks almost nothing of you.",kidNote:"Eggs in a mild sauce with bread for dipping is a combination that works brilliantly for children — set firm if small children prefer their eggs fully cooked",
  ingredients:["6 eggs","2 tins chopped tomatoes","2 peppers","1 onion","2 tsp smoked paprika","1 tsp cumin","1 tbsp olive oil","bread for serving"],
  steps:["Finely dice the onion; slice peppers into long strips. Heat olive oil in a wide, lidded pan over medium heat. Cook onion and peppers together, stirring occasionally, for 8–10 min until very soft, sweet and beginning to caramelise — take your time here, this is where the flavour base is built.","Add smoked paprika and cumin; stir constantly for 1 min until the spices are fragrant and coated onto the vegetables.","Pour in the chopped tomatoes; season generously with salt, pepper and a pinch of sugar if the tomatoes seem sharp. Simmer over medium heat for 10 min, stirring occasionally, until the sauce has thickened and is deeply coloured.","Taste the sauce and adjust seasoning — it should be robustly flavoured. Make six shallow wells with the back of a spoon. Crack one egg carefully into each well.","Cover the pan with a lid and cook over low-medium heat for 5–8 min. Check at 5 min — the whites should be just set and opaque but the yolks still soft and runny. Serve straight from the pan with plenty of crusty bread."],
  tip:"Covering the pan with a lid (not foil) traps steam that gently sets the whites from above without overcooking the yolks — remove the lid at exactly the right moment for the classic set-white, runny-yolk result."},
 
-{name:"Pulled Spiced Chicken Tacos with Lime Slaw",time:"35 min",minutes:35,protein:"chicken",cuisine:"mexican",serves:4,
+{name:"Pulled Spiced Chicken Tacos with Lime Slaw",time:"35 min",minutes:35,protein:"chicken",cuisine:"mexican",seasons:["spring","summer"],serves:4,
  description:"Thighs cooked until the meat shreds effortlessly into spiced, juicy ribbons, piled into warm soft tacos with sharp lime slaw, salsa and cool sour cream. The kind of assembly meal where everyone at the table is happy.",kidNote:"Soft tacos and mild shredded chicken are ideal for young children — provide toppings separately so they can choose",
  ingredients:["6 chicken thighs","1 pack taco seasoning","8 soft tacos","200g white cabbage","1 lime","4 tbsp sour cream","4 tbsp salsa","1 tbsp vegetable oil"],
  steps:["Season chicken thighs generously all over with taco seasoning, pressing it into both sides.","Heat oil in a wide pan over medium-high heat. Cook thighs skin-side down for 6–7 min without moving until the skin is golden and the fat has rendered. Flip and cook for 6–7 min more until completely cooked through — the juices must run clear, not pink.","Transfer to a plate and rest for 5 min — this is the step that keeps the meat juicy rather than dry when you shred it. Resting allows the juices to settle back into the meat.","While chicken rests, finely shred the cabbage with a sharp knife or mandoline. Toss with the juice of the whole lime and a pinch of salt; set aside. The lime gently softens the cabbage.","Shred the chicken using two forks, pulling against the grain of the meat. Warm tacos in the microwave for 30 seconds wrapped in damp kitchen paper. Build tacos: chicken, then slaw, salsa and sour cream on top."],
@@ -377,19 +377,19 @@ var WEEKEND_MEALS=[
  steps:["Finely dice the onion. Melt butter in a large saucepan over medium heat and cook the onion, stirring, for 3–4 min until completely soft and translucent but not coloured — any browning will muddy the brilliant green colour of the finished soup.","Add the chicken stock and bring to a simmer. Add the frozen peas — don't defrost them first, they cook instantly and the cold helps preserve the vivid colour.","Simmer for 3–4 min until the peas are completely tender. Blend immediately with a stick blender (or in a jug blender in batches) until completely smooth.","Pass through a sieve if you want a very silky result. Season generously with salt and white pepper — peas need salt to taste of themselves. Stir in most of the cream.","Tear the ham into rough pieces and stir through. Serve in bowls with a swirl of remaining cream and crusty bread alongside."],
  tip:"Blending the soup immediately while it's very hot — and serving or cooling it fast — is what preserves the vivid green colour; letting it sit on the heat after blending turns it a dull, khaki colour within minutes."},
 
-{name:"Creamy Chicken & Mushroom Stroganoff with Rice",time:"35 min",minutes:35,protein:"chicken",cuisine:"british",serves:4,
+{name:"Creamy Chicken & Mushroom Stroganoff with Rice",time:"35 min",minutes:35,protein:"chicken",cuisine:"british",seasons:["autumn","winter"],serves:4,
  description:"Tender strips of chicken and earthy chestnut mushrooms in a rich, paprika-dusted sour cream sauce — the kind of dish that makes everyone go back for seconds. Indulgent yet genuinely simple to pull together.",kidNote:"Creamy and mild with no sharp or unfamiliar flavours — most children find this a favourite immediately",
  ingredients:["4 chicken breasts","300g chestnut mushrooms","1 onion","200ml sour cream","1 tbsp plain flour","1 tbsp smoked paprika","2 tbsp vegetable oil","1 tsp Dijon mustard","250g rice"],
  steps:["Cook rice per pack instructions and keep warm. Slice chicken breasts into long thin strips, roughly 1cm wide — uniform sizing ensures even cooking. Season generously with salt, pepper and half the paprika.","Heat 1 tbsp oil in a wide pan over high heat. Fry chicken strips in a single layer without moving for 2 min to colour, then toss and cook 2 min more until golden and just cooked through. Remove and set aside — cooking in batches if needed so the pan stays hot.","Finely dice the onion. Add the remaining oil to the same pan over medium heat and cook onion for 3–4 min until soft and translucent. Slice mushrooms thickly and add; cook over medium-high heat for 5–6 min until their moisture has fully evaporated and the edges start to colour.","Stir in the flour and remaining paprika; cook for 1 min. Remove the pan from the heat and stir in the sour cream and Dijon mustard until smooth — adding it off the heat prevents the sauce from splitting.","Return to low heat, add the chicken back, and stir gently to combine. Simmer on low for 3–4 min until the sauce is glossy and coats everything. Taste and adjust seasoning. Serve over rice."],
  tip:"Adding sour cream off the heat — or over the gentlest possible heat — stops it splitting into grainy curds; high heat causes the proteins to seize and the sauce loses its silky texture immediately."},
 
-{name:"Saucy Onion Gravy Beef Meatballs with Crushed Potatoes",time:"35 min",minutes:35,protein:"beef",cuisine:"british",serves:4,
+{name:"Saucy Onion Gravy Beef Meatballs with Crushed Potatoes",time:"35 min",minutes:35,protein:"beef",cuisine:"british",seasons:["autumn","winter"],serves:4,
  description:"Golden, herb-flecked beef meatballs simmered in a deeply savoury, sticky onion gravy until they're almost falling apart — spooned over rough-crushed buttery potatoes. British comfort food at its most honest.",kidNote:"Round, saucy and easy to eat with a fork — children enjoy spearing each meatball individually",
  ingredients:["500g beef mince","600g potatoes","2 onions","400ml beef stock","2 tbsp plain flour","1 tbsp Worcestershire sauce","1 tsp dried mixed herbs","2 tbsp vegetable oil","30g butter"],
  steps:["Peel and dice potatoes into even chunks. Boil in well-salted water for 18–20 min until completely tender when pierced. Drain thoroughly, return to the pan with the butter, and crush roughly with a fork — leave them textured and chunky rather than smooth. Season generously with salt and pepper.","Combine mince with the dried herbs, a generous pinch of salt and plenty of black pepper. Mix until just combined — overworking makes meatballs dense and tough. Roll into 20 even balls, roughly the size of a large marble.","Heat 1 tbsp oil in a wide, heavy pan over medium-high heat. Brown the meatballs in batches with space between each, turning every 2 min, until deeply golden all over — about 6–8 min total. Remove and set aside. The browned bits left in the pan are pure flavour.","Slice onions into thin half-moons. Add the remaining oil to the same pan over medium heat and cook onions, stirring frequently, for 8–10 min until very soft, sweet and deeply golden. Stir in the flour and cook for 1 min.","Gradually add the beef stock and Worcestershire sauce, stirring constantly to prevent lumps. Bring to a gentle simmer. Return meatballs to the pan; simmer for 8–10 min until the gravy coats the back of a spoon and the meatballs are cooked through. Serve over crushed potatoes."],
  tip:"The browned bits (fond) left in the pan after frying the meatballs are the foundation of the gravy's colour and flavour — dissolve them into the stock by scraping the pan base as you stir."},
 
-{name:"Herby Pork Gnocchi Bolognese",time:"30 min",minutes:30,protein:"pork",cuisine:"italian",serves:4,
+{name:"Herby Pork Gnocchi Bolognese",time:"30 min",minutes:30,protein:"pork",cuisine:"italian",seasons:["autumn","winter"],serves:4,
  description:"Pillowy gnocchi tossed through a quick, fennel-scented pork ragù — richer and more interesting than a standard bolognese, with the gnocchi soaking up the sauce from the inside. A clever twist on the family staple.",kidNote:"Soft pillowy gnocchi in a saucy meat ragù is very approachable — cut into halves for toddlers to make them easier to manage",
  ingredients:["400g pork mince","500g gnocchi","400g tin chopped tomatoes","1 onion","1 carrot","1 tsp dried mixed herbs","1 tsp fennel seeds","1 tbsp olive oil","30g parmesan"],
  steps:["Finely dice the onion and carrot into small, even pieces. Heat olive oil in a wide pan over medium heat and cook, stirring occasionally, for 4–5 min until softened and smelling sweet.","Add fennel seeds and stir for 30 seconds until fragrant. Increase heat to high, add pork mince and press flat across the pan — leave undisturbed for 2 min to develop colour, then break up and cook until no pink remains and the mince is beginning to caramelise, about 4 min more.","Add chopped tomatoes, mixed herbs, a generous amount of salt and plenty of black pepper. Stir well and simmer over medium heat for 12 min, stirring occasionally, until the sauce has thickened and the tomatoes have broken down into a deep, rich ragù.","Cook gnocchi in a large pan of well-salted boiling water — they're ready 30 seconds after they float to the surface. Reserve a mug of pasta water, then drain.","Add gnocchi to the ragù with a splash of pasta water; toss gently to coat — the starchy water helps the sauce cling. Taste and adjust seasoning. Serve with finely grated parmesan."],
@@ -425,7 +425,7 @@ var WEEKEND_MEALS=[
  steps:["Preheat oven to 220°C / 200°C fan. Halve the squash, scoop out the seeds and cut into 2cm-thick wedges — no need to peel; the skin becomes deliciously chewy. Slice the red onion into thick wedges, keeping the root intact so the layers don't fall apart.","Spread squash and onion across a large roasting tin. Drizzle with 2 tbsp olive oil, scatter over the chilli flakes, pull the rosemary leaves from their sprigs and add those too. Season generously with salt and pepper. Nestle the sausages among the veg, toss to coat, and roast for 35 min, turning halfway, until the sausages are golden and the squash is tender and beginning to caramelise.","Meanwhile, pull the kale leaves from their stalks and tear into rough pieces. Toss with the remaining olive oil and a pinch of salt.","Scatter the kale over the tray. Tear the taleggio into rough chunks — it's a very soft, slightly sticky cheese, so don't worry about neatness — and distribute across the top.","Return to the oven for 8–10 min until the taleggio has melted into glossy, golden-edged puddles and the kale has crisped at its edges. Squeeze lemon over the tray and serve straight from it — the caramelised bits on the bottom are the best part."],
  tip:"Taleggio melts quickly and can go oily if overcooked — check at exactly 8 minutes and pull the tray the moment it's pooled into glossy puddles; another 2–3 minutes past perfect and the fat splits from the cheese."},
 
-{name:"Smash Burgers with Special Sauce & Crispy Fries",time:"35 min",minutes:35,protein:"beef",cuisine:"american",serves:4,
+{name:"Smash Burgers with Special Sauce & Crispy Fries",time:"35 min",minutes:35,protein:"beef",cuisine:"american",seasons:["spring","summer"],serves:4,
  description:"Thin, crispy-edged beef patties with a deeply caramelised, lacy crust, draped in molten cheese and piled into a toasted bun with a tangy special sauce. The burger technique that taught everyone what a screaming-hot pan and high-fat mince can do.",kidNote:"Children tend to love these — make smaller single-patty versions for younger ones and serve with plain ketchup rather than the special sauce",
  ingredients:["600g beef mince 20% fat","4 brioche burger buns","4 slices cheddar or American cheese","400g frozen oven fries","4 tbsp mayonnaise","2 tbsp ketchup","1 tbsp American mustard","1 tbsp white wine vinegar","1 little gem lettuce","2 tbsp vegetable oil"],
  steps:["Cook fries per pack instructions. Make the special sauce: combine mayo, ketchup, mustard and vinegar; stir until smooth. Taste — it should be tangy, creamy and slightly sweet. Adjust and set aside.","Divide the beef into 8 equal loosely packed balls (about 75g each) without compacting the mince tightly — loose balls smash better and create a better crust. Season the outside of each ball generously with salt and pepper.","Heat a cast iron or heavy frying pan over the highest heat possible until smoking. Add a small amount of oil. Place 2 mince balls in the pan with space between them and immediately press flat with a heavy spatula until very thin. Cook completely undisturbed for 90 seconds to 2 min until the edges look cooked and the underside is deeply, properly brown and lacy.","Lay a slice of cheese on each patty, flip, and cook for 30 more seconds. Total cooking time is about 2.5 min per batch. Cook remaining patties.","Toast the cut sides of the buns in the same pan for 30 seconds until golden. Build: special sauce on both halves, lettuce on the base, then 2 stacked patties. Serve immediately alongside the fries."],
@@ -514,7 +514,7 @@ function buildShop(plan,pantry,familySize){
     scaledIngredients(m.ingredients,scale).forEach(function(ing){
       var lc=ing.label.toLowerCase();
       if(seen.has(lc))return;
-      if(pw.some(function(w){return lc.includes(w)||ing.display.toLowerCase().includes(w)}))return;
+      if(pw.some(function(w){var re=new RegExp('(?:^|\\b)'+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?:\\b|$)','i');return re.test(lc)||re.test(ing.display.toLowerCase());}))return;
       seen.add(lc);items.push({display:ing.display,category:categoriseItem(lc)});
     });
   });
@@ -534,7 +534,7 @@ function getPool(type,timeFilter,customMeals,kids){
 
 function nextDateForDayName(dayName){
   var idx=DAYS.indexOf(dayName),today=new Date(),todayDow=(today.getDay()+6)%7,diff=(idx-todayDow+7)%7;
-  if(diff===0)diff=7;var d=new Date(today);d.setDate(today.getDate()+diff);return d;
+  var d=new Date(today);d.setDate(today.getDate()+diff);return d;
 }
 function toICSDate(d){return''+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');}
 function generateICS(plan){
@@ -574,7 +574,17 @@ function decodePlan(encoded,allBuiltin){
 </script>
 
 <script type="text/babel">
-const { useState, useEffect } = React;
+const { useState, useEffect, useRef } = React;
+
+function formatLastUsed(ts){
+  if(!ts)return null;
+  const days=Math.floor((Date.now()-ts)/(24*60*60*1000));
+  if(days===0)return'today';
+  if(days===1)return'yesterday';
+  if(days<7)return days+'d ago';
+  const weeks=Math.floor(days/7);
+  return weeks===1?'1 week ago':weeks+' weeks ago';
+}
 
 const Tag = ({ bg, color, children }) => (
   <span style={{ display:"inline-block", background:bg, color, borderRadius:"8px",
@@ -602,13 +612,15 @@ const Secondary = ({ muted, children, onClick }) => (
 );
 
 function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, familySize,
-                    onExpand, onFav, onSwap, onDislike, readOnly }) {
+                    onExpand, onFav, onSwap, onDislike, readOnly, lastUsed }) {
   const scale = familySize / (meal.serves || 4);
   const ing = scaledIngredients(meal.ingredients, scale);
+  const lastUsedStr = formatLastUsed(lastUsed);
   return (
     <div style={{ background:P.card, borderRadius:"16px", marginBottom:"10px",
       boxShadow:P.shadow, border:`2px solid ${isFav?P.gold:P.border}`, overflow:"hidden" }}>
-      <div style={{ padding:"15px 16px", cursor:"pointer" }} onClick={onExpand}>
+      <div style={{ padding:"15px 16px", cursor:"pointer" }} onClick={onExpand}
+        role="button" aria-expanded={expanded} aria-label={`${meal.name} — ${expanded?"hide":"show"} recipe`}>
         <div style={{ display:"flex", gap:"12px" }}>
           <div style={{ fontSize:"26px", flexShrink:0, paddingTop:"2px" }}>{EMOJIS[day]||"🍽️"}</div>
           <div style={{ flex:1, minWidth:0 }}>
@@ -616,13 +628,17 @@ function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, familyS
               <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"12px", color:P.accent, textTransform:"uppercase", letterSpacing:"0.5px" }}>{day}</div>
               {!readOnly && (
                 <div style={{ display:"flex", gap:"0", marginRight:"-4px" }}>
-                  <button onClick={e=>{e.stopPropagation();onFav();}} title="Favourite"
+                  <button onClick={e=>{e.stopPropagation();onFav();}}
+                    aria-label={isFav?"Remove from favourites":"Add to favourites"}
+                    title={isFav?"Remove from favourites":"Add to favourites"}
                     style={{ background:"none", border:"none", fontSize:"18px", cursor:"pointer", padding:"4px 6px", color:isFav?P.gold:P.muted }}>
                     {isFav?"★":"☆"}
                   </button>
-                  <button onClick={e=>{e.stopPropagation();onSwap();}} title="Swap"
+                  <button onClick={e=>{e.stopPropagation();onSwap();}}
+                    aria-label="Swap for another meal" title="Swap for another meal"
                     style={{ background:"none", border:"none", fontSize:"18px", cursor:"pointer", padding:"4px 6px" }}>🔄</button>
-                  <button onClick={e=>{e.stopPropagation();onDislike();}} title="Don't suggest again"
+                  <button onClick={e=>{e.stopPropagation();onDislike();}}
+                    aria-label="Don't suggest this meal again" title="Don't suggest this meal again"
                     style={{ background:"none", border:"none", fontSize:"18px", cursor:"pointer", padding:"4px 6px" }}>👎</button>
                 </div>
               )}
@@ -634,6 +650,7 @@ function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, familyS
               {isSeasonal && <Tag bg="#EDF7ED" color="#2E7D32">{seasonLabel}</Tag>}
               {isFav && <Tag bg={P.goldLight} color={P.gold}>⭐ Fav</Tag>}
               {meal.kidNote && <Tag bg={P.greenLight} color={P.greenDark}>👶 {meal.kidNote}</Tag>}
+              {lastUsedStr && <Tag bg={P.border} color={P.muted}>🕐 {lastUsedStr}</Tag>}
             </div>
             <div style={{ fontSize:"12px", color:P.accent, fontWeight:600, marginTop:"7px" }}>
               {expanded?"▲ Hide recipe":"▼ Ingredients & recipe"}
@@ -723,11 +740,16 @@ function AddMealForm({ onSave, onCancel }) {
 }
 
 function PrefsScreen({ favourites, dislikes, customMeals, onToggleFav, onRemoveDislike,
-                       onAddCustom, onDeleteCustom, onClearAll, onClose, showToast }) {
+                       onAddDislike, onAddCustom, onDeleteCustom, onClearAll, onClose, showToast }) {
   const [adding, setAdding] = useState(false);
+  const [search, setSearch] = useState('');
   const ALL = [...WEEKDAY_MEALS,...WEEKEND_MEALS,...customMeals];
   const allFavs = ALL.filter(m=>favourites.includes(m.name));
   const allDislikes = ALL.filter(m=>dislikes.includes(m.name));
+  const q = search.trim().toLowerCase();
+  const searchResults = q.length>1 ? ALL.filter(m=>
+    m.name.toLowerCase().includes(q)||m.cuisine.toLowerCase().includes(q)||m.protein.toLowerCase().includes(q)
+  ) : [];
   if (adding) return (
     <div>
       <div style={{ background:`linear-gradient(135deg,${P.accent},${P.accentDark})`, color:"#fff", padding:"48px 24px 24px" }}>
@@ -765,6 +787,42 @@ function PrefsScreen({ favourites, dislikes, customMeals, onToggleFav, onRemoveD
               style={{ background:"none", border:"none", color:P.muted, cursor:"pointer", fontSize:"20px" }}>✕</button>
           </div>
         ))}
+        <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"18px", marginBottom:"10px", marginTop:"32px" }}>🔍 Browse all meals</div>
+        <input value={search} onChange={e=>setSearch(e.target.value)}
+          placeholder="Search by name, cuisine or protein…"
+          aria-label="Search meals"
+          style={{ width:"100%", padding:"11px 14px", border:`2px solid ${P.border}`, borderRadius:"12px",
+            fontSize:"14px", background:P.card, marginBottom:"8px", boxSizing:"border-box" }} />
+        {q.length>0 && q.length<2 && <p style={{ color:P.muted, fontSize:"13px", margin:"4px 0 8px" }}>Keep typing…</p>}
+        {searchResults.length>0 && searchResults.map(m=>{
+          const isFav=favourites.includes(m.name), isSkipped=dislikes.includes(m.name);
+          return (
+            <div key={m.name} style={{ background:P.card, borderRadius:"12px", padding:"11px 14px", marginBottom:"6px",
+              boxShadow:P.shadow, border:`1px solid ${isSkipped?P.border:isFav?P.gold:P.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <div style={{ flex:1, minWidth:0, marginRight:"10px" }}>
+                <div style={{ fontWeight:700, fontSize:"14px", lineHeight:1.3 }}>{m.name}</div>
+                <div style={{ fontSize:"12px", color:P.muted, marginTop:"2px" }}>{m.time} · {m.cuisine} · {m.protein}{m.adult?" · adults":"" }</div>
+              </div>
+              <div style={{ display:"flex", gap:"6px", flexShrink:0 }}>
+                <button onClick={()=>onToggleFav(m.name)}
+                  aria-label={isFav?"Remove from favourites":"Add to favourites"}
+                  style={{ background:isFav?P.goldLight:"transparent", border:`1.5px solid ${isFav?P.gold:P.border}`,
+                    borderRadius:"8px", padding:"5px 10px", fontSize:"16px", cursor:"pointer", color:isFav?P.gold:P.muted }}>
+                  {isFav?"★":"☆"}
+                </button>
+                <button onClick={()=>isSkipped?onRemoveDislike(m.name):onAddDislike(m.name)}
+                  aria-label={isSkipped?"Restore meal":"Skip this meal"}
+                  style={{ background:isSkipped?P.accentLight:"transparent", border:`1.5px solid ${isSkipped?P.accent:P.border}`,
+                    borderRadius:"8px", padding:"5px 10px", fontSize:"14px", cursor:"pointer",
+                    color:isSkipped?P.accentDark:P.muted, fontWeight:isSkipped?700:400 }}>
+                  {isSkipped?"✕ Skipped":"👎"}
+                </button>
+              </div>
+            </div>
+          );
+        })}
+        {q.length>1 && searchResults.length===0 && <p style={{ color:P.muted, fontSize:"13px", margin:"4px 0 8px" }}>No meals found.</p>}
+
         <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"18px", marginBottom:"10px", marginTop:"32px" }}>⭐ Favourites ({allFavs.length})</div>
         {allFavs.length===0
           ? <p style={{ color:P.muted, fontSize:"14px", marginBottom:"8px" }}>Tap ☆ on any meal to add it as a favourite — it'll be suggested more often.</p>
@@ -813,7 +871,7 @@ function App() {
   const [pantry,      setPantry]     = useState(()=>load(SK.PANTRY, ""));
   const [plan,        setPlan]       = useState(null);
   const [shopList,    setShopList]   = useState(null);
-  const [checked,     setChecked]    = useState({});
+  const [checked,     setChecked]    = useState(()=>load(SK.CHECKED, {}));
   const [mealHistory, setMealHistory]= useState(()=>load(SK.HISTORY, []));
   const [favourites,  setFavourites] = useState(()=>load(SK.FAVS, []));
   const [dislikes,    setDislikes]   = useState(()=>load(SK.DISLIKES, []));
@@ -843,6 +901,17 @@ function App() {
     document.body.style.overflow = cookNow ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [cookNow]);
+  useEffect(()=>{ save(SK.CHECKED, checked); }, [checked]);
+  const _familySizeInit = useRef(false);
+  useEffect(()=>{
+    if(!_familySizeInit.current){ _familySizeInit.current=true; return; }
+    if(plan){
+      const newShop=buildShop(plan,pantry,familySize);
+      setShopList(newShop);
+      const ns={...savedState,familySize,shopList:newShop};
+      setSavedState(ns); save(SK.STATE,ns);
+    }
+  }, [familySize]);
 
   const scrollTop = () => setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}), 50);
   const showToast = msg => { setToast(msg); setTimeout(()=>setToast(null), 2600); };
@@ -954,7 +1023,7 @@ function App() {
   if(showPrefs) return (
     <>
       <PrefsScreen favourites={favourites} dislikes={dislikes} customMeals={customMeals}
-        onToggleFav={toggleFav} onRemoveDislike={removeDislike}
+        onToggleFav={toggleFav} onRemoveDislike={removeDislike} onAddDislike={addDislike}
         onAddCustom={addCustom} onDeleteCustom={deleteCustom}
         onClearAll={()=>{setFavourites([]);setDislikes([]);save(SK.FAVS,[]);save(SK.DISLIKES,[]);showToast("Cleared");}}
         onClose={()=>setShowPrefs(false)} showToast={showToast} />
@@ -1143,13 +1212,16 @@ function App() {
               );
               const meal=plan.meals.find(m=>m.day===day);
               if(!meal)return null;
+              const lu=mealHistory.filter(h=>h.name===meal.name);
+              const lastUsed=lu.length?Math.max(...lu.map(h=>h.date)):null;
               return <MealCard key={day} meal={meal} day={day}
                 isFav={favourites.includes(meal.name)}
                 isSeasonal={!!(meal.seasons&&meal.seasons.includes(season))}
                 seasonLabel={si.label} expanded={expandedDay===day} familySize={familySize}
                 onExpand={()=>setExpandedDay(expandedDay===day?null:day)}
                 onFav={()=>toggleFav(meal.name)} onSwap={()=>swap(day)}
-                onDislike={()=>addDislike(meal.name)} readOnly={false} />;
+                onDislike={()=>addDislike(meal.name)} readOnly={false}
+                lastUsed={lastUsed} />;
             })}
             <Primary onClick={()=>{setStep("shopping");scrollTop();}}>View Shopping List</Primary>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginTop:"10px" }}>
@@ -1182,6 +1254,7 @@ function App() {
                     const key=cat+':'+item.display;
                     return (
                       <div key={key} onClick={()=>setChecked(prev=>({...prev,[key]:!prev[key]}))}
+                        role="checkbox" aria-checked={!!checked[key]} aria-label={item.display}
                         style={{ display:"flex", alignItems:"center", gap:"12px", padding:"11px 0",
                           borderBottom:i<items.length-1?`1px solid ${P.border}`:"none", cursor:"pointer" }}>
                         <div style={{ width:"24px", height:"24px", borderRadius:"7px",
@@ -1226,17 +1299,20 @@ function App() {
                   <div style={{ fontSize:"11px",opacity:0.85,fontWeight:700,letterSpacing:"1.2px",textTransform:"uppercase" }}>Cook tonight</div>
                   <div style={{ fontFamily:"'DM Serif Display',serif",fontSize:"22px",marginTop:"3px" }}>What shall we make?</div>
                 </div>
-                <button onClick={()=>setCookNow(null)}
+                <button onClick={()=>setCookNow(null)} aria-label="Close"
                   style={{ background:"rgba(255,255,255,0.2)",border:"none",color:"#fff",
                     borderRadius:"10px",padding:"8px 12px",cursor:"pointer",fontSize:"18px",fontWeight:700 }}>✕</button>
               </div>
               <div style={{ padding:"16px" }}>
+                {(()=>{const clu=mealHistory.filter(h=>h.name===cookNow.name);const cookNowLastUsed=clu.length?Math.max(...clu.map(h=>h.date)):null;return(
                 <MealCard meal={cookNow} day="Tonight" isFav={favourites.includes(cookNow.name)}
                   isSeasonal={!!(cookNow.seasons&&cookNow.seasons.includes(season))}
                   seasonLabel={si.label} expanded={cookNowExp} familySize={familySize}
                   onExpand={()=>setCookNowExp(x=>!x)}
                   onFav={()=>toggleFav(cookNow.name)} onSwap={pickCookNow}
-                  onDislike={()=>{addDislike(cookNow.name);pickCookNow();}} readOnly={false} />
+                  onDislike={()=>{addDislike(cookNow.name);pickCookNow();}} readOnly={false}
+                  lastUsed={cookNowLastUsed} />
+                );})()}
               </div>
               <div style={{ padding:"0 16px 20px" }}>
                 <button onClick={pickCookNow}
@@ -1252,7 +1328,7 @@ function App() {
         </div>
       )}
       {/* Floating Cook Tonight button */}
-      <button onClick={pickCookNow}
+      <button onClick={pickCookNow} aria-label="Get a recipe suggestion for tonight"
         style={{ position:"fixed",bottom:"24px",right:"20px",zIndex:200,
           background:`linear-gradient(135deg,${P.accent},${P.accentDark})`,
           color:"#fff",border:"none",borderRadius:"28px",
