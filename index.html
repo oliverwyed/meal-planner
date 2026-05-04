@@ -508,18 +508,29 @@ function categoriseItem(label){
 
 function buildShop(plan,pantry,familySize){
   var pw=(pantry||'').toLowerCase().split(/[,\n]/).map(function(s){return s.trim()}).filter(Boolean);
-  var seen=new Set(),items=[];
+  var seen=new Map();
   plan.meals.forEach(function(m){
     var scale=familySize/(m.serves||4);
     scaledIngredients(m.ingredients,scale).forEach(function(ing){
       var lc=ing.label.toLowerCase();
-      if(seen.has(lc))return;
       if(pw.some(function(w){var re=new RegExp('(?:^|\\b)'+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?:\\b|$)','i');return re.test(lc)||re.test(ing.display.toLowerCase());}))return;
-      seen.add(lc);items.push({display:ing.display,category:categoriseItem(lc)});
+      if(seen.has(lc)){
+        var ex=seen.get(lc);
+        var em=ex.qty.match(/^([\d.]+)\s*(g|kg|ml|l|tbsp|tsp|x|)$/i);
+        var nm=ing.qty.match(/^([\d.]+)\s*(g|kg|ml|l|tbsp|tsp|x|)$/i);
+        if(em&&nm&&em[2].toLowerCase()===nm[2].toLowerCase()){
+          var tot=parseFloat(em[1])+parseFloat(nm[1]);
+          var rounded=tot%1<0.1||tot%1>0.9?Math.round(tot):parseFloat(tot.toFixed(1));
+          var u=em[2].toLowerCase(),sp=['g','kg','ml','l'].includes(u)?'':' ';
+          seen.set(lc,{qty:rounded+(u?sp+u:''),label:ing.label,display:u?(rounded+sp+u+' '+ing.label):(rounded+' '+ing.label),category:categoriseItem(lc)});
+        }
+        return;
+      }
+      seen.set(lc,{qty:ing.qty,label:ing.label,display:ing.display,category:categoriseItem(lc)});
     });
   });
   var result={};CATEGORY_ORDER.forEach(function(c){result[c]=[]});
-  items.forEach(function(item){(result[item.category]||(result['Fresh Produce'])).push(item)});
+  seen.forEach(function(item){(result[item.category]||(result['Fresh Produce'])).push(item)});
   var out={};CATEGORY_ORDER.forEach(function(c){if(result[c]&&result[c].length)out[c]=result[c]});
   return out;
 }
@@ -953,15 +964,17 @@ function App() {
   const [expandedDay, setExpandedDay]= useState(null);
   const [sharedPlan,  setSharedPlan] = useState(null);
   const [kidsConfig, setKidsConfig] = useState(()=>load(SK.KIDS_CFG, {}));
-  const [cookNow,    setCookNow]    = useState(null);
-  const [cookNowExp, setCookNowExp] = useState(false);
-  const [pickerFor,  setPickerFor]  = useState(null);
+  const [cookNow,      setCookNow]      = useState(null);
+  const [cookNowExp,   setCookNowExp]   = useState(false);
+  const [pickerFor,    setPickerFor]    = useState(null);
+  const [invalidShare, setInvalidShare] = useState(false);
 
   useEffect(()=>{
     const hash = window.location.hash;
     if(hash.startsWith('#share=')){
       const decoded = decodePlan(hash.slice(7), [...WEEKDAY_MEALS,...WEEKEND_MEALS,...customMeals]);
       if(decoded){ setSharedPlan(decoded); setStep("shared"); }
+      else { setInvalidShare(true); window.history.replaceState(null,'',location.pathname); }
     }
   }, []);
 
@@ -1087,6 +1100,7 @@ function App() {
     setPlan(null); setShopList(null); setChecked({}); setExpandedDay(null);
     setStep("setup"); scrollTop();
   };
+  const confirmReset = () => { if(window.confirm('Start over and discard this week\'s plan?')) reset(); };
 
   const doShare = () => {
     const encoded = encodePlan(plan,dayConfig,familySize,customMeals);
@@ -1176,6 +1190,15 @@ function App() {
 
         {step==="setup" && (
           <div className="fade-in">
+            {invalidShare && (
+              <div style={{ background:"#fdecea", border:"1.5px solid #f5c2c0", borderRadius:"12px",
+                padding:"11px 16px", marginBottom:"16px", fontSize:"13px", color:"#b71c1c", fontWeight:600,
+                display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                <span>⚠️ Invalid share link — it may be corrupted or from an older version.</span>
+                <button onClick={()=>setInvalidShare(false)} style={{ background:"none", border:"none",
+                  color:"#b71c1c", cursor:"pointer", fontSize:"16px", padding:"0 0 0 10px", fontWeight:700 }}>✕</button>
+              </div>
+            )}
             <div style={{ background:P.accentLight, borderRadius:"12px", padding:"11px 16px", marginBottom:"16px", fontSize:"13px", color:P.accentDark, fontWeight:600 }}>
               {si.label} — {si.tip}
             </div>
@@ -1321,7 +1344,7 @@ function App() {
               </button>
             </div>
             <Secondary onClick={generate}>Shuffle all meals</Secondary>
-            <Secondary muted onClick={reset}>Start over</Secondary>
+            <Secondary muted onClick={confirmReset}>Start over</Secondary>
           </div>
         )}
 
@@ -1365,7 +1388,7 @@ function App() {
               else if(navigator.clipboard){navigator.clipboard.writeText(unchecked.join('\n')).then(()=>showToast("Copied!"));}
             }}>Share / Copy remaining</Primary>
             <Secondary onClick={()=>{setStep("plan");scrollTop();}}>Back to meals</Secondary>
-            <Secondary muted onClick={reset}>Plan another week</Secondary>
+            <Secondary muted onClick={confirmReset}>Plan another week</Secondary>
           </div>
         )}
       </div>
