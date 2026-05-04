@@ -537,6 +537,26 @@ function buildShop(plan,pantry,familySize){
   return out;
 }
 
+function countPantryExclusions(plan,pantry,familySize){
+  var pw=(pantry||'').toLowerCase().split(/[,\n]/).map(function(s){return s.trim()}).filter(Boolean);
+  if(!pw.length)return 0;
+  var excluded=new Set();
+  plan.meals.forEach(function(m){
+    var scale=familySize/(m.serves||4);
+    scaledIngredients(m.ingredients,scale).forEach(function(ing){
+      var lc=ing.label.toLowerCase();
+      if(pw.some(function(w){var re=new RegExp('(?:^|\\b)'+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?:\\b|$)','i');return re.test(lc)||re.test(ing.display.toLowerCase());}))excluded.add(lc);
+    });
+  });
+  return excluded.size;
+}
+function formatAgo(ts){
+  if(!ts)return'';
+  var days=Math.floor((Date.now()-ts)/(24*60*60*1000));
+  if(days===0)return'Generated today';
+  if(days===1)return'Generated yesterday';
+  return'Generated '+days+' days ago';
+}
 function getPool(type,timeFilter,customMeals,kids){
   if(kids===undefined)kids=true;
   var base=type==='weekend'?WEEKEND_MEALS:WEEKDAY_MEALS;
@@ -1010,6 +1030,7 @@ function App() {
   const si = SEASON_INFO[season];
   const homeDays  = DAYS.filter(d=>dayConfig[d]==="home");
   const goustoDays = DAYS.filter(d=>dayConfig[d]==="gousto");
+  const pantryExcluded = plan&&pantry.trim() ? countPantryExclusions(plan,pantry,familySize) : 0;
 
   const getKids = day => kidsConfig[day] !== false;
   const toggleKids = day => setKidsConfig(prev=>({...prev,[day]:!getKids(day)}));
@@ -1026,7 +1047,7 @@ function App() {
       if(pick){ selected.push(pick); return {...pick, day}; }
       return null;
     }).filter(Boolean);
-    const newPlan = { meals };
+    const newPlan = { meals, generatedAt: Date.now() };
     const newShop = buildShop(newPlan, pantry, familySize);
     const now = Date.now();
     const newHistory = [...mealHistory, ...meals.map(m=>({name:m.name,date:now}))].filter(h=>now-h.date<60*24*60*60*1000);
@@ -1212,7 +1233,7 @@ function App() {
                 marginBottom:"16px", boxShadow:P.shadow, border:`2px solid ${P.accent}`, cursor:"pointer" }}>
                 <div style={{ fontSize:"11px", color:P.accent, fontWeight:700, textTransform:"uppercase", letterSpacing:"1px", marginBottom:"3px" }}>Resume</div>
                 <div style={{ fontWeight:700, fontSize:"16px" }}>Continue last week's plan →</div>
-                <div style={{ fontSize:"13px", color:P.muted, marginTop:"2px" }}>{savedState.plan.meals.length} meals planned · tap to resume</div>
+                <div style={{ fontSize:"13px", color:P.muted, marginTop:"2px" }}>{savedState.plan.meals.length} meals planned{savedState.plan.generatedAt?' · '+formatAgo(savedState.plan.generatedAt):''} · tap to resume</div>
               </div>
             )}
             <div style={{ fontSize:"11px", textTransform:"uppercase", letterSpacing:"1.5px", color:P.accent, fontWeight:700, marginBottom:"5px" }}>Step 1 of 2</div>
@@ -1310,6 +1331,7 @@ function App() {
           <div className="fade-in">
             <div style={{ fontSize:"11px", textTransform:"uppercase", letterSpacing:"1.5px", color:P.accent, fontWeight:700, marginBottom:"5px" }}>Your week</div>
             <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"22px", lineHeight:1.3, marginBottom:"4px" }}>Here's the plan</div>
+            {plan.generatedAt&&<div style={{ fontSize:"12px", color:P.muted, marginBottom:"6px" }}>{formatAgo(plan.generatedAt)}</div>}
             <p style={{ fontSize:"13px", color:P.muted, marginBottom:"16px" }}>Tap a card for recipe &amp; ingredients · ☆ favourite · 🔄 swap · 👎 skip forever</p>
             {DAYS.map(day=>{
               if(dayConfig[day]==="off") return null;
@@ -1337,6 +1359,12 @@ function App() {
                 onDislike={()=>addDislike(meal.name)} onChoose={()=>setPickerFor(day)} readOnly={false}
                 lastUsed={lastUsed} />;
             })}
+            {(()=>{
+              const pc={},cb={};
+              plan.meals.forEach(m=>{if(m.protein)pc[m.protein]=(pc[m.protein]||0)+1;if(m.carb&&m.carb!=='none')cb[m.carb]=(cb[m.carb]||0)+1;});
+              const parts=[...Object.entries(pc).sort((a,b)=>b[1]-a[1]).map(([k,v])=>v+'× '+k),...Object.entries(cb).sort((a,b)=>b[1]-a[1]).map(([k,v])=>v+'× '+k)];
+              return parts.length?<div style={{fontSize:"12px",color:P.muted,textAlign:"center",marginTop:"8px",marginBottom:"14px",lineHeight:1.8}}>{parts.join(' · ')}</div>:null;
+            })()}
             <Primary onClick={()=>{setStep("shopping");scrollTop();}}>View Shopping List</Primary>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginTop:"10px" }}>
               <button onClick={()=>downloadICS(plan,familySize)} style={{ background:P.card, color:P.accent, border:`2px solid ${P.accent}`,
@@ -1359,7 +1387,7 @@ function App() {
             <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"22px", lineHeight:1.3, marginBottom:"4px" }}>
               {Object.entries(shopList).reduce((n,[,items])=>n+items.filter(item=>checked[Object.keys(shopList).find(c=>shopList[c].includes(item))+':'+item.display]).length,0)} of {Object.values(shopList).flat().length} items
             </div>
-            <div style={{ fontSize:"13px", color:P.muted, marginBottom:"16px" }}>Scaled for {familySize} · tap to check off</div>
+            <div style={{ fontSize:"13px", color:P.muted, marginBottom:"16px" }}>Scaled for {familySize} · tap to check off{pantryExcluded>0?` · ${pantryExcluded} in pantry`:''}</div>
             {Object.entries(shopList).map(([cat,items])=>(
               <div key={cat} style={{ marginBottom:"12px" }}>
                 <div style={{ fontSize:"11px", fontWeight:700, color:P.muted, textTransform:"uppercase", letterSpacing:"1.5px", marginBottom:"6px", paddingLeft:"4px" }}>{cat}</div>
