@@ -533,6 +533,16 @@ function scaledIngredients(ingredients,scale){
   });
 }
 
+function getCookedNote(label, qty) {
+  var m = (qty||'').match(/^([\d.]+)\s*g$/i);
+  if(!m) return null;
+  var g = parseFloat(m[1]);
+  if(/\b(pasta|penne|spaghetti|fusilli|linguine|rigatoni|macaroni|tagliatelle|orzo|shells|farfalle)\b/i.test(label)) return '≈'+Math.round(g*2.5)+'g cooked';
+  if(/\brice\b/i.test(label) && !/microwave|arborio/i.test(label)) return '≈'+Math.round(g*3)+'g cooked';
+  if(/\bnoodle/i.test(label) && !/microwave|fresh|cooked/i.test(label)) return '≈'+Math.round(g*2.5)+'g cooked';
+  return null;
+}
+
 function categoriseItem(label){
   var s=label.toLowerCase();
   if(/\bchicken\b|breast|thigh|drumstick|goujon|beef mince|turkey mince|\bpork\b|sausage|\blamb\b|salmon|\bfish\b|prawn|\btuna\b|meatball|bacon|\bham\b/.test(s))return'Meat & Fish';
@@ -815,7 +825,7 @@ function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, familyS
           </div>
           <ul style={{ paddingLeft:"18px", marginBottom:"16px" }}>
             {ing.length>0
-              ? ing.map((x,i)=><li key={i} style={{ fontSize:"14px", lineHeight:1.6 }}>{x.display}</li>)
+              ? ing.map((x,i)=>{var cn=getCookedNote(x.label,x.qty);return<li key={i} style={{ fontSize:"14px", lineHeight:1.6 }}>{x.display}{cn&&<span style={{ fontSize:"12px", color:P.muted, marginLeft:"4px" }}>({cn})</span>}</li>;})
               : <li style={{ fontSize:"14px", color:P.muted }}>No ingredients listed</li>}
           </ul>
           {meal.steps && meal.steps.length>0 && <>
