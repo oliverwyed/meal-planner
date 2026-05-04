@@ -972,10 +972,45 @@ function HelpScreen({ onClose }) {
   );
 }
 
-function PrefsScreen({ favourites, dislikes, customMeals, mealHistory, onToggleFav, onRemoveDislike,
-                       onAddDislike, onAddCustom, onDeleteCustom, onClearAll, onClose, showToast }) {
+function PrefsScreen({ favourites, dislikes, customMeals, mealHistory, familySize, pantry,
+                       onToggleFav, onRemoveDislike, onAddDislike, onAddCustom, onDeleteCustom,
+                       onClearAll, onImport, onClose, showToast }) {
   const [adding, setAdding] = useState(false);
   const [search, setSearch] = useState('');
+  const [importCode, setImportCode] = useState('');
+
+  const handleExport = () => {
+    const data = JSON.stringify({ v:1, exported:new Date().toISOString(),
+      favourites, dislikes, pantry, familySize, customMeals });
+    const code = btoa(encodeURIComponent(data));
+    if(navigator.share) {
+      navigator.share({ title:'My Meal Planner Profile', text:code })
+        .catch(()=>{});
+    } else {
+      navigator.clipboard.writeText(code)
+        .then(()=>showToast('Code copied ✓'))
+        .catch(()=>showToast('Copy failed — select and copy manually'));
+    }
+  };
+
+  const handleImport = () => {
+    try {
+      const data = JSON.parse(decodeURIComponent(atob(importCode.trim())));
+      if(!data.v) throw new Error();
+      const parts = [];
+      if(data.favourites&&data.favourites.length) parts.push(data.favourites.length+' favourite'+(data.favourites.length===1?'':'s'));
+      if(data.dislikes&&data.dislikes.length) parts.push(data.dislikes.length+' skipped meal'+(data.dislikes.length===1?'':'s'));
+      if(data.customMeals&&data.customMeals.length) parts.push(data.customMeals.length+' custom meal'+(data.customMeals.length===1?'':'s'));
+      if(data.pantry) parts.push('pantry list');
+      const summary = parts.length ? parts.join(', ') : 'an empty profile';
+      if(window.confirm('Import '+summary+'?\n\nThis will replace your current favourites, skipped meals, pantry and custom recipes.')) {
+        onImport(data);
+        setImportCode('');
+      }
+    } catch(e) {
+      showToast('Invalid code — check and try again');
+    }
+  };
   const ALL = [...WEEKDAY_MEALS,...WEEKEND_MEALS,...customMeals];
   const allFavs = ALL.filter(m=>favourites.includes(m.name));
   const allDislikes = ALL.filter(m=>dislikes.includes(m.name));
@@ -1119,6 +1154,32 @@ function PrefsScreen({ favourites, dislikes, customMeals, mealHistory, onToggleF
           Meals used in the last 2 weeks are heavily de-prioritised. Favourites appear 2.5× more often.
           Seasonal meals get a boost. Protein types and cuisines are balanced across the week automatically.
         </div>
+        <div style={{ marginTop:"32px" }}>
+          <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"18px", marginBottom:"8px" }}>🔗 Share profile</div>
+          <p style={{ fontSize:"13px", color:P.muted, lineHeight:1.5, marginBottom:"12px" }}>
+            Export your favourites, skipped meals, pantry and custom recipes as a code. Share it with someone else so they can import your setup.
+          </p>
+          <button onClick={handleExport}
+            style={{ display:"block", width:"100%", padding:"13px 18px", borderRadius:"14px",
+              background:`linear-gradient(135deg,${P.accent},${P.accentDark})`, color:"#fff",
+              border:"none", fontSize:"15px", fontWeight:700, cursor:"pointer", marginBottom:"16px" }}>
+            Export my profile
+          </button>
+          <textarea value={importCode} onChange={e=>setImportCode(e.target.value)}
+            placeholder="Paste an import code here…"
+            rows={3}
+            style={{ width:"100%", padding:"11px 14px", border:`2px solid ${P.border}`, borderRadius:"12px",
+              fontSize:"12px", background:P.card, boxSizing:"border-box", resize:"vertical",
+              fontFamily:"monospace", marginBottom:"8px" }} />
+          {importCode.trim().length>10 && (
+            <button onClick={handleImport}
+              style={{ display:"block", width:"100%", padding:"13px 18px", borderRadius:"14px",
+                background:P.card, color:P.accent, border:`2px solid ${P.accent}`,
+                fontSize:"15px", fontWeight:700, cursor:"pointer" }}>
+              Import profile
+            </button>
+          )}
+        </div>
         {(allFavs.length>0||allDislikes.length>0)&&(
           <button onClick={()=>{if(window.confirm('Clear all favourites and skipped meals?'))onClearAll();}}
             style={{ marginTop:"32px", color:P.muted, background:"none", border:"none", fontSize:"14px", cursor:"pointer", width:"100%", textAlign:"center" }}>
@@ -1259,6 +1320,14 @@ function App() {
     const nd=dislikes.filter(d=>d!==name); setDislikes(nd); save(SK.DISLIKES, nd);
     showToast("Restored ✓");
   };
+  const importProfile = data => {
+    if(data.favourites){setFavourites(data.favourites);save(SK.FAVS,data.favourites);}
+    if(data.dislikes){setDislikes(data.dislikes);save(SK.DISLIKES,data.dislikes);}
+    if(data.pantry!==undefined){setPantry(data.pantry);save(SK.PANTRY,data.pantry);}
+    if(data.familySize){setFamilySize(data.familySize);save(SK.FAMILY,data.familySize);}
+    if(data.customMeals){setCustomMeals(data.customMeals);save(SK.CUSTOM,data.customMeals);}
+    showToast("Profile imported ✓");
+  };
   const pickCookNow = () => {
     const allDis = pendingDislike ? [...dislikes, pendingDislike] : dislikes;
     const all=[...getPool("weekday","any",customMeals,true),...getPool("weekend","any",customMeals,true)];
@@ -1338,11 +1407,11 @@ function App() {
   if(showPrefs) return (
     <>
       <PrefsScreen favourites={favourites} dislikes={dislikes} customMeals={customMeals}
-        mealHistory={mealHistory}
+        mealHistory={mealHistory} familySize={familySize} pantry={pantry}
         onToggleFav={toggleFav} onRemoveDislike={removeDislike} onAddDislike={addDislike}
         onAddCustom={addCustom} onDeleteCustom={deleteCustom}
         onClearAll={()=>{setFavourites([]);setDislikes([]);save(SK.FAVS,[]);save(SK.DISLIKES,[]);showToast("Cleared");}}
-        onClose={()=>setShowPrefs(false)} showToast={showToast} />
+        onImport={importProfile} onClose={()=>setShowPrefs(false)} showToast={showToast} />
       {toast&&<div className="toast">{toast}</div>}
     </>
   );
