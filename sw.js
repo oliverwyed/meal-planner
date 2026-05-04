@@ -1,4 +1,4 @@
-const CACHE = 'mp-v16';
+const CACHE = 'mp-v17';
 const ASSETS = ['./', './index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {

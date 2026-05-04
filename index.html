@@ -690,12 +690,12 @@ var DIETARY_EXCLUDE={
   veggie:['chicken','beef','pork','lamb','fish','seafood'],
 };
 function getPool(type,timeFilter,customMeals,kids,dietaryMode){
-  if(kids===undefined)kids=true;
+  if(kids===undefined)kids='either';
   var excl=DIETARY_EXCLUDE[dietaryMode]||[];
   var base=type==='weekend'?WEEKEND_MEALS:WEEKDAY_MEALS;
   var custom=(customMeals||[]).filter(function(m){return type==='weekday'?m.pool!=='weekend':m.pool!=='weekday'});
   var limit=timeFilter==='15'?15:timeFilter==='25'?25:Infinity;
-  return[].concat(base,custom).filter(function(m){return m.minutes<=limit&&(!m.adult||!kids)&&!excl.includes(m.protein)});
+  return[].concat(base,custom).filter(function(m){return m.minutes<=limit&&(kids!=='kids'||!m.adult)&&!excl.includes(m.protein)});
 }
 
 function nextDateForDayName(dayName){
@@ -1394,7 +1394,7 @@ function App() {
   const [invalidShare, setInvalidShare] = useState(false);
   const [pendingDislike, setPendingDislike] = useState(null);
   const [addToPlanOpen,  setAddToPlanOpen]  = useState(false);
-  const [cookNowOpts,    setCookNowOpts]    = useState({kids:true,size:4,dietary:"none",time:"any"});
+  const [cookNowOpts,    setCookNowOpts]    = useState({kids:'either',size:4,dietary:"none",time:"any"});
   const [sizeOverrides,  setSizeOverrides]  = useState(()=>load(SK.SIZE_OVR, {}));
   const dislikeTimerRef = useRef(null);
 
@@ -1447,18 +1447,18 @@ function App() {
   const goustoDays = DAYS.filter(d=>dayConfig[d]==="gousto");
   const pantryExcluded = plan&&pantry.trim() ? countPantryExclusions(plan,pantry,familySize,dayConfig,sizeOverrides) : 0;
 
-  const getKids = day => kidsConfig[day] !== false;
-  const toggleKids = day => setKidsConfig(prev=>({...prev,[day]:!getKids(day)}));
+  const getKidsMode = day => { const v=kidsConfig[day]; return v===true||v==='kids'?'kids':v===false||v==='adults'?'adults':'either'; };
+  const cycleKids = day => { const next={'kids':'adults','adults':'either','either':'kids'}; setKidsConfig(prev=>({...prev,[day]:next[getKidsMode(day)]})); };
 
   const generate = () => {
     const opts = { history:mealHistory, favourites, dislikes };
     const selected = [];
     const meals = homeDays.map(day => {
       const type = WEEKEND.includes(day) ? "weekend" : "weekday";
-      const pool = getPool(type, timeFilter, customMeals, getKids(day), dietaryMode);
+      const pool = getPool(type, timeFilter, customMeals, getKidsMode(day), dietaryMode);
       const usedNames = selected.map(m=>m.name);
       const avail = pool.filter(m=>!usedNames.includes(m.name));
-      const [pick] = smartPick(avail.length ? avail : pool, 1, {...opts, preferAdult: !getKids(day)});
+      const [pick] = smartPick(avail.length ? avail : pool, 1, {...opts, preferAdult: getKidsMode(day)==='adults'});
       if(pick){ selected.push(pick); return {...pick, day}; }
       return null;
     }).filter(Boolean);
@@ -1474,12 +1474,12 @@ function App() {
   };
 
   const swap = (day, extraDislikes=[]) => {
-    const pool = getPool(WEEKEND.includes(day)?"weekend":"weekday", timeFilter, customMeals, getKids(day), dietaryMode);
+    const pool = getPool(WEEKEND.includes(day)?"weekend":"weekday", timeFilter, customMeals, getKidsMode(day), dietaryMode);
     const used = plan.meals.map(m=>m.name);
     const allD = [...dislikes, ...extraDislikes];
     const avail = pool.filter(m=>!used.includes(m.name)&&!allD.includes(m.name));
     if(!avail.length){ showToast("No more meals to swap to!"); return; }
-    const swapOpts={history:mealHistory,favourites,dislikes:allD,preferAdult:!getKids(day)};
+    const swapOpts={history:mealHistory,favourites,dislikes:allD,preferAdult:!getKidsMode(day)};
     const [r]=smartPick(avail,1,swapOpts);
     const newPlan = { meals:plan.meals.map(m=>m.day===day?{...r,day}:m) };
     const newShop = buildShop(newPlan, pantry, familySize, dayConfig, sizeOverrides);
@@ -1494,7 +1494,7 @@ function App() {
     setDayConfig(newDC);
     if(mode==='home' && plan && !plan.meals.find(m=>m.day===day)){
       const type=WEEKEND.includes(day)?"weekend":"weekday";
-      const pool=getPool(type,timeFilter,customMeals,getKids(day),dietaryMode);
+      const pool=getPool(type,timeFilter,customMeals,getKidsMode(day),dietaryMode);
       const used=plan.meals.map(m=>m.name);
       const avail=pool.filter(m=>!used.includes(m.name)&&!dislikes.includes(m.name));
       const [pick]=smartPick(avail.length?avail:pool,1,{history:mealHistory,favourites,dislikes});
@@ -1559,13 +1559,13 @@ function App() {
                ...getPool("weekend",opts.time,customMeals,opts.kids,opts.dietary)];
     const unique=all.filter((m,i)=>all.findIndex(x=>x.name===m.name)===i);
     if(!unique.length){showToast("No meals match these filters");return;}
-    const [pick]=smartPick(unique,1,{history:mealHistory,favourites,dislikes:allDis,preferAdult:!opts.kids});
+    const [pick]=smartPick(unique,1,{history:mealHistory,favourites,dislikes:allDis,preferAdult:opts.kids==='adults'});
     if(pick){setCookNow(pick);setCookNowExp(true);}
     else showToast("No more meals available!");
   };
   const pickCookNow = () => pickCookNowWith(cookNowOpts);
   const openCookNow = () => {
-    const opts={kids:true,size:familySize,dietary:dietaryMode,time:"any"};
+    const opts={kids:'either',size:familySize,dietary:dietaryMode,time:"any"};
     setCookNowOpts(opts);
     pickCookNowWith(opts);
   };
@@ -1785,7 +1785,7 @@ function App() {
             {/* Day grid */}
             <div style={{ background:P.card, borderRadius:"14px", padding:"14px 18px", boxShadow:P.shadow, border:`1px solid ${P.border}`, marginBottom:"16px" }}>
               <div style={{ fontWeight:700, fontSize:"15px", marginBottom:"3px" }}>Days this week</div>
-              <div style={{ fontSize:"13px", color:P.muted, marginBottom:"12px" }}>Tap to cycle: Home → Gousto → Day off · tap 👶/🍷 to toggle kids</div>
+              <div style={{ fontSize:"13px", color:P.muted, marginBottom:"12px" }}>Tap to cycle: Home → Gousto → Day off · tap 👶/🍷/✌️ to set who's eating</div>
               {DAYS.map((day,idx)=>{
                 const val = dayConfig[day]||"home";
                 const cycle = {home:"gousto",gousto:"off",off:"home"};
@@ -1803,12 +1803,12 @@ function App() {
                     </div>
                     <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
                       {val==="home" && (
-                        <button onClick={e=>{e.stopPropagation();toggleKids(day);}}
-                          style={{ background:getKids(day)?P.greenLight:"#EDE7F6",
-                            color:getKids(day)?P.greenDark:"#6D28D9",
+                        <button onClick={e=>{e.stopPropagation();cycleKids(day);}}
+                          style={{ background:getKidsMode(day)==='kids'?P.greenLight:getKidsMode(day)==='adults'?"#EDE7F6":P.border,
+                            color:getKidsMode(day)==='kids'?P.greenDark:getKidsMode(day)==='adults'?"#6D28D9":P.muted,
                             border:"none", borderRadius:"8px", padding:"4px 10px",
                             fontSize:"12px", fontWeight:700, cursor:"pointer" }}>
-                          {getKids(day)?"👶 Kids":"🍷 Adults"}
+                          {getKidsMode(day)==='kids'?"👶 Kids":getKidsMode(day)==='adults'?"🍷 Adults":"✌️ Either"}
                         </button>
                       )}
                       <span style={{ background:colors[val][0], color:colors[val][1],
@@ -2005,13 +2005,13 @@ function App() {
               <div style={{ padding:"12px 16px",borderBottom:`1px solid ${P.border}`,background:P.card }}>
                 <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"8px" }}>
                   <div style={{ display:"flex",gap:"5px" }}>
-                    {[["Kids",true,"👶"],["Adults",false,"🍷"]].map(([label,val,icon])=>(
-                      <button key={label} onClick={()=>updateCookNowFilter({kids:val})}
+                    {[["👶 Kids",'kids'],["✌️ Either",'either'],["🍷 Adults",'adults']].map(([label,val])=>(
+                      <button key={val} onClick={()=>updateCookNowFilter({kids:val})}
                         style={{ background:cookNowOpts.kids===val?P.accentLight:"transparent",
                           border:`1.5px solid ${cookNowOpts.kids===val?P.accent:P.border}`,
                           borderRadius:"20px",padding:"4px 10px",fontSize:"12px",fontWeight:700,
                           color:cookNowOpts.kids===val?P.accentDark:P.muted,cursor:"pointer" }}>
-                        {icon} {label}
+                        {label}
                       </button>
                     ))}
                   </div>
