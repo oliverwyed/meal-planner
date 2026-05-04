@@ -466,19 +466,21 @@ function smartPick(pool,count,opts){
     if(m.seasons&&m.seasons.includes(season))s*=1.4;
     return{m:m,s:s};
   });
-  var selected=[],usedP={},usedC={};
+  var selected=[],usedP={},usedC={},usedCarb={};
   for(var i=0;i<count;i++){
     var remaining=scored.filter(function(x){return!selected.some(function(s){return s.name===x.m.name})});
     if(!remaining.length)break;
     var adj=remaining.map(function(x){
-      var w=Math.max(x.s,0.001),pc=usedP[x.m.protein]||0,cc=usedC[x.m.cuisine]||0;
+      var w=Math.max(x.s,0.001),pc=usedP[x.m.protein]||0,cc=usedC[x.m.cuisine]||0,cb=usedCarb[x.m.carb]||0;
       if(pc>=2)w*=0.08;else if(pc===1)w*=0.5;
       if(cc>=2)w*=0.12;else if(cc===1)w*=0.6;
+      if(x.m.carb&&x.m.carb!=='none'){if(cb>=2)w*=0.12;else if(cb===1)w*=0.6;}
       return{m:x.m,w:Math.max(w,0.001)};
     });
     var total=adj.reduce(function(a,x){return a+x.w},0),rand=Math.random()*total,chosen=adj[adj.length-1].m;
     for(var j=0;j<adj.length;j++){rand-=adj[j].w;if(rand<=0){chosen=adj[j].m;break;}}
     selected.push(chosen);usedP[chosen.protein]=(usedP[chosen.protein]||0)+1;usedC[chosen.cuisine]=(usedC[chosen.cuisine]||0)+1;
+    if(chosen.carb&&chosen.carb!=='none')usedCarb[chosen.carb]=(usedCarb[chosen.carb]||0)+1;
   }
   return selected;
 }
@@ -774,13 +776,13 @@ function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, familyS
 }
 
 function AddMealForm({ onSave, onCancel }) {
-  const [f, setF] = useState({ name:'', minutes:'15', protein:'chicken', cuisine:'british', pool:'weekday', ingredients:'', steps:'' });
+  const [f, setF] = useState({ name:'', minutes:'15', protein:'chicken', cuisine:'british', carb:'none', pool:'weekday', ingredients:'', steps:'' });
   const set = (k,v) => setF(p=>({...p,[k]:v}));
   const valid = f.name.trim().length > 0;
   const handleSave = () => {
     if(!valid)return;
     onSave({ name:f.name.trim(), time:f.minutes+' min', minutes:parseInt(f.minutes)||15,
-      protein:f.protein, cuisine:f.cuisine, pool:f.pool, serves:4,
+      protein:f.protein, cuisine:f.cuisine, carb:f.carb, pool:f.pool, serves:4,
       description:f.steps.trim().split('\n')[0]||f.name, kidNote:'',
       ingredients:f.ingredients.split('\n').map(s=>s.trim()).filter(Boolean),
       steps:f.steps.split('\n').map(s=>s.trim()).filter(Boolean), custom:true });
@@ -806,6 +808,9 @@ function AddMealForm({ onSave, onCancel }) {
         </select>)}
         {row("Cuisine", <select value={f.cuisine} onChange={e=>set('cuisine',e.target.value)} style={ss}>
           {["british","italian","asian","mexican","indian","american","middleeastern","other"].map(c=><option key={c}>{c}</option>)}
+        </select>)}
+        {row("Carb base", <select value={f.carb} onChange={e=>set('carb',e.target.value)} style={ss}>
+          {["none","pasta","rice","potato","bread","noodles"].map(c=><option key={c}>{c}</option>)}
         </select>)}
       </div>
       {row("For", <select value={f.pool} onChange={e=>set('pool',e.target.value)} style={ss}>
