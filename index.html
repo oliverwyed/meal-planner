@@ -892,6 +892,76 @@ function AddMealForm({ onSave, onCancel }) {
   );
 }
 
+function HelpScreen({ onClose }) {
+  const sections = [
+    { icon:"🍴", title:"Cook Tonight", items:[
+      "Tap the orange button in the bottom-right corner for an instant meal suggestion tuned to your history and season.",
+      "🔀 Suggest something else for a new pick · 📋 Browse all meals to choose a specific one.",
+      "📅 Add to this week's plan expands a day picker — tap any day to replace it with the current suggestion.",
+      "👎 Skip on a suggestion marks it as skipped forever, but you have 4 seconds to tap Undo if you change your mind.",
+    ]},
+    { icon:"📅", title:"Your week", items:[
+      "Tap any meal card to expand the full recipe with ingredients scaled to your family size.",
+      "☆ to favourite (suggested 2.5× more often) · 🔄 to swap for something different · 👎 to skip forever.",
+      "📋 button on each day opens the full meal library so you can hand-pick a specific meal for that slot.",
+      "The summary line below the plan shows protein and carb variety — e.g. 3× chicken · 2× pasta.",
+    ]},
+    { icon:"🧠", title:"Smart suggestions", items:[
+      "Meals you've had in the last 1–2 weeks are heavily de-prioritised. After 3–5 weeks they're back in full rotation.",
+      "Favourites are suggested 2.5× more often. Meals tagged for the current season get a 1.4× boost.",
+      "Protein, cuisine and carb type are balanced across the week automatically — no more pasta four nights running.",
+      "Dislikes, time filters and kid-friendly settings all combine to shape the pool before scoring begins.",
+    ]},
+    { icon:"🛒", title:"Shopping list", items:[
+      "Every ingredient is scaled to your family size. Identical ingredients from different meals are combined into a single quantity.",
+      "Add pantry items (things you already have) during setup — they're removed from the list automatically.",
+      "The subtitle shows how many ingredients were excluded by your pantry.",
+      "Share / Copy remaining sends only unchecked items so you can paste into a message or notes app.",
+    ]},
+    { icon:"⚙️", title:"Preferences", items:[
+      "Browse all meals to search the full 75-recipe library and favourite or skip anything.",
+      "Cook history shows your most-used meals by count and a recent log with relative dates.",
+      "Add your own meals under Your meals — they join the rotation and the diversity algorithm straight away.",
+      "Favourites and skipped meals sync with the smart suggestion engine immediately.",
+    ]},
+    { icon:"🔗", title:"Sharing & calendar", items:[
+      "Share creates a link that encodes your full plan — anyone with it can import it directly.",
+      "Calendar export adds each dinner to your calendar app with the full recipe in the event description.",
+      "Resume on the home screen restores your last plan including the shopping list and checked items.",
+    ]},
+  ];
+  return (
+    <div style={{ position:"fixed",inset:0,zIndex:800,overflowY:"auto",background:P.bg }}>
+      <div style={{ background:`linear-gradient(135deg,${P.accent},${P.accentDark})`,color:"#fff",padding:"48px 24px 24px" }}>
+        <div style={{ maxWidth:"480px",margin:"0 auto",display:"flex",alignItems:"center",gap:"12px" }}>
+          <button onClick={onClose} style={{ background:"rgba(255,255,255,0.2)",border:"none",color:"white",
+            borderRadius:"10px",padding:"8px 14px",cursor:"pointer",fontSize:"15px",fontWeight:700 }}>← Back</button>
+          <h1 style={{ fontFamily:"'DM Serif Display',Georgia,serif",fontSize:"22px",margin:0 }}>How it works</h1>
+        </div>
+      </div>
+      <div style={{ maxWidth:"480px",margin:"0 auto",padding:"24px 16px 100px" }}>
+        {sections.map(s=>(
+          <div key={s.title} style={{ marginBottom:"28px" }}>
+            <div style={{ fontFamily:"'DM Serif Display',serif",fontSize:"18px",marginBottom:"10px" }}>{s.icon} {s.title}</div>
+            <div style={{ background:P.card,borderRadius:"14px",padding:"4px 16px",boxShadow:P.shadow,border:`1px solid ${P.border}` }}>
+              {s.items.map((item,i)=>(
+                <div key={i} style={{ padding:"12px 0",
+                  borderBottom:i<s.items.length-1?`1px solid ${P.border}`:"none",
+                  fontSize:"14px",lineHeight:1.6,color:P.text }}>
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+        <div style={{ textAlign:"center",fontSize:"12px",color:P.muted,marginTop:"4px" }}>
+          75 recipes and counting
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PrefsScreen({ favourites, dislikes, customMeals, mealHistory, onToggleFav, onRemoveDislike,
                        onAddDislike, onAddCustom, onDeleteCustom, onClearAll, onClose, showToast }) {
   const [adding, setAdding] = useState(false);
@@ -1066,6 +1136,7 @@ function App() {
   const [savedState,  setSavedState] = useState(()=>load(SK.STATE, null));
   const [toast,       setToast]      = useState(null);
   const [showPrefs,   setShowPrefs]  = useState(false);
+  const [showHelp,    setShowHelp]   = useState(false);
   const [expandedDay, setExpandedDay]= useState(null);
   const [sharedPlan,  setSharedPlan] = useState(null);
   const [kidsConfig, setKidsConfig] = useState(()=>load(SK.KIDS_CFG, {}));
@@ -1247,6 +1318,13 @@ function App() {
     window.history.replaceState(null,'',location.pathname); scrollTop();
   };
 
+  if(showHelp) return (
+    <>
+      <HelpScreen onClose={()=>setShowHelp(false)} />
+      {toast&&<div className="toast">{toast}</div>}
+    </>
+  );
+
   if(showPrefs) return (
     <>
       <PrefsScreen favourites={favourites} dislikes={dislikes} customMeals={customMeals}
@@ -1302,8 +1380,12 @@ function App() {
             <h1 style={{ fontFamily:"'DM Serif Display',Georgia,serif", fontSize:"26px", margin:0, lineHeight:1.2 }}>Weekly Dinner Planner</h1>
             <div style={{ fontSize:"13px", opacity:0.85, marginTop:"5px" }}>Quick, kid-friendly meals for the family</div>
           </div>
-          <button onClick={()=>setShowPrefs(true)} style={{ background:"rgba(255,255,255,0.2)", border:"none",
-            color:"white", borderRadius:"10px", padding:"8px 10px", cursor:"pointer", fontSize:"18px", flexShrink:0, marginTop:"2px" }}>⚙️</button>
+          <div style={{ display:"flex", gap:"6px", flexShrink:0, marginTop:"2px" }}>
+            <button onClick={()=>setShowHelp(true)} style={{ background:"rgba(255,255,255,0.2)", border:"none",
+              color:"white", borderRadius:"10px", padding:"8px 10px", cursor:"pointer", fontSize:"18px" }}>ℹ️</button>
+            <button onClick={()=>setShowPrefs(true)} style={{ background:"rgba(255,255,255,0.2)", border:"none",
+              color:"white", borderRadius:"10px", padding:"8px 10px", cursor:"pointer", fontSize:"18px" }}>⚙️</button>
+          </div>
         </div>
       </div>
 
