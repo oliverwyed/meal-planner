@@ -1348,12 +1348,20 @@ function PrefsScreen({ favourites, dislikes, customMeals, mealHistory, savedStat
             </button>
           )}
         </div>
-        {(allFavs.length>0||allDislikes.length>0)&&(
-          <button onClick={()=>{if(window.confirm('Clear all favourites and skipped meals?'))onClearAll();}}
-            style={{ marginTop:"32px", color:P.muted, background:"none", border:"none", fontSize:"14px", cursor:"pointer", width:"100%", textAlign:"center" }}>
-            Clear all preferences
-          </button>
-        )}
+        <div style={{ marginTop:"32px", display:"flex", flexDirection:"column", gap:"10px" }}>
+          {(allFavs.length>0||allDislikes.length>0)&&(
+            <button onClick={()=>{if(window.confirm('Clear all favourites and skipped meals?'))onClearAll();}}
+              style={{ color:P.muted, background:"none", border:"none", fontSize:"14px", cursor:"pointer", width:"100%", textAlign:"center" }}>
+              Clear all preferences
+            </button>
+          )}
+          {mealHistory.length>0&&(
+            <button onClick={()=>{if(window.confirm('Clear cook history? Meals will no longer be avoided based on recent use.'))onClearHistory();}}
+              style={{ color:P.muted, background:"none", border:"none", fontSize:"14px", cursor:"pointer", width:"100%", textAlign:"center" }}>
+              Clear cook history
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
