@@ -57,7 +57,23 @@ var P={bg:"#FAFAF7",card:"#FFF",accent:"#E07A5F",accentLight:"#F4D1C7",accentDar
 
 var DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 var WEEKEND=["Saturday","Sunday"];
-var EMOJIS={Monday:"🍝",Tuesday:"🥘",Wednesday:"🐟",Thursday:"🍗",Friday:"🌮",Saturday:"🥩",Sunday:"🍕"};
+function getMealEmoji(meal){
+  if(!meal)return'🍽️';
+  var c=meal.cuisine||'',p=meal.protein||'';
+  if(c==='italian')return'🍝';
+  if(c==='asian')return'🥢';
+  if(c==='mexican')return'🌮';
+  if(c==='indian')return'🍛';
+  if(c==='middleeastern')return'🥙';
+  if(c==='american')return'🍔';
+  if(p==='fish'||p==='seafood')return'🐟';
+  if(p==='chicken')return'🍗';
+  if(p==='beef')return'🥩';
+  if(p==='lamb'||p==='pork')return'🍖';
+  if(p==='eggs')return'🍳';
+  if(p==='veggie')return'🥗';
+  return'🍽️';
+}
 var SEASON_INFO={spring:{label:"🌸 Spring",tip:"lighter meals & spring veg"},
                  summer:{label:"☀️ Summer",tip:"fresh, quick & colourful"},
                  autumn:{label:"🍂 Autumn",tip:"hearty bakes & warming bowls"},
@@ -787,7 +803,7 @@ function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, familyS
       <div style={{ padding:"15px 16px", cursor:"pointer" }} onClick={onExpand}
         role="button" aria-expanded={expanded} aria-label={`${meal.name} — ${expanded?"hide":"show"} recipe`}>
         <div style={{ display:"flex", gap:"12px" }}>
-          <div style={{ fontSize:"26px", flexShrink:0, paddingTop:"2px" }}>{EMOJIS[day]||"🍽️"}</div>
+          <div style={{ fontSize:"26px", flexShrink:0, paddingTop:"2px" }}>{getMealEmoji(meal)}</div>
           <div style={{ flex:1, minWidth:0 }}>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"2px" }}>
               <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:"12px", color:P.accent, textTransform:"uppercase", letterSpacing:"0.5px" }}>{day}</div>
@@ -817,7 +833,7 @@ function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, familyS
               {meal.time && <Tag bg={P.accentLight} color={P.accentDark}>{meal.time}</Tag>}
               {isSeasonal && <Tag bg="#EDF7ED" color="#2E7D32">{seasonLabel}</Tag>}
               {isFav && <Tag bg={P.goldLight} color={P.gold}>⭐ Fav</Tag>}
-              {meal.kidNote && <Tag bg={P.greenLight} color={P.greenDark}>👶 {meal.kidNote}</Tag>}
+              {meal.kidNote && <Tag bg={P.greenLight} color={P.greenDark}>👶 Kid-friendly</Tag>}
               {lastUsedStr && <Tag bg={P.border} color={P.muted}>🕐 {lastUsedStr}</Tag>}
             </div>
             <div style={{ fontSize:"12px", color:P.accent, fontWeight:600, marginTop:"7px" }}>
@@ -842,6 +858,17 @@ function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, familyS
               {meal.steps.map((s,i)=><li key={i} style={{ fontSize:"14px", lineHeight:1.6, marginBottom:"6px" }}>{s}</li>)}
             </ol>
           </>}
+          {meal.kidNote && (
+            <div style={{ marginTop:"14px", background:P.greenLight, borderRadius:"10px",
+              padding:"11px 14px", display:"flex", gap:"10px", alignItems:"flex-start" }}>
+              <span style={{ fontSize:"16px", flexShrink:0 }}>👶</span>
+              <div>
+                <div style={{ fontSize:"11px", fontWeight:700, color:P.greenDark, letterSpacing:"1.2px",
+                  textTransform:"uppercase", marginBottom:"3px" }}>For kids</div>
+                <div style={{ fontSize:"13px", lineHeight:1.5, color:P.greenDark }}>{meal.kidNote}</div>
+              </div>
+            </div>
+          )}
           {meal.tip && (
             <div style={{ marginTop:"14px", background:P.goldLight, borderRadius:"10px",
               padding:"11px 14px", display:"flex", gap:"10px", alignItems:"flex-start" }}>
