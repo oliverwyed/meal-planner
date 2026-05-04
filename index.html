@@ -694,7 +694,7 @@ function getPool(type,timeFilter,customMeals,kids,dietaryMode){
   var excl=DIETARY_EXCLUDE[dietaryMode]||[];
   var base=type==='weekend'?WEEKEND_MEALS:WEEKDAY_MEALS;
   var custom=(customMeals||[]).filter(function(m){return type==='weekday'?m.pool!=='weekend':m.pool!=='weekday'});
-  var limit=timeFilter==='15'?15:timeFilter==='25'?25:Infinity;
+  var limit=timeFilter==='any'?Infinity:(parseInt(timeFilter)||Infinity);
   return[].concat(base,custom).filter(function(m){return m.minutes<=limit&&(kids!=='kids'||!m.adult)&&!excl.includes(m.protein)});
 }
 
@@ -1758,14 +1758,18 @@ function App() {
 
             {/* Time filter */}
             <div style={{ background:P.card, borderRadius:"14px", padding:"14px 18px", marginBottom:"10px", boxShadow:P.shadow, border:`1px solid ${P.border}` }}>
-              <div style={{ fontWeight:700, fontSize:"15px", marginBottom:"10px" }}>Max cook time</div>
-              <div style={{ display:"flex", gap:"8px" }}>
-                {[["any","Any time"],["25","≤ 25 min"],["15","≤ 15 min"]].map(([val,label])=>(
-                  <button key={val} onClick={()=>setTimeFilter(val)} style={{ flex:1, padding:"10px 4px", borderRadius:"10px",
-                    border:`2px solid ${timeFilter===val?P.accent:P.border}`,
-                    background:timeFilter===val?P.accent:P.card, color:timeFilter===val?"#fff":P.text,
-                    fontSize:"13px", fontWeight:700, cursor:"pointer" }}>{label}</button>
-                ))}
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"10px" }}>
+                <div style={{ fontWeight:700, fontSize:"15px" }}>Max cook time</div>
+                <div style={{ fontWeight:700, fontSize:"15px", color:P.accent }}>
+                  {timeFilter==='any'?'Any time':`≤ ${timeFilter} min`}
+                </div>
+              </div>
+              <input type="range" min="15" max="60" step="5"
+                value={timeFilter==='any'?60:parseInt(timeFilter)||60}
+                onChange={e=>{const v=parseInt(e.target.value);setTimeFilter(v>=60?'any':String(v));}}
+                style={{ width:"100%", accentColor:P.accent, cursor:"pointer" }} />
+              <div style={{ display:"flex", justifyContent:"space-between", fontSize:"11px", color:P.muted, marginTop:"4px" }}>
+                <span>15 min</span><span>Any time</span>
               </div>
             </div>
 
@@ -2025,16 +2029,19 @@ function App() {
                         fontSize:"15px",cursor:"pointer",color:P.muted,display:"flex",alignItems:"center",justifyContent:"center" }}>+</button>
                   </div>
                 </div>
-                <div style={{ display:"flex",gap:"5px",marginBottom:"7px" }}>
-                  {[["any","Any time"],["25","≤25 min"],["15","≤15 min"]].map(([v,l])=>(
-                    <button key={v} onClick={()=>updateCookNowFilter({time:v})}
-                      style={{ background:cookNowOpts.time===v?P.accentLight:"transparent",
-                        border:`1.5px solid ${cookNowOpts.time===v?P.accent:P.border}`,
-                        borderRadius:"20px",padding:"3px 9px",fontSize:"11px",fontWeight:700,
-                        color:cookNowOpts.time===v?P.accentDark:P.muted,cursor:"pointer" }}>
-                      {l}
-                    </button>
-                  ))}
+                <div style={{ marginBottom:"7px" }}>
+                  <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"4px" }}>
+                    <span style={{ fontSize:"11px",fontWeight:700,color:P.muted,textTransform:"uppercase",letterSpacing:"0.8px" }}>Max cook time</span>
+                    <span style={{ fontSize:"12px",fontWeight:700,color:P.accent }}>{cookNowOpts.time==='any'?'Any time':`≤ ${cookNowOpts.time} min`}</span>
+                  </div>
+                  <input type="range" min="15" max="60" step="5"
+                    value={cookNowOpts.time==='any'?60:parseInt(cookNowOpts.time)||60}
+                    onChange={e=>{const v=parseInt(e.target.value);setCookNowOpts(prev=>({...prev,time:v>=60?'any':String(v)}));}}
+                    onPointerUp={e=>{const v=parseInt(e.target.value);updateCookNowFilter({time:v>=60?'any':String(v)});}}
+                    style={{ width:"100%",accentColor:P.accent,cursor:"pointer" }} />
+                  <div style={{ display:"flex",justifyContent:"space-between",fontSize:"10px",color:P.muted,marginTop:"2px" }}>
+                    <span>15 min</span><span>Any time</span>
+                  </div>
                 </div>
                 <div style={{ display:"flex",gap:"5px",flexWrap:"wrap" }}>
                   {[["none","All"],["noFish","No fish"],["noPork","No pork"],["noRed","No red meat"],["veggie","🌱 Veggie"]].map(([v,l])=>(
