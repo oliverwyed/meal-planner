@@ -507,7 +507,7 @@ function getSeason(){var m=new Date().getMonth();if(m>=2&&m<=4)return'spring';if
 
 function smartPick(pool,count,opts){
   if(count<=0)return[];
-  var history=opts.history||[],favs=opts.favourites||[],dis=opts.dislikes||[];
+  var history=opts.history||[],favs=opts.favourites||[],dis=opts.dislikes||[],preferAdult=opts.preferAdult;
   var season=getSeason(),now=Date.now(),WEEK=7*24*60*60*1000;
   var avail=pool.filter(function(m){return!dis.includes(m.name)});
   if(avail.length<count)avail=pool;
@@ -516,6 +516,7 @@ function smartPick(pool,count,opts){
     if(uses.length){var wa=(now-Math.max.apply(null,uses.map(function(h){return h.date})))/WEEK;if(wa<1.5)s*=0.02;else if(wa<3)s*=0.2;else if(wa<5)s*=0.55;}
     if(favs.includes(m.name))s*=2.5;
     if(m.seasons&&m.seasons.includes(season))s*=1.4;
+    if(preferAdult&&m.kidNote)s*=0.12;
     return{m:m,s:s};
   });
   var selected=[],usedP={},usedC={},usedCarb={};
@@ -1388,7 +1389,7 @@ function App() {
       const pool = getPool(type, timeFilter, customMeals, getKids(day), dietaryMode);
       const usedNames = selected.map(m=>m.name);
       const avail = pool.filter(m=>!usedNames.includes(m.name));
-      const [pick] = smartPick(avail.length ? avail : pool, 1, opts);
+      const [pick] = smartPick(avail.length ? avail : pool, 1, {...opts, preferAdult: !getKids(day)});
       if(pick){ selected.push(pick); return {...pick, day}; }
       return null;
     }).filter(Boolean);
@@ -1409,7 +1410,8 @@ function App() {
     const allD = [...dislikes, ...extraDislikes];
     const avail = pool.filter(m=>!used.includes(m.name)&&!allD.includes(m.name));
     if(!avail.length){ showToast("No more meals to swap to!"); return; }
-    const r = avail[Math.floor(Math.random()*avail.length)];
+    const swapOpts={history:mealHistory,favourites,dislikes:allD,preferAdult:!getKids(day)};
+    const [r]=smartPick(avail,1,swapOpts);
     const newPlan = { meals:plan.meals.map(m=>m.day===day?{...r,day}:m) };
     const newShop = buildShop(newPlan, pantry, familySize, dayConfig, sizeOverrides);
     setPlan(newPlan); setShopList(newShop);
