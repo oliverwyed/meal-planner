@@ -39,7 +39,7 @@ export type AppActions = {
   replaceMealInPlan: (day: DayName, meal: Meal) => void;
   restorePlan: (plan: Plan) => void;
   clearHistory: () => void;
-  addToHistory: (meals: PlanMeal[]) => void;
+  addToHistory: (meals: { name: string }[]) => void;
   pickCookNow: (time: string, kidsMode: KidsMode, dietary: string) => Meal | null;
 };
 
@@ -244,7 +244,7 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
     setHs(prev => ({ ...prev, cookHistory: [] }));
   }, []);
 
-  const addToHistory = useCallback((meals: PlanMeal[]) => {
+  const addToHistory = useCallback((meals: { name: string }[]) => {
     const now = Date.now();
     setHs(prev => ({
       ...prev,

@@ -5,7 +5,7 @@ import { ImportRecipe } from './components/ImportRecipe';
 import { Primary, Secondary, Toast, Spinner, Section, TimeSlider } from './components/ui';
 import { useHousehold } from './hooks/useHousehold';
 import { DAYS, HOUSEHOLD_ID_KEY, P } from './lib/constants';
-import type { DayName, DayMode, Meal } from './lib/types';
+import type { DayName, DayMode, KidsMode, Meal } from './lib/types';
 import { CAT_EMOJI } from './lib/shopping';
 import RECIPES from './data/recipes.json';
 
@@ -45,12 +45,13 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [checked, setChecked] = useState<Record<string, boolean>>(() => {
     try { return JSON.parse(sessionStorage.getItem('shopChecked') ?? '{}'); } catch { return {}; }
   });
-  const [pickerFor, setPickerFor] = useState<DayName | null>(null);
+  const [pickerFor, setPickerFor] = useState<DayName | 'cookNow' | null>(null);
   const [showImport, setShowImport] = useState(false);
   const [addMealOpen, setAddMealOpen] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
-  const [inviteVisible, setInviteVisible] = useState(false);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const [hintDismissed, setHintDismissed] = useState(() => localStorage.getItem('hintDismissed') === '1');
+  const [pantryDraft, setPantryDraft] = useState(state.preferences.pantry);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const toastUndoRef = useRef<(() => void) | null>(null);
   const [cookNow, setCookNow] = useState<Meal | null>(null);
@@ -68,21 +69,18 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   }, []);
 
   useEffect(() => {
-    if (inviteVisible && !inviteCode) {
-      import('./lib/supabase').then(({ supabase }) => {
-        supabase.from('households').select('invite_code').eq('id', householdId).single()
-          .then(({ data }) => { if (data) setInviteCode(data.invite_code); });
-      });
-    }
-  }, [inviteVisible, householdId, inviteCode]);
-
-  useEffect(() => {
     if (state.plan && step === 'setup') setStep('plan');
   }, [state.plan, step]);
 
   useEffect(() => {
+    if (step === 'plan' && !state.plan && !loading) setStep('setup');
+  }, [step, state.plan, loading]);
+
+  useEffect(() => {
     sessionStorage.setItem('shopChecked', JSON.stringify(checked));
   }, [checked]);
+
+  useEffect(() => { setPantryDraft(state.preferences.pantry); }, [state.preferences.pantry]);
 
   const si = SEASON_INFO[state.season] ?? { label: '' };
 
@@ -135,9 +133,15 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
             <IconBtn onClick={() => setStep('prefs')} title="Preferences">👤</IconBtn>
           </div>
         </div>
-        <p style={{ fontSize: '13px', color: P.muted, marginBottom: '12px' }}>
-          Tap a card for recipe & ingredients · ☆ favourite · 🔄 swap · 👎 skip forever
-        </p>
+        {!hintDismissed && (
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', marginBottom: '12px' }}>
+            <p style={{ fontSize: '13px', color: P.muted, margin: 0, flex: 1, lineHeight: 1.5 }}>
+              Tap a card for recipe &amp; ingredients · ☆ favourite · 🔄 swap · 👎 skip forever
+            </p>
+            <button onClick={() => { setHintDismissed(true); localStorage.setItem('hintDismissed', '1'); }}
+              style={{ background: 'none', border: 'none', color: P.muted, cursor: 'pointer', fontSize: '16px', flexShrink: 0, padding: '0 2px', lineHeight: 1 }}>×</button>
+          </div>
+        )}
       </div>
 
       {DAYS.map(day => {
@@ -213,7 +217,10 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               onChoose={() => setPickerFor(day)}
               onMarkGousto={() => actions.setDayMode(day, 'gousto')}
               onMarkOff={() => actions.setDayMode(day, 'off')}
+              onMarkCooked={() => { actions.addToHistory([{ name: meal.name }]); showToast('Logged as cooked!'); }}
               onChangeMealSize={d => actions.setDaySize(day, Math.max(1, Math.min(20, daySize + d)))}
+              kidsMode={(state.kidsConfig[day] as KidsMode) ?? 'either'}
+              onCycleKids={() => actions.cycleKids(day)}
               dayTimeFilter={dayTF}
               onSetDayTime={tf => actions.setDayTime(day, tf)}
               lastUsedStr={lastUsedStr}
@@ -251,7 +258,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         🍴 Cook tonight
       </button>
 
-      {toast && <Toast message={toast} onUndo={toastUndoRef.current ?? undefined} />}
+      {toast && <Toast message={toast} onUndo={toastUndoRef.current ?? undefined} bottom="80px" />}
 
       {/* Cook Tonight modal */}
       {cookNow && (() => {
@@ -325,7 +332,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                       overviewOpen={true}
                       expanded={cookNowExp}
                       familySize={cookNowOpts.size}
-                      onOverview={() => {}}
+                      onOverview={() => setCookNowExp(x => !x)}
                       onFullExpand={() => setCookNowExp(x => !x)}
                       onFav={() => actions.toggleFav(cookNow.name)}
                       onSwap={() => rePick()}
@@ -337,7 +344,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                   {/* Actions */}
                   <div style={{ padding: '0 16px 20px' }}>
                     <Primary onClick={() => rePick()}>🔀 Suggest something else</Primary>
-                    <button onClick={() => setPickerFor('cookNow' as any)}
+                    <Secondary muted onClick={() => { actions.addToHistory([{ name: cookNow.name }]); setCookNow(null); showToast('Logged as cooked!'); }}>✓ Cooked it</Secondary>
+                    <button onClick={() => setPickerFor('cookNow')}
                       style={{ width: '100%', background: 'none', border: 'none', color: P.muted, fontSize: '14px', fontWeight: 600, cursor: 'pointer', marginTop: '4px', padding: '4px' }}>
                       📋 Browse all meals
                     </button>
@@ -379,10 +387,10 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
             favourites={state.preferences.favourites}
             dislikes={state.preferences.dislikes}
             onPick={meal => {
-              if (pickerFor === ('cookNow' as any)) {
+              if (pickerFor === 'cookNow') {
                 setCookNow(meal); setCookNowExp(true); setPickerFor(null);
               } else {
-                actions.replaceMealInPlan(pickerFor, meal); setPickerFor(null); showToast(`Switched to ${meal.name}`);
+                actions.replaceMealInPlan(pickerFor as DayName, meal); setPickerFor(null); showToast(`Switched to ${meal.name}`);
               }
             }}
             onToggleFav={actions.toggleFav}
@@ -450,16 +458,17 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       <Section>
         <div style={{ fontWeight: 700, marginBottom: '8px' }}>Household</div>
         <div style={{ fontSize: '13px', color: P.muted, marginBottom: '10px' }}>Share this code so your partner can join on their device.</div>
-        <button onClick={() => setInviteVisible(v => !v)}
-          style={{ background: P.accentLight, border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '13px', fontWeight: 700, color: P.accentDark, cursor: 'pointer' }}>
-          {inviteVisible ? (inviteCode ?? '…') : 'Show invite code'}
+        {inviteCode && <div style={{ fontSize: '16px', fontWeight: 700, letterSpacing: '2px', marginBottom: '8px', color: P.text }}>{inviteCode}</div>}
+        <button onClick={async () => {
+          const { supabase } = await import('./lib/supabase');
+          const { data } = await supabase.from('households').select('invite_code').eq('id', householdId).single();
+          if (data?.invite_code) {
+            setInviteCode(data.invite_code);
+            navigator.clipboard?.writeText(data.invite_code).then(() => showToast('Invite code copied!'));
+          }
+        }} style={{ background: P.accentLight, border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '13px', fontWeight: 700, color: P.accentDark, cursor: 'pointer' }}>
+          📋 Copy invite code
         </button>
-        {inviteVisible && inviteCode && (
-          <button onClick={() => navigator.clipboard?.writeText(inviteCode).then(() => showToast('Copied!'))}
-            style={{ background: 'none', border: 'none', fontSize: '12px', color: P.muted, cursor: 'pointer', paddingLeft: '8px' }}>
-            Copy
-          </button>
-        )}
       </Section>
 
       <Section>
@@ -490,8 +499,9 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       <Section>
         <div style={{ fontWeight: 700, marginBottom: '8px' }}>Pantry</div>
         <div style={{ fontSize: '13px', color: P.muted, marginBottom: '8px' }}>Items you always have — excluded from the shopping list.</div>
-        <textarea value={state.preferences.pantry}
-          onChange={e => actions.setPreferences({ pantry: e.target.value })}
+        <textarea value={pantryDraft}
+          onChange={e => setPantryDraft(e.target.value)}
+          onBlur={e => actions.setPreferences({ pantry: e.target.value })}
           placeholder="olive oil, salt, pepper, garlic, onion"
           style={{ width: '100%', padding: '10px 12px', border: `2px solid ${P.border}`, borderRadius: '10px', fontSize: '14px', background: P.card, resize: 'vertical', minHeight: '80px', boxSizing: 'border-box' }} />
       </Section>
@@ -524,9 +534,23 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       </Section>
 
       <Section>
+        <div style={{ fontWeight: 700, marginBottom: '8px' }}>Cook history</div>
+        {state.cookHistory.length === 0
+          ? <div style={{ fontSize: '13px', color: P.muted, marginBottom: '8px' }}>No meals logged yet.</div>
+          : [...state.cookHistory]
+              .sort((a, b) => b.date - a.date)
+              .slice(0, 8)
+              .map((h, i, arr) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '13px',
+                  borderBottom: i < arr.length - 1 ? `1px solid ${P.border}` : 'none' }}>
+                  <span>{h.name}</span>
+                  <span style={{ color: P.muted }}>{formatLastUsed(h.date)}</span>
+                </div>
+              ))
+        }
         <button onClick={() => { actions.clearHistory(); showToast('Cook history cleared'); }}
-          style={{ background: 'none', border: 'none', color: P.muted, fontSize: '13px', cursor: 'pointer', padding: 0 }}>
-          Clear cook history
+          style={{ background: 'none', border: 'none', color: P.muted, fontSize: '13px', cursor: 'pointer', padding: 0, marginTop: '8px' }}>
+          Clear history
         </button>
       </Section>
 
@@ -677,10 +701,23 @@ function MealPicker({ meals, favourites, dislikes, onPick, onToggleFav, onDislik
 }) {
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState<string | null>(null);
-  const filtered = meals.filter(m => !dislikes.includes(m.name) && m.name.toLowerCase().includes(query.toLowerCase()));
+  const [timeChip, setTimeChip] = useState<string>('any');
+  const filtered = meals.filter(m =>
+    !dislikes.includes(m.name) &&
+    m.name.toLowerCase().includes(query.toLowerCase()) &&
+    (timeChip === 'any' || m.minutes <= parseInt(timeChip))
+  );
   return (
     <div>
-      <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', marginBottom: '14px' }}>Choose a meal</div>
+      <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', marginBottom: '12px' }}>Choose a meal</div>
+      <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginBottom: '10px' }}>
+        {([['any', 'Any time'], ['30', '≤ 30 min'], ['20', '≤ 20 min'], ['15', '≤ 15 min']] as [string, string][]).map(([v, l]) => (
+          <button key={v} onClick={() => setTimeChip(v)}
+            style={{ background: timeChip === v ? P.accentLight : 'transparent', border: `1.5px solid ${timeChip === v ? P.accent : P.border}`, borderRadius: '20px', padding: '3px 10px', fontSize: '12px', fontWeight: 700, color: timeChip === v ? P.accentDark : P.muted, cursor: 'pointer' }}>
+            {l}
+          </button>
+        ))}
+      </div>
       <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search…"
         style={{ width: '100%', padding: '10px 14px', border: `2px solid ${P.border}`, borderRadius: '10px', fontSize: '14px', background: P.card, marginBottom: '14px', boxSizing: 'border-box' }} />
       <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>
@@ -716,7 +753,7 @@ function MealPicker({ meals, favourites, dislikes, onPick, onToggleFav, onDislik
 }
 
 function AddMealForm({ onSave, onCancel }: { onSave: (m: Meal) => Promise<void>; onCancel: () => void }) {
-  const [f, setF] = useState({ name: '', minutes: '20', protein: 'chicken', cuisine: 'british', carb: 'none', ingredients: '', steps: '' });
+  const [f, setF] = useState({ name: '', minutes: '20', protein: 'chicken', cuisine: 'british', carb: 'none', description: '', ingredients: '', steps: '' });
   const set = (k: string, v: string) => setF(p => ({ ...p, [k]: v }));
   const ss: React.CSSProperties = { width: '100%', padding: '10px 12px', border: `2px solid ${P.border}`, borderRadius: '10px', fontSize: '14px', background: P.card, boxSizing: 'border-box' };
   const valid = f.name.trim().length > 0;
@@ -725,6 +762,7 @@ function AddMealForm({ onSave, onCancel }: { onSave: (m: Meal) => Promise<void>;
     ['Cook time (min)', <select key="m" value={f.minutes} onChange={e => set('minutes', e.target.value)} style={ss}>{[10,15,20,25,30,35,40,45].map(n => <option key={n} value={n}>{n}</option>)}</select>],
     ['Protein', <select key="p" value={f.protein} onChange={e => set('protein', e.target.value)} style={ss}>{['chicken','beef','fish','pork','lamb','seafood','eggs','veggie'].map(p => <option key={p}>{p}</option>)}</select>],
     ['Cuisine', <select key="c" value={f.cuisine} onChange={e => set('cuisine', e.target.value)} style={ss}>{['british','italian','asian','mexican','indian','american','middleeastern','other'].map(c => <option key={c}>{c}</option>)}</select>],
+    ['Description (optional)', <textarea key="d" value={f.description} onChange={e => set('description', e.target.value)} placeholder="A short summary shown on the meal card" style={{ ...ss, resize: 'vertical', minHeight: '60px' }} />],
     ['Ingredients (one per line)', <textarea key="i" value={f.ingredients} onChange={e => set('ingredients', e.target.value)} placeholder={'400g pasta\n2 x chicken breasts'} style={{ ...ss, resize: 'vertical', minHeight: '80px' }} />],
     ['Steps (one per line)', <textarea key="s" value={f.steps} onChange={e => set('steps', e.target.value)} style={{ ...ss, resize: 'vertical', minHeight: '80px' }} />],
   ];
@@ -740,7 +778,7 @@ function AddMealForm({ onSave, onCancel }: { onSave: (m: Meal) => Promise<void>;
       <Primary disabled={!valid} onClick={async () => {
         await onSave({ name: f.name.trim(), time: `${f.minutes} min`, minutes: parseInt(f.minutes) || 20,
           protein: f.protein as any, cuisine: f.cuisine as any, carb: f.carb as any, serves: 4,
-          description: f.steps.split('\n')[0] || f.name,
+          description: f.description.trim() || f.steps.split('\n')[0] || f.name,
           ingredients: f.ingredients.split('\n').map(s => s.trim()).filter(Boolean),
           steps: f.steps.split('\n').map(s => s.trim()).filter(Boolean), custom: true });
       }}>Save meal</Primary>

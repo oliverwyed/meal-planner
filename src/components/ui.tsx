@@ -31,9 +31,9 @@ export function Tag({ children, bg, color }: { children: React.ReactNode; bg: st
   );
 }
 
-export function Toast({ message, onUndo }: { message: string; onUndo?: () => void }) {
+export function Toast({ message, onUndo, bottom }: { message: string; onUndo?: () => void; bottom?: string }) {
   return (
-    <div style={{ position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)', background: P.text,
+    <div style={{ position: 'fixed', bottom: bottom ?? '24px', left: '50%', transform: 'translateX(-50%)', background: P.text,
       color: '#fff', padding: '11px 20px', borderRadius: '12px', fontSize: '14px', fontWeight: 600,
       boxShadow: P.shadowMd, zIndex: 1000, whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '12px' }}>
       {message}
