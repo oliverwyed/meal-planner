@@ -68,9 +68,14 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     toastTimer.current = setTimeout(() => { setToast(null); toastUndoRef.current = null; }, 2500);
   }, []);
 
+  const didAutoNav = useRef(false);
+
   useEffect(() => {
-    if (state.plan && step === 'setup') setStep('plan');
-  }, [state.plan, step]);
+    if (!loading && state.plan && !didAutoNav.current) {
+      didAutoNav.current = true;
+      setStep('plan');
+    }
+  }, [loading, state.plan]);
 
   useEffect(() => {
     if (step === 'plan' && !state.plan && !loading) setStep('setup');
