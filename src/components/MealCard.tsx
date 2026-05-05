@@ -10,9 +10,11 @@ interface Props {
   isFav: boolean;
   isSeasonal: boolean;
   seasonLabel: string;
+  overviewOpen: boolean;
   expanded: boolean;
   familySize: number;
-  onExpand: () => void;
+  onOverview: () => void;
+  onFullExpand: () => void;
   onFav: () => void;
   onSwap?: () => void;
   onDislike?: () => void;
@@ -32,7 +34,7 @@ function getMealEmoji(meal: Meal): string {
   return p[meal.protein] ?? c[meal.cuisine] ?? '🍽️';
 }
 
-export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, familySize, onExpand, onFav,
+export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOpen, expanded, familySize, onOverview, onFullExpand, onFav,
   onSwap, onDislike, onChoose, onMarkGousto, onMarkOff, onChangeMealSize, dayTimeFilter, onSetDayTime,
   readOnly, lastUsedStr }: Props) {
   const scale = familySize / (meal.serves ?? 4);
@@ -43,7 +45,7 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, 
       boxShadow: P.shadow, border: `2px solid ${isFav ? P.gold : P.border}`, overflow: 'hidden' }}>
 
       {/* Header */}
-      <div style={{ padding: '15px 16px', cursor: 'pointer' }} onClick={onExpand}>
+      <div style={{ padding: '15px 16px', cursor: 'pointer' }} onClick={onOverview}>
         <div style={{ display: 'flex', gap: '12px' }}>
           <div style={{ fontSize: '26px', flexShrink: 0, paddingTop: '2px' }}>{getMealEmoji(meal)}</div>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -60,7 +62,7 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, 
             </div>
             <div style={{ fontWeight: 700, fontSize: '16px', lineHeight: 1.3, marginBottom: '3px' }}>{meal.name}</div>
             <div style={{ fontSize: '13px', color: P.muted, lineHeight: 1.45,
-              ...(expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }) }}>{meal.description}</div>
+              ...(overviewOpen || expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }) }}>{meal.description}</div>
             <div style={{ marginTop: '7px' }}>
               {meal.time && <Tag bg={P.accentLight} color={P.accentDark}>{meal.time}</Tag>}
               {isSeasonal && <Tag bg="#EDF7ED" color="#2E7D32">{seasonLabel}</Tag>}
@@ -69,8 +71,9 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, 
               {meal.sourceUrl && <Tag bg={P.border} color={P.muted}>🔗 Imported</Tag>}
               {lastUsedStr && <Tag bg={P.border} color={P.muted}>🕐 {lastUsedStr}</Tag>}
             </div>
-            <div style={{ fontSize: '12px', color: P.accent, fontWeight: 600, marginTop: '7px' }}>
-              {expanded ? '▲ Hide recipe' : '▼ Ingredients & recipe'}
+            <div onClick={e => { e.stopPropagation(); onFullExpand(); }}
+              style={{ fontSize: '12px', color: P.accent, fontWeight: 600, marginTop: '7px' }}>
+              {expanded ? '▲ Hide recipe' : overviewOpen ? '▼ Ingredients & recipe' : '▼ Details'}
             </div>
           </div>
         </div>

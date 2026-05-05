@@ -39,6 +39,7 @@ export default function App() {
 function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () => void }) {
   const { state, actions, loading } = useHousehold(householdId);
   const [step, setStep] = useState<Step>('setup');
+  const [previewDay, setPreviewDay] = useState<DayName | null>(null);
   const [expandedDay, setExpandedDay] = useState<DayName | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [checked, setChecked] = useState<Record<string, boolean>>({});
@@ -162,15 +163,26 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         const dayTF = state.dayOverrides[day]?.time ?? state.preferences.timeFilter;
 
         return (
-          <div key={day}>
+          <div key={day} data-day={day}>
             <MealCard
               meal={meal} day={day}
               isFav={state.preferences.favourites.includes(meal.name)}
               isSeasonal={!!(meal.seasons?.includes(state.season as any))}
               seasonLabel={si.label}
+              overviewOpen={previewDay === day || expandedDay === day}
               expanded={expandedDay === day}
               familySize={daySize}
-              onExpand={() => setExpandedDay(expandedDay === day ? null : day)}
+              onOverview={() => {
+                if (previewDay === day || expandedDay === day) {
+                  setPreviewDay(null); setExpandedDay(null);
+                } else {
+                  setPreviewDay(day); setExpandedDay(null);
+                }
+              }}
+              onFullExpand={() => {
+                if (expandedDay === day) { setExpandedDay(null); }
+                else { setPreviewDay(day); setExpandedDay(day); }
+              }}
               onFav={() => actions.toggleFav(meal.name)}
               onSwap={() => { actions.swap(day); showToast('Swapped!'); }}
               onDislike={() => { actions.addDislike(meal.name); actions.swap(day); showToast("Got it — won't suggest again"); }}
@@ -200,7 +212,13 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         const target = state.plan!.meals.find(m => m.day === today)
           ? today
           : (DAYS.find(d => state.plan!.meals.find(m => m.day === d)) ?? null);
-        if (target) setExpandedDay(expandedDay === target ? null : target);
+        if (target) {
+          setPreviewDay(target);
+          setExpandedDay(target);
+          setTimeout(() => {
+            document.querySelector(`[data-day="${target}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 50);
+        }
       }} style={{ position: 'fixed', bottom: '24px', right: '20px', zIndex: 200,
         background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`,
         color: '#fff', border: 'none', borderRadius: '28px',
