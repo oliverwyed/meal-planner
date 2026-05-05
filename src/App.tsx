@@ -50,6 +50,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [addMealOpen, setAddMealOpen] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const [inviteLoading, setInviteLoading] = useState(false);
   const [hintDismissed, setHintDismissed] = useState(() => localStorage.getItem('hintDismissed') === '1');
   const [pantryDraft, setPantryDraft] = useState(state.preferences.pantry);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -79,7 +80,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
 
   useEffect(() => {
     if (step === 'plan' && !state.plan && !loading) setStep('setup');
-  }, [step, state.plan, loading]);
+    if (step === 'shopping' && !state.shopList && !loading) setStep('plan');
+  }, [step, state.plan, state.shopList, loading]);
 
   useEffect(() => {
     sessionStorage.setItem('shopChecked', JSON.stringify(checked));
@@ -130,7 +132,14 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           <div>
             <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1.5px', color: P.accent, fontWeight: 700, marginBottom: '5px' }}>Your week</div>
             <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '22px', lineHeight: 1.3, marginBottom: '4px' }}>Here's the plan</div>
-            <div style={{ fontSize: '12px', color: P.muted, marginBottom: '6px' }}>Generated {formatLastUsed(state.plan.generatedAt) ?? 'today'}</div>
+            {(() => {
+              const isStale = Date.now() - state.plan.generatedAt > 7 * 24 * 60 * 60 * 1000;
+              return (
+                <div style={{ fontSize: '12px', color: isStale ? P.accent : P.muted, fontWeight: isStale ? 600 : 400, marginBottom: '6px' }}>
+                  Generated {formatLastUsed(state.plan.generatedAt) ?? 'today'}{isStale ? ' — time to refresh?' : ''}
+                </div>
+              );
+            })()}
           </div>
           <div style={{ display: 'flex', gap: '8px', paddingTop: '4px' }}>
             <IconBtn onClick={() => setShowHelp(true)} title="How it works">ℹ️</IconBtn>
@@ -209,11 +218,12 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                 else { setPreviewDay(day); setExpandedDay(day); }
               }}
               onFav={() => actions.toggleFav(meal.name)}
-              onSwap={() => { actions.swap(day); showToast('Swapped!'); }}
+              onSwap={() => { actions.swap(day); setPreviewDay(null); setExpandedDay(null); showToast('Swapped!'); }}
               onDislike={() => {
                 const dislikedMeal = meal;
                 actions.addDislike(dislikedMeal.name);
                 actions.swap(day);
+                setPreviewDay(null); setExpandedDay(null);
                 showToast("Won't suggest again", () => {
                   actions.setPreferences({ dislikes: state.preferences.dislikes.filter(d => d !== dislikedMeal.name) });
                   actions.replaceMealInPlan(day, dislikedMeal);
@@ -238,10 +248,11 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         <Primary onClick={() => setStep('shopping')}>View shopping list</Primary>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
           <Secondary onClick={() => {
-            const prev = state.plan;
+            const prevPlan = state.plan;
+            const prevOverrides = state.dayOverrides;
             actions.generate();
             setChecked({});
-            showToast('New plan generated!', prev ? () => { actions.restorePlan(prev); setChecked({}); } : undefined);
+            showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); setChecked({}); } : undefined);
           }}>🔄 Regenerate</Secondary>
           <Secondary onClick={() => setStep('setup')}>⚙️ Edit days</Secondary>
         </div>
@@ -341,7 +352,15 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                       onFullExpand={() => setCookNowExp(x => !x)}
                       onFav={() => actions.toggleFav(cookNow.name)}
                       onSwap={() => rePick()}
-                      onDislike={() => { actions.addDislike(cookNow.name); rePick(); }}
+                      onDislike={() => {
+                        const prev = cookNow;
+                        actions.addDislike(prev.name);
+                        rePick();
+                        showToast("Won't suggest again", () => {
+                          actions.setPreferences({ dislikes: state.preferences.dislikes.filter(d => d !== prev.name) });
+                          setCookNow(prev); setCookNowExp(true);
+                        });
+                      }}
                       lastUsedStr={lastUsedStr}
                     />
                   </div>
@@ -464,15 +483,28 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         <div style={{ fontWeight: 700, marginBottom: '8px' }}>Household</div>
         <div style={{ fontSize: '13px', color: P.muted, marginBottom: '10px' }}>Share this code so your partner can join on their device.</div>
         {inviteCode && <div style={{ fontSize: '16px', fontWeight: 700, letterSpacing: '2px', marginBottom: '8px', color: P.text }}>{inviteCode}</div>}
-        <button onClick={async () => {
-          const { supabase } = await import('./lib/supabase');
-          const { data } = await supabase.from('households').select('invite_code').eq('id', householdId).single();
-          if (data?.invite_code) {
-            setInviteCode(data.invite_code);
-            navigator.clipboard?.writeText(data.invite_code).then(() => showToast('Invite code copied!'));
+        <button disabled={inviteLoading} onClick={async () => {
+          if (inviteCode) {
+            navigator.clipboard?.writeText(inviteCode).then(() => showToast('Invite code copied!'));
+            return;
           }
-        }} style={{ background: P.accentLight, border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '13px', fontWeight: 700, color: P.accentDark, cursor: 'pointer' }}>
-          📋 Copy invite code
+          setInviteLoading(true);
+          try {
+            const { supabase } = await import('./lib/supabase');
+            const { data } = await supabase.from('households').select('invite_code').eq('id', householdId).single();
+            if (data?.invite_code) {
+              setInviteCode(data.invite_code);
+              navigator.clipboard?.writeText(data.invite_code).then(() => showToast('Invite code copied!'));
+            } else {
+              showToast('Could not load invite code');
+            }
+          } catch {
+            showToast('Could not load invite code');
+          } finally {
+            setInviteLoading(false);
+          }
+        }} style={{ background: inviteLoading ? P.border : P.accentLight, border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '13px', fontWeight: 700, color: inviteLoading ? P.muted : P.accentDark, cursor: inviteLoading ? 'default' : 'pointer' }}>
+          {inviteLoading ? 'Loading…' : '📋 Copy invite code'}
         </button>
       </Section>
 
@@ -546,7 +578,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               .sort((a, b) => b.date - a.date)
               .slice(0, 8)
               .map((h, i, arr) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '13px',
+                <div key={`${h.name}-${h.date}`} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '13px',
                   borderBottom: i < arr.length - 1 ? `1px solid ${P.border}` : 'none' }}>
                   <span>{h.name}</span>
                   <span style={{ color: P.muted }}>{formatLastUsed(h.date)}</span>

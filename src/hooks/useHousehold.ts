@@ -37,7 +37,7 @@ export type AppActions = {
   addMeal: (meal: Meal) => Promise<void>;
   removeMeal: (id: string) => Promise<void>;
   replaceMealInPlan: (day: DayName, meal: Meal) => void;
-  restorePlan: (plan: Plan) => void;
+  restorePlan: (plan: Plan, dayOverrides?: DayOverrides) => void;
   clearHistory: () => void;
   addToHistory: (meals: { name: string }[]) => void;
   pickCookNow: (time: string, kidsMode: KidsMode, dietary: string) => Meal | null;
@@ -236,8 +236,8 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
     }));
   }, []);
 
-  const restorePlan = useCallback((plan: Plan) => {
-    setHs(prev => ({ ...prev, plan }));
+  const restorePlan = useCallback((plan: Plan, dayOverrides?: DayOverrides) => {
+    setHs(prev => ({ ...prev, plan, ...(dayOverrides !== undefined ? { dayOverrides } : {}) }));
   }, []);
 
   const clearHistory = useCallback(() => {
@@ -246,11 +246,18 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
 
   const addToHistory = useCallback((meals: { name: string }[]) => {
     const now = Date.now();
-    setHs(prev => ({
-      ...prev,
-      cookHistory: [...prev.cookHistory, ...meals.map(m => ({ name: m.name, date: now }))]
-        .filter(h => now - h.date < 60 * 24 * 60 * 60 * 1000),
-    }));
+    const oneDayAgo = now - 24 * 60 * 60 * 1000;
+    setHs(prev => {
+      const newEntries = meals
+        .filter(m => !prev.cookHistory.some(h => h.name === m.name && h.date > oneDayAgo))
+        .map(m => ({ name: m.name, date: now }));
+      if (!newEntries.length) return prev;
+      return {
+        ...prev,
+        cookHistory: [...prev.cookHistory, ...newEntries]
+          .filter(h => now - h.date < 60 * 24 * 60 * 60 * 1000),
+      };
+    });
   }, []);
 
   const pickCookNow = useCallback((time: string, kidsMode: KidsMode, dietary: string): Meal | null => {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { Meal, KidsMode } from '../lib/types';
 import { P } from '../lib/constants';
 import { Tag, TimeSlider } from './ui';
@@ -41,7 +41,7 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
   onSwap, onDislike, onChoose, onMarkGousto, onMarkOff, onMarkCooked, onChangeMealSize, kidsMode, onCycleKids, dayTimeFilter, onSetDayTime,
   readOnly, lastUsedStr }: Props) {
   const scale = familySize / (meal.serves ?? 4);
-  const shopByCategory = buildMealShop(meal, scale);
+  const shopByCategory = useMemo(() => buildMealShop(meal, scale), [meal, scale]);
 
   return (
     <div style={{ background: P.card, borderRadius: '16px', marginBottom: '10px',
@@ -91,9 +91,10 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
             <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, letterSpacing: '1.2px', textTransform: 'uppercase' }}>Ingredients — serves {familySize}</div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '4px' }}>
               {onCycleKids && (
-                <SmallBtn onClick={onCycleKids}>
-                  {kidsMode === 'kids' ? '👶' : kidsMode === 'adults' ? '🍷' : '✌️'}
-                </SmallBtn>
+                <button onClick={e => { e.stopPropagation(); onCycleKids(); }}
+                  style={{ background: P.border, border: 'none', borderRadius: '20px', padding: '3px 8px', fontSize: '11px', fontWeight: 700, color: P.muted, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px', flexShrink: 0 }}>
+                  {kidsMode === 'kids' ? '👶 Kids' : kidsMode === 'adults' ? '🍷 Adults' : '✌️ Either'}
+                </button>
               )}
               {onChangeMealSize && <SmallBtn onClick={() => onChangeMealSize(-1)}>−</SmallBtn>}
               {onChangeMealSize && <SmallBtn onClick={() => onChangeMealSize(1)}>+</SmallBtn>}
@@ -173,7 +174,7 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
             <div style={{ display: 'flex', gap: '6px', marginTop: '16px', paddingTop: '12px', borderTop: `1px solid ${P.border}` }}>
               {onMarkCooked && (
                 <button onClick={e => { e.stopPropagation(); onMarkCooked(); }}
-                  style={{ background: P.greenLight, border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, color: P.greenDark, cursor: 'pointer' }}>
+                  style={{ background: P.border, border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, color: P.text, cursor: 'pointer' }}>
                   ✓ Cooked it
                 </button>
               )}
