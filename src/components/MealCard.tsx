@@ -32,8 +32,8 @@ function getMealEmoji(meal: Meal): string {
   return p[meal.protein] ?? c[meal.cuisine] ?? '🍽️';
 }
 
-export function MealCard({ meal, isFav, isSeasonal, seasonLabel, expanded, familySize, onExpand, onFav,
-  onSwap, onDislike, onChoose, onMarkGousto, onMarkOff, onChangeMealSize, dayTimeFilter, onSetDayTime,
+export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, familySize, onExpand, onFav,
+  onSwap, onDislike, onChoose, onChangeMealSize, dayTimeFilter, onSetDayTime,
   readOnly, lastUsedStr }: Props) {
   const scale = familySize / (meal.serves ?? 4);
   const shopByCategory = buildMealShop(meal, scale);
