@@ -50,6 +50,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [inviteVisible, setInviteVisible] = useState(false);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const cardRefs = useRef<Partial<Record<DayName, HTMLDivElement>>>({});
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
@@ -165,7 +166,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         const dayTF = state.dayOverrides[day]?.time ?? state.preferences.timeFilter;
 
         return (
-          <div key={day} data-day={day}>
+          <div key={day} ref={el => { if (el) cardRefs.current[day] = el; else delete cardRefs.current[day]; }}>
             <MealCard
               meal={meal} day={day}
               isFav={state.preferences.favourites.includes(meal.name)}
@@ -209,18 +210,27 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       </div>
 
       <button onClick={() => {
-        const dayMap: Record<number, string> = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 0: 'Sunday' };
-        const today = dayMap[new Date().getDay()] as DayName;
-        const target = state.plan!.meals.find(m => m.day === today)
-          ? today
-          : (DAYS.find(d => state.plan!.meals.find(m => m.day === d)) ?? null);
-        if (target) {
-          setPreviewDay(target);
-          setExpandedDay(target);
-          setTimeout(() => {
-            document.querySelector(`[data-day="${target}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 50);
-        }
+        const todayIdx = new Date().getDay(); // 0=Sun … 6=Sat
+        const dayOrder: DayName[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const today = dayOrder[todayIdx];
+        // Prefer today's meal; otherwise find the next upcoming planned day this week; fall back to first meal
+        const meals = state.plan!.meals;
+        const targetMeal = meals.find(m => m.day === today)
+          ?? DAYS.slice(DAYS.indexOf(today as DayName)).map(d => meals.find(m => m.day === d)).find(Boolean)
+          ?? meals[0]
+          ?? null;
+        if (!targetMeal) return;
+        const target = targetMeal.day;
+        setPreviewDay(target);
+        setExpandedDay(target);
+        showToast(`🍴 ${targetMeal.name}`);
+        setTimeout(() => {
+          const el = cardRefs.current[target];
+          if (el) {
+            const top = el.getBoundingClientRect().top + window.pageYOffset - 16;
+            window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+          }
+        }, 80);
       }} style={{ position: 'fixed', bottom: '24px', right: '20px', zIndex: 200,
         background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`,
         color: '#fff', border: 'none', borderRadius: '28px',
