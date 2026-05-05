@@ -75,7 +75,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   // ── Setup screen ──────────────────────────────────────────────────────────
   if (step === 'setup') return (
     <Screen>
-      <Header subtitle="What's for dinner this week?" />
+      <Header eyebrow="Meal Planner" title="Set up your week" subtitle="Choose your days and preferences" />
       <Section>
         <Row label="People eating">
           <Stepper value={state.familySize} min={1} max={12} onChange={actions.setFamilySize} />
@@ -105,7 +105,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
 
   // ── Plan screen ───────────────────────────────────────────────────────────
   if (step === 'plan' && state.plan) return (
-    <Screen>
+    <Screen padBottom="100px">
       <div style={{ padding: '24px 0 16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
@@ -118,7 +118,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
             <IconBtn onClick={() => setStep('prefs')} title="Preferences">👤</IconBtn>
           </div>
         </div>
-        <p style={{ fontSize: '13px', color: P.muted, marginBottom: '0' }}>
+        <p style={{ fontSize: '13px', color: P.muted, marginBottom: '12px' }}>
           Tap a card for recipe & ingredients · ☆ favourite · 🔄 swap · 👎 skip forever
         </p>
       </div>
@@ -127,19 +127,24 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         const mode = (state.dayConfig[day] as DayMode) ?? 'home';
 
         if (mode === 'off') return (
-          <div key={day} style={{ background: P.card, borderRadius: '16px', padding: '14px 18px', marginBottom: '10px', boxShadow: P.shadow, border: `1px solid ${P.border}`, opacity: 0.5 }}>
-            <DayLabel day={day} />
-            <div style={{ fontWeight: 700, fontSize: '15px', color: P.muted }}>Day off</div>
+          <div key={day} style={{ background: P.card, borderRadius: '16px', padding: '15px 16px', marginBottom: '10px', boxShadow: P.shadow, border: `1px solid ${P.border}`, opacity: 0.5 }}>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ fontSize: '26px', flexShrink: 0, paddingTop: '2px' }}>—</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '12px', color: P.accent, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{day}</div>
+                <div style={{ fontWeight: 700, fontSize: '16px', color: P.muted }}>Day off</div>
+              </div>
+            </div>
             <DayActions onHome={() => actions.setDayMode(day, 'home')} onGousto={() => actions.setDayMode(day, 'gousto')} />
           </div>
         );
 
         if (mode === 'gousto') return (
-          <div key={day} style={{ background: P.card, borderRadius: '16px', padding: '14px 18px', marginBottom: '10px', boxShadow: P.shadow, border: `1px solid ${P.border}`, opacity: 0.6 }}>
-            <DayLabel day={day} />
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-              <div style={{ fontSize: '26px' }}>📦</div>
-              <div>
+          <div key={day} style={{ background: P.card, borderRadius: '16px', padding: '15px 16px', marginBottom: '10px', boxShadow: P.shadow, border: `1px solid ${P.border}`, opacity: 0.6 }}>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ fontSize: '26px', flexShrink: 0, paddingTop: '2px' }}>📦</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '12px', color: P.accent, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{day}</div>
                 <div style={{ fontWeight: 700, fontSize: '16px' }}>Gousto</div>
                 <div style={{ fontSize: '13px', color: P.muted }}>Meal kit — sorted!</div>
               </div>
@@ -181,7 +186,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         );
       })}
 
-      <div style={{ paddingBottom: '80px' }}>
+      <div style={{ marginTop: '6px' }}>
         <Primary onClick={() => setStep('shopping')}>View shopping list</Primary>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
           <Secondary onClick={() => { actions.generate(); showToast('New plan generated!'); }}>🔄 Regenerate</Secondary>
@@ -225,7 +230,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   // ── Shopping screen ───────────────────────────────────────────────────────
   if (step === 'shopping' && state.shopList) return (
     <Screen>
-      <Header subtitle="Shopping list" actions={<IconBtn onClick={() => setStep('plan')} title="Back">←</IconBtn>} />
+      <Header eyebrow="Shopping" title="What to buy" actions={<IconBtn onClick={() => setStep('plan')} title="Back">←</IconBtn>} />
       <div style={{ fontSize: '13px', color: P.muted, marginBottom: '16px' }}>
         {Object.values(state.shopList).flat().length} items · {Object.values(checked).filter(Boolean).length} checked
       </div>
@@ -272,7 +277,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   // ── Prefs screen ──────────────────────────────────────────────────────────
   if (step === 'prefs') return (
     <Screen>
-      <Header subtitle="Preferences" actions={<IconBtn onClick={() => setStep('plan')} title="Back">←</IconBtn>} />
+      <Header eyebrow="Preferences" title="Your settings" actions={<IconBtn onClick={() => setStep('plan')} title="Back">←</IconBtn>} />
 
       <Section>
         <div style={{ fontWeight: 700, marginBottom: '8px' }}>Household</div>
@@ -388,20 +393,21 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
 
 // ── Shared sub-components ─────────────────────────────────────────────────────
 
-function Screen({ children }: { children: React.ReactNode }) {
+function Screen({ children, padBottom }: { children: React.ReactNode; padBottom?: string }) {
   return (
-    <div style={{ minHeight: '100vh', background: P.bg, padding: '0 0 40px' }}>
+    <div style={{ minHeight: '100vh', background: P.bg, padding: `0 0 ${padBottom ?? '40px'}` }}>
       <div style={{ maxWidth: '480px', margin: '0 auto', padding: '0 16px' }}>{children}</div>
     </div>
   );
 }
 
-function Header({ subtitle, actions }: { subtitle: string; actions?: React.ReactNode }) {
+function Header({ eyebrow, title, subtitle, actions }: { eyebrow: string; title: string; subtitle?: string; actions?: React.ReactNode }) {
   return (
     <div style={{ padding: '24px 0 16px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
       <div>
-        <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '26px', lineHeight: 1.2 }}>🍽️ Meal Planner</div>
-        <div style={{ fontSize: '14px', color: P.muted, marginTop: '2px' }}>{subtitle}</div>
+        <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1.5px', color: P.accent, fontWeight: 700, marginBottom: '5px' }}>{eyebrow}</div>
+        <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '22px', lineHeight: 1.3 }}>{title}</div>
+        {subtitle && <div style={{ fontSize: '13px', color: P.muted, marginTop: '3px' }}>{subtitle}</div>}
       </div>
       {actions && <div style={{ display: 'flex', gap: '4px', paddingTop: '4px' }}>{actions}</div>}
     </div>
@@ -448,12 +454,6 @@ function Chip({ children, active, onClick }: { children: React.ReactNode; active
   );
 }
 
-function DayLabel({ day, inline }: { day: DayName; inline?: boolean }) {
-  return (
-    <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '12px', color: P.accent, textTransform: 'uppercase',
-      marginBottom: inline ? '-8px' : '3px', letterSpacing: '0.5px' }}>{day}</div>
-  );
-}
 
 function DayActions({ onHome, onGousto, onOff }: { onHome?: () => void; onGousto?: () => void; onOff?: () => void }) {
   return (

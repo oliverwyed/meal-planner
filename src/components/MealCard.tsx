@@ -33,7 +33,7 @@ function getMealEmoji(meal: Meal): string {
 }
 
 export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, familySize, onExpand, onFav,
-  onSwap, onDislike, onChoose, onChangeMealSize, dayTimeFilter, onSetDayTime,
+  onSwap, onDislike, onChoose, onMarkGousto, onMarkOff, onChangeMealSize, dayTimeFilter, onSetDayTime,
   readOnly, lastUsedStr }: Props) {
   const scale = familySize / (meal.serves ?? 4);
   const shopByCategory = buildMealShop(meal, scale);
@@ -60,7 +60,7 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, 
             </div>
             <div style={{ fontWeight: 700, fontSize: '16px', lineHeight: 1.3, marginBottom: '3px' }}>{meal.name}</div>
             <div style={{ fontSize: '13px', color: P.muted, lineHeight: 1.45,
-              display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{meal.description}</div>
+              ...(expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }) }}>{meal.description}</div>
             <div style={{ marginTop: '7px' }}>
               {meal.time && <Tag bg={P.accentLight} color={P.accentDark}>{meal.time}</Tag>}
               {isSeasonal && <Tag bg="#EDF7ED" color="#2E7D32">{seasonLabel}</Tag>}
@@ -154,6 +154,24 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, expanded, 
                 <div style={{ fontSize: '11px', fontWeight: 700, color: P.gold, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '3px' }}>Chef's tip</div>
                 <div style={{ fontSize: '13px', lineHeight: 1.5, color: '#5a4200' }}>{meal.tip}</div>
               </div>
+            </div>
+          )}
+
+          {/* Day-mode actions */}
+          {(onMarkGousto || onMarkOff) && (
+            <div style={{ display: 'flex', gap: '6px', marginTop: '16px', paddingTop: '12px', borderTop: `1px solid ${P.border}` }}>
+              {onMarkGousto && (
+                <button onClick={e => { e.stopPropagation(); onMarkGousto(); }}
+                  style={{ background: P.greenLight, border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, color: P.greenDark, cursor: 'pointer' }}>
+                  📦 Using Gousto
+                </button>
+              )}
+              {onMarkOff && (
+                <button onClick={e => { e.stopPropagation(); onMarkOff(); }}
+                  style={{ background: P.border, border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, color: P.muted, cursor: 'pointer' }}>
+                  — Day off
+                </button>
+              )}
             </div>
           )}
         </div>

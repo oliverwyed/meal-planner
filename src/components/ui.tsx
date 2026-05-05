@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { P } from '../lib/constants';
 
 export function Primary({ children, onClick, disabled }: { children: React.ReactNode; onClick?: () => void; disabled?: boolean }) {
@@ -63,17 +63,24 @@ export function Section({ children, style }: { children: React.ReactNode; style?
 export function TimeSlider({ value, onChange, onCommit, label }: {
   value: string; onChange: (v: string) => void; onCommit?: (v: string) => void; label?: string;
 }) {
-  const num = value === 'any' ? 60 : (parseInt(value) || 60);
-  const display = value === 'any' ? 'Any time' : `≤ ${value} min`;
+  const toNum = (v: string) => v === 'any' ? 60 : (parseInt(v) || 60);
+  const [localVal, setLocalVal] = useState(() => toNum(value));
+  useEffect(() => { setLocalVal(toNum(value)); }, [value]);
+  const display = localVal >= 60 ? 'Any time' : `≤ ${localVal} min`;
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
         {label && <span style={{ fontSize: '11px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '0.8px' }}>{label}</span>}
         <span style={{ fontSize: '12px', fontWeight: 700, color: P.accent, marginLeft: 'auto' }}>{display}</span>
       </div>
-      <input type="range" min="15" max="60" step="5" value={num}
-        onChange={e => { const v = parseInt(e.target.value); onChange(v >= 60 ? 'any' : String(v)); }}
-        onPointerUp={e => { if (onCommit) { const v = parseInt((e.target as HTMLInputElement).value); onCommit(v >= 60 ? 'any' : String(v)); } }}
+      <input type="range" min="15" max="60" step="5" value={localVal}
+        onChange={e => setLocalVal(parseInt(e.target.value))}
+        onPointerUp={e => {
+          const v = parseInt((e.target as HTMLInputElement).value);
+          const str = v >= 60 ? 'any' : String(v);
+          onChange(str);
+          if (onCommit) onCommit(str);
+        }}
         style={{ width: '100%', accentColor: P.accent, cursor: 'pointer' } as any} />
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: P.muted, marginTop: '2px' }}>
         <span>15 min</span><span>Any time</span>
