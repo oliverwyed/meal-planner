@@ -44,36 +44,35 @@ export function MealCard({ meal, isFav, isSeasonal, seasonLabel, expanded, famil
 
       {/* Header */}
       <div style={{ padding: '15px 16px', cursor: 'pointer' }} onClick={onExpand}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: '28px', flexShrink: 0, marginTop: '1px' }}>{getMealEmoji(meal)}</div>
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontWeight: 700, fontSize: '16px', lineHeight: 1.3, marginBottom: '3px' }}>{meal.name}</div>
-              <div style={{ fontSize: '13px', color: P.muted, lineHeight: 1.45,
-                display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{meal.description}</div>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ fontSize: '26px', flexShrink: 0, paddingTop: '2px' }}>{getMealEmoji(meal)}</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+              <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '12px', color: P.accent, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{day ?? ''}</div>
+              {!readOnly && (
+                <div style={{ display: 'flex', gap: 0, marginRight: '-4px', flexShrink: 0 }}>
+                  <Btn onClick={onFav} title={isFav ? 'Remove favourite' : 'Add favourite'} fontSize="18px" color={isFav ? P.gold : P.muted}>{isFav ? '★' : '☆'}</Btn>
+                  {onSwap && <Btn onClick={onSwap} title="Swap">🔄</Btn>}
+                  {onDislike && <Btn onClick={onDislike} title="Never suggest again">👎</Btn>}
+                  {onChoose && <Btn onClick={onChoose} title="Choose from list" fontSize="15px" color={P.muted}>📋</Btn>}
+                </div>
+              )}
+            </div>
+            <div style={{ fontWeight: 700, fontSize: '16px', lineHeight: 1.3, marginBottom: '3px' }}>{meal.name}</div>
+            <div style={{ fontSize: '13px', color: P.muted, lineHeight: 1.45,
+              display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{meal.description}</div>
+            <div style={{ marginTop: '7px' }}>
+              {meal.time && <Tag bg={P.accentLight} color={P.accentDark}>{meal.time}</Tag>}
+              {isSeasonal && <Tag bg="#EDF7ED" color="#2E7D32">{seasonLabel}</Tag>}
+              {isFav && <Tag bg={P.goldLight} color={P.gold}>⭐ Fav</Tag>}
+              {meal.kidNote && <Tag bg={P.greenLight} color={P.greenDark}>👶 Kid-friendly</Tag>}
+              {meal.sourceUrl && <Tag bg={P.border} color={P.muted}>🔗 Imported</Tag>}
+              {lastUsedStr && <Tag bg={P.border} color={P.muted}>🕐 {lastUsedStr}</Tag>}
+            </div>
+            <div style={{ fontSize: '12px', color: P.accent, fontWeight: 600, marginTop: '7px' }}>
+              {expanded ? '▲ Hide recipe' : '▼ Ingredients & recipe'}
             </div>
           </div>
-          {!readOnly && (
-            <div style={{ display: 'flex', gap: 0, marginRight: '-4px', flexShrink: 0 }}>
-              <Btn onClick={onFav} title={isFav ? 'Remove favourite' : 'Add favourite'} fontSize="18px" color={isFav ? P.gold : P.muted}>{isFav ? '★' : '☆'}</Btn>
-              {onSwap && <Btn onClick={onSwap} title="Swap">🔄</Btn>}
-              {onDislike && <Btn onClick={onDislike} title="Never suggest again">👎</Btn>}
-              {onChoose && <Btn onClick={onChoose} title="Choose from list" fontSize="15px" color={P.muted}>📋</Btn>}
-              {onMarkGousto && <Btn onClick={onMarkGousto} title="Gousto" fontSize="15px" color={P.muted}>📦</Btn>}
-              {onMarkOff && <Btn onClick={onMarkOff} title="Day off" fontSize="14px" color={P.muted} fontWeight={700}>—</Btn>}
-            </div>
-          )}
-        </div>
-        <div style={{ marginTop: '7px' }}>
-          {meal.time && <Tag bg={P.accentLight} color={P.accentDark}>{meal.time}</Tag>}
-          {isSeasonal && <Tag bg="#EDF7ED" color="#2E7D32">{seasonLabel}</Tag>}
-          {isFav && <Tag bg={P.goldLight} color={P.gold}>⭐ Fav</Tag>}
-          {meal.kidNote && <Tag bg={P.greenLight} color={P.greenDark}>👶 Kid-friendly</Tag>}
-          {meal.sourceUrl && <Tag bg={P.border} color={P.muted}>🔗 Imported</Tag>}
-          {lastUsedStr && <Tag bg={P.border} color={P.muted}>🕐 {lastUsedStr}</Tag>}
-        </div>
-        <div style={{ fontSize: '12px', color: P.accent, fontWeight: 600, marginTop: '7px' }}>
-          {expanded ? '▲ Hide recipe' : '▼ Ingredients & recipe'}
         </div>
       </div>
 
@@ -83,10 +82,9 @@ export function MealCard({ meal, isFav, isSeasonal, seasonLabel, expanded, famil
 
           {/* Serving size + time override */}
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, letterSpacing: '1.2px', textTransform: 'uppercase' }}>Ingredients</div>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, letterSpacing: '1.2px', textTransform: 'uppercase' }}>Ingredients — serves {familySize}</div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '2px' }}>
               {onChangeMealSize && <SmallBtn onClick={() => onChangeMealSize(-1)}>−</SmallBtn>}
-              <span style={{ fontSize: '12px', fontWeight: 600, color: P.muted, padding: '0 6px' }}>serves {familySize}</span>
               {onChangeMealSize && <SmallBtn onClick={() => onChangeMealSize(1)}>+</SmallBtn>}
             </div>
           </div>

@@ -106,15 +106,22 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   // ── Plan screen ───────────────────────────────────────────────────────────
   if (step === 'plan' && state.plan) return (
     <Screen>
-      <Header subtitle="This week's meals" actions={
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <IconBtn onClick={() => setStep('setup')} title="Settings">⚙️</IconBtn>
-          <IconBtn onClick={() => setStep('prefs')} title="Preferences">👤</IconBtn>
+      <div style={{ padding: '24px 0 16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1.5px', color: P.accent, fontWeight: 700, marginBottom: '5px' }}>Your week</div>
+            <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '22px', lineHeight: 1.3, marginBottom: '4px' }}>Here's the plan</div>
+            <div style={{ fontSize: '12px', color: P.muted, marginBottom: '6px' }}>Generated {formatLastUsed(state.plan.generatedAt) ?? 'today'}</div>
+          </div>
+          <div style={{ display: 'flex', gap: '8px', paddingTop: '4px' }}>
+            <IconBtn onClick={() => setStep('setup')} title="Settings">⚙️</IconBtn>
+            <IconBtn onClick={() => setStep('prefs')} title="Preferences">👤</IconBtn>
+          </div>
         </div>
-      } />
-      <p style={{ fontSize: '13px', color: P.muted, marginBottom: '16px' }}>
-        Tap a card for recipe · ☆ favourite · 🔄 swap · 👎 skip forever
-      </p>
+        <p style={{ fontSize: '13px', color: P.muted, marginBottom: '0' }}>
+          Tap a card for recipe & ingredients · ☆ favourite · 🔄 swap · 👎 skip forever
+        </p>
+      </div>
 
       {DAYS.map(day => {
         const mode = (state.dayConfig[day] as DayMode) ?? 'home';
@@ -151,7 +158,6 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
 
         return (
           <div key={day}>
-            <DayLabel day={day} inline />
             <MealCard
               meal={meal} day={day}
               isFav={state.preferences.favourites.includes(meal.name)}
@@ -175,11 +181,29 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         );
       })}
 
-      <Primary onClick={() => setStep('shopping')}>View shopping list</Primary>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-        <Secondary onClick={() => { actions.generate(); showToast('New plan generated!'); }}>🔄 Regenerate</Secondary>
-        <Secondary onClick={() => setStep('setup')}>⚙️ Edit days</Secondary>
+      <div style={{ paddingBottom: '80px' }}>
+        <Primary onClick={() => setStep('shopping')}>View shopping list</Primary>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+          <Secondary onClick={() => { actions.generate(); showToast('New plan generated!'); }}>🔄 Regenerate</Secondary>
+          <Secondary onClick={() => setStep('setup')}>⚙️ Edit days</Secondary>
+        </div>
       </div>
+
+      <button onClick={() => {
+        const dayMap: Record<number, string> = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 0: 'Sunday' };
+        const today = dayMap[new Date().getDay()] as DayName;
+        const target = state.plan!.meals.find(m => m.day === today)
+          ? today
+          : (DAYS.find(d => state.plan!.meals.find(m => m.day === d)) ?? null);
+        if (target) setExpandedDay(expandedDay === target ? null : target);
+      }} style={{ position: 'fixed', bottom: '24px', right: '20px', zIndex: 200,
+        background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`,
+        color: '#fff', border: 'none', borderRadius: '28px',
+        padding: '14px 20px', fontSize: '15px', fontWeight: 700,
+        cursor: 'pointer', boxShadow: '0 4px 20px rgba(224,122,95,0.45)',
+        display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}>
+        🍴 Cook tonight
+      </button>
 
       {toast && <Toast message={toast} />}
 
