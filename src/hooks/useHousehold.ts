@@ -37,6 +37,7 @@ export type AppActions = {
   addMeal: (meal: Meal) => Promise<void>;
   removeMeal: (id: string) => Promise<void>;
   replaceMealInPlan: (day: DayName, meal: Meal) => void;
+  restorePlan: (plan: Plan) => void;
   clearHistory: () => void;
   addToHistory: (meals: PlanMeal[]) => void;
   pickCookNow: (time: string, kidsMode: KidsMode, dietary: string) => Meal | null;
@@ -235,6 +236,10 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
     }));
   }, []);
 
+  const restorePlan = useCallback((plan: Plan) => {
+    setHs(prev => ({ ...prev, plan }));
+  }, []);
+
   const clearHistory = useCallback(() => {
     setHs(prev => ({ ...prev, cookHistory: [] }));
   }, []);
@@ -261,7 +266,7 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
 
   return {
     state: { ...hs, householdId, shopList, season },
-    actions: { generate, swap, setDayMode, setKidsMode, cycleKids, setFamilySize, setDaySize, setDayTime, setPreferences, toggleFav, addDislike, addMeal, removeMeal, replaceMealInPlan, clearHistory, addToHistory, pickCookNow },
+    actions: { generate, swap, setDayMode, setKidsMode, cycleKids, setFamilySize, setDaySize, setDayTime, setPreferences, toggleFav, addDislike, addMeal, removeMeal, replaceMealInPlan, restorePlan, clearHistory, addToHistory, pickCookNow },
     loading,
   };
 }

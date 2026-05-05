@@ -42,7 +42,9 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [previewDay, setPreviewDay] = useState<DayName | null>(null);
   const [expandedDay, setExpandedDay] = useState<DayName | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const [checked, setChecked] = useState<Record<string, boolean>>({});
+  const [checked, setChecked] = useState<Record<string, boolean>>(() => {
+    try { return JSON.parse(sessionStorage.getItem('shopChecked') ?? '{}'); } catch { return {}; }
+  });
   const [pickerFor, setPickerFor] = useState<DayName | null>(null);
   const [showImport, setShowImport] = useState(false);
   const [addMealOpen, setAddMealOpen] = useState(false);
@@ -50,6 +52,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [inviteVisible, setInviteVisible] = useState(false);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const toastUndoRef = useRef<(() => void) | null>(null);
   const [cookNow, setCookNow] = useState<Meal | null>(null);
   const [cookNowExp, setCookNowExp] = useState(false);
   const [cookNowAddToPlan, setCookNowAddToPlan] = useState(false);
@@ -57,10 +60,11 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     kids: 'either', size: 4, time: 'any', dietary: 'none',
   });
 
-  const showToast = useCallback((msg: string) => {
+  const showToast = useCallback((msg: string, undo?: () => void) => {
     setToast(msg);
+    toastUndoRef.current = undo ?? null;
     clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(null), 2500);
+    toastTimer.current = setTimeout(() => { setToast(null); toastUndoRef.current = null; }, 2500);
   }, []);
 
   useEffect(() => {
@@ -74,7 +78,11 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
 
   useEffect(() => {
     if (state.plan && step === 'setup') setStep('plan');
-  }, [state.plan]);
+  }, [state.plan, step]);
+
+  useEffect(() => {
+    sessionStorage.setItem('shopChecked', JSON.stringify(checked));
+  }, [checked]);
 
   const si = SEASON_INFO[state.season] ?? { label: '' };
 
@@ -193,7 +201,15 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               }}
               onFav={() => actions.toggleFav(meal.name)}
               onSwap={() => { actions.swap(day); showToast('Swapped!'); }}
-              onDislike={() => { actions.addDislike(meal.name); actions.swap(day); showToast("Got it — won't suggest again"); }}
+              onDislike={() => {
+                const dislikedMeal = meal;
+                actions.addDislike(dislikedMeal.name);
+                actions.swap(day);
+                showToast("Won't suggest again", () => {
+                  actions.setPreferences({ dislikes: state.preferences.dislikes.filter(d => d !== dislikedMeal.name) });
+                  actions.replaceMealInPlan(day, dislikedMeal);
+                });
+              }}
               onChoose={() => setPickerFor(day)}
               onMarkGousto={() => actions.setDayMode(day, 'gousto')}
               onMarkOff={() => actions.setDayMode(day, 'off')}
@@ -209,7 +225,12 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       <div style={{ marginTop: '6px' }}>
         <Primary onClick={() => setStep('shopping')}>View shopping list</Primary>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-          <Secondary onClick={() => { actions.generate(); showToast('New plan generated!'); }}>🔄 Regenerate</Secondary>
+          <Secondary onClick={() => {
+            const prev = state.plan;
+            actions.generate();
+            setChecked({});
+            showToast('New plan generated!', prev ? () => { actions.restorePlan(prev); setChecked({}); } : undefined);
+          }}>🔄 Regenerate</Secondary>
           <Secondary onClick={() => setStep('setup')}>⚙️ Edit days</Secondary>
         </div>
       </div>
@@ -220,7 +241,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         setCookNowOpts(opts);
         const meal = actions.pickCookNow(opts.time, opts.kids as any, opts.dietary);
         if (meal) { setCookNow(meal); setCookNowExp(true); setCookNowAddToPlan(false); }
-      }} style={{ position: 'fixed', bottom: '24px', right: '20px', zIndex: 200,
+        else showToast('No meals match — try relaxing your filters');
+      }} style={{ position: 'fixed', bottom: 'calc(24px + env(safe-area-inset-bottom, 0px))', right: '20px', zIndex: 200,
         background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`,
         color: '#fff', border: 'none', borderRadius: '28px',
         padding: '14px 20px', fontSize: '15px', fontWeight: 700,
@@ -229,13 +251,14 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         🍴 Cook tonight
       </button>
 
-      {toast && <Toast message={toast} />}
+      {toast && <Toast message={toast} onUndo={toastUndoRef.current ?? undefined} />}
 
       {/* Cook Tonight modal */}
       {cookNow && (() => {
         const rePick = (opts = cookNowOpts) => {
           const meal = actions.pickCookNow(opts.time, opts.kids as any, opts.dietary);
           if (meal) { setCookNow(meal); setCookNowExp(true); }
+          else showToast('No meals match — try relaxing your filters');
         };
         const updateOpts = (patch: Partial<typeof cookNowOpts>) => {
           const next = { ...cookNowOpts, ...patch };
@@ -415,7 +438,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         else navigator.clipboard?.writeText(body).then(() => showToast('Copied!'));
       }}>🔗 Share list</Primary>
       <Secondary muted onClick={() => setStep('plan')}>Back to meals</Secondary>
-      {toast && <Toast message={toast} />}
+      {toast && <Toast message={toast} onUndo={toastUndoRef.current ?? undefined} />}
     </Screen>
   );
 
@@ -511,7 +534,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         Leave household
       </Secondary>
 
-      {toast && <Toast message={toast} />}
+      {toast && <Toast message={toast} onUndo={toastUndoRef.current ?? undefined} />}
 
       {showImport && (
         <Modal onClose={() => setShowImport(false)}>
@@ -736,9 +759,10 @@ function HelpModal({ onClose }: { onClose: () => void }) {
       '📋 to hand-pick any meal from the full library for that day.',
     ]},
     { icon: '🍴', title: 'Cook tonight', items: [
-      'Tap the orange button at the bottom-right to jump straight to today\'s meal.',
-      'If today isn\'t planned, it opens the first available day instead.',
-      'The full recipe and ingredients expand automatically.',
+      'Tap the orange button at the bottom-right to get a meal suggestion for tonight — independent of your weekly plan.',
+      'Filter by kids/adults, max cook time, and dietary preference before picking.',
+      '🔀 Suggest something else to get a different recommendation. 📋 Browse all meals to hand-pick from the full library.',
+      '📅 Add to this week\'s plan to slot tonight\'s suggestion into any day.',
     ]},
     { icon: '🧠', title: 'Smart suggestions', items: [
       'Meals you\'ve had recently are de-prioritised. After 3–5 weeks they\'re back in full rotation.',
