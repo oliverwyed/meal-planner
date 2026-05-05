@@ -39,6 +39,7 @@ export type AppActions = {
   replaceMealInPlan: (day: DayName, meal: Meal) => void;
   clearHistory: () => void;
   addToHistory: (meals: PlanMeal[]) => void;
+  pickCookNow: (time: string, kidsMode: KidsMode, dietary: string) => Meal | null;
 };
 
 export function useHousehold(householdId: string): { state: AppState; actions: AppActions; loading: boolean } {
@@ -247,9 +248,20 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
     }));
   }, []);
 
+  const pickCookNow = useCallback((time: string, kidsMode: KidsMode, dietary: string): Meal | null => {
+    const p = getPool(allMeals, time, kidsMode, dietary as any);
+    const used = hs.plan?.meals.map(m => m.name) ?? [];
+    const avail = p.filter(m => !used.includes(m.name) && !hs.preferences.dislikes.includes(m.name));
+    const [pick] = smartPick(avail.length ? avail : p, 1, {
+      history: hs.cookHistory, favourites: hs.preferences.favourites, dislikes: hs.preferences.dislikes,
+      preferAdult: kidsMode === 'adults',
+    });
+    return pick ?? null;
+  }, [allMeals, hs.plan, hs.preferences, hs.cookHistory]);
+
   return {
     state: { ...hs, householdId, shopList, season },
-    actions: { generate, swap, setDayMode, setKidsMode, cycleKids, setFamilySize, setDaySize, setDayTime, setPreferences, toggleFav, addDislike, addMeal, removeMeal, replaceMealInPlan, clearHistory, addToHistory },
+    actions: { generate, swap, setDayMode, setKidsMode, cycleKids, setFamilySize, setDaySize, setDayTime, setPreferences, toggleFav, addDislike, addMeal, removeMeal, replaceMealInPlan, clearHistory, addToHistory, pickCookNow },
     loading,
   };
 }

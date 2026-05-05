@@ -1,12 +1,12 @@
 import React from 'react';
-import type { Meal, DayName } from '../lib/types';
+import type { Meal } from '../lib/types';
 import { P } from '../lib/constants';
 import { Tag, TimeSlider } from './ui';
 import { buildMealShop, getCookedNote, CAT_EMOJI } from '../lib/shopping';
 
 interface Props {
   meal: Meal;
-  day?: DayName;
+  day?: string;
   isFav: boolean;
   isSeasonal: boolean;
   seasonLabel: string;

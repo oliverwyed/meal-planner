@@ -50,7 +50,12 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [inviteVisible, setInviteVisible] = useState(false);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const cardRefs = useRef<Partial<Record<DayName, HTMLDivElement>>>({});
+  const [cookNow, setCookNow] = useState<Meal | null>(null);
+  const [cookNowExp, setCookNowExp] = useState(false);
+  const [cookNowAddToPlan, setCookNowAddToPlan] = useState(false);
+  const [cookNowOpts, setCookNowOpts] = useState<{ kids: string; size: number; time: string; dietary: string }>({
+    kids: 'either', size: 4, time: 'any', dietary: 'none',
+  });
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
@@ -166,7 +171,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         const dayTF = state.dayOverrides[day]?.time ?? state.preferences.timeFilter;
 
         return (
-          <div key={day} ref={el => { if (el) cardRefs.current[day] = el; else delete cardRefs.current[day]; }}>
+          <div key={day}>
             <MealCard
               meal={meal} day={day}
               isFav={state.preferences.favourites.includes(meal.name)}
@@ -209,28 +214,12 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         </div>
       </div>
 
+      {/* Floating Cook Tonight button */}
       <button onClick={() => {
-        const todayIdx = new Date().getDay(); // 0=Sun … 6=Sat
-        const dayOrder: DayName[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const today = dayOrder[todayIdx];
-        // Prefer today's meal; otherwise find the next upcoming planned day this week; fall back to first meal
-        const meals = state.plan!.meals;
-        const targetMeal = meals.find(m => m.day === today)
-          ?? DAYS.slice(DAYS.indexOf(today as DayName)).map(d => meals.find(m => m.day === d)).find(Boolean)
-          ?? meals[0]
-          ?? null;
-        if (!targetMeal) return;
-        const target = targetMeal.day;
-        setPreviewDay(target);
-        setExpandedDay(target);
-        showToast(`🍴 ${targetMeal.name}`);
-        setTimeout(() => {
-          const el = cardRefs.current[target];
-          if (el) {
-            const top = el.getBoundingClientRect().top + window.pageYOffset - 16;
-            window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
-          }
-        }, 80);
+        const opts = { kids: 'either', size: state.familySize, time: state.preferences.timeFilter, dietary: state.preferences.dietaryMode };
+        setCookNowOpts(opts);
+        const meal = actions.pickCookNow(opts.time, opts.kids as any, opts.dietary);
+        if (meal) { setCookNow(meal); setCookNowExp(true); setCookNowAddToPlan(false); }
       }} style={{ position: 'fixed', bottom: '24px', right: '20px', zIndex: 200,
         background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`,
         color: '#fff', border: 'none', borderRadius: '28px',
@@ -242,13 +231,137 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
 
       {toast && <Toast message={toast} />}
 
+      {/* Cook Tonight modal */}
+      {cookNow && (() => {
+        const rePick = (opts = cookNowOpts) => {
+          const meal = actions.pickCookNow(opts.time, opts.kids as any, opts.dietary);
+          if (meal) { setCookNow(meal); setCookNowExp(true); }
+        };
+        const updateOpts = (patch: Partial<typeof cookNowOpts>) => {
+          const next = { ...cookNowOpts, ...patch };
+          setCookNowOpts(next);
+          if (!('size' in patch)) rePick(next);
+        };
+        const lu = state.cookHistory.filter(h => h.name === cookNow.name);
+        const lastUsedStr = formatLastUsed(lu.length ? Math.max(...lu.map(h => h.date)) : null);
+        const homeDays = DAYS.filter(d => !state.dayConfig[d] || state.dayConfig[d] === 'home');
+        return (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 500 }}>
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '24px 0 40px' } as React.CSSProperties}
+              onClick={() => setCookNow(null)}>
+              <div style={{ maxWidth: '480px', margin: '0 auto', padding: '0 16px' }} onClick={e => e.stopPropagation()}>
+                <div style={{ background: P.bg, borderRadius: '20px', boxShadow: '0 8px 40px rgba(0,0,0,0.22)', overflow: 'hidden' }}>
+                  {/* Header */}
+                  <div style={{ background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`, padding: '20px 20px 16px', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontSize: '11px', opacity: 0.85, fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase' }}>Cook tonight</div>
+                      <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '22px', marginTop: '3px' }}>What shall we make?</div>
+                    </div>
+                    <button onClick={() => setCookNow(null)}
+                      style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: '10px', padding: '8px 12px', cursor: 'pointer', fontSize: '18px', fontWeight: 700 }}>✕</button>
+                  </div>
+
+                  {/* Filters */}
+                  <div style={{ padding: '12px 16px', borderBottom: `1px solid ${P.border}`, background: P.card }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <div style={{ display: 'flex', gap: '5px' }}>
+                        {([['👶 Kids', 'kids'], ['✌️ Either', 'either'], ['🍷 Adults', 'adults']] as [string, string][]).map(([label, val]) => (
+                          <button key={val} onClick={() => updateOpts({ kids: val })}
+                            style={{ background: cookNowOpts.kids === val ? P.accentLight : 'transparent', border: `1.5px solid ${cookNowOpts.kids === val ? P.accent : P.border}`, borderRadius: '20px', padding: '4px 10px', fontSize: '12px', fontWeight: 700, color: cookNowOpts.kids === val ? P.accentDark : P.muted, cursor: 'pointer' }}>
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <button onClick={() => setCookNowOpts(p => ({ ...p, size: Math.max(1, p.size - 1) }))}
+                          style={{ background: P.border, border: 'none', borderRadius: '6px', width: '22px', height: '22px', fontSize: '15px', cursor: 'pointer', color: P.muted, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
+                        <span style={{ fontSize: '12px', fontWeight: 600, color: P.muted, minWidth: '52px', textAlign: 'center' }}>{cookNowOpts.size} people</span>
+                        <button onClick={() => setCookNowOpts(p => ({ ...p, size: Math.min(20, p.size + 1) }))}
+                          style={{ background: P.border, border: 'none', borderRadius: '6px', width: '22px', height: '22px', fontSize: '15px', cursor: 'pointer', color: P.muted, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                      </div>
+                    </div>
+                    <div style={{ marginBottom: '8px' }}>
+                      <TimeSlider value={cookNowOpts.time} label="Max cook time" onChange={v => updateOpts({ time: v })} />
+                    </div>
+                    <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                      {([['none', 'All'], ['noFish', 'No fish'], ['noPork', 'No pork'], ['noRed', 'No red meat'], ['veggie', '🌱 Veggie']] as [string, string][]).map(([v, l]) => (
+                        <button key={v} onClick={() => updateOpts({ dietary: v })}
+                          style={{ background: cookNowOpts.dietary === v ? P.greenLight : 'transparent', border: `1.5px solid ${cookNowOpts.dietary === v ? P.greenDark : P.border}`, borderRadius: '20px', padding: '3px 9px', fontSize: '11px', fontWeight: 700, color: cookNowOpts.dietary === v ? P.greenDark : P.muted, cursor: 'pointer' }}>
+                          {l}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Suggested meal card */}
+                  <div style={{ padding: '16px' }}>
+                    <MealCard meal={cookNow} day="Tonight"
+                      isFav={state.preferences.favourites.includes(cookNow.name)}
+                      isSeasonal={!!(cookNow.seasons?.includes(state.season as any))}
+                      seasonLabel={si.label}
+                      overviewOpen={true}
+                      expanded={cookNowExp}
+                      familySize={cookNowOpts.size}
+                      onOverview={() => {}}
+                      onFullExpand={() => setCookNowExp(x => !x)}
+                      onFav={() => actions.toggleFav(cookNow.name)}
+                      onSwap={() => rePick()}
+                      onDislike={() => { actions.addDislike(cookNow.name); rePick(); }}
+                      lastUsedStr={lastUsedStr}
+                    />
+                  </div>
+
+                  {/* Actions */}
+                  <div style={{ padding: '0 16px 20px' }}>
+                    <Primary onClick={() => rePick()}>🔀 Suggest something else</Primary>
+                    <button onClick={() => setPickerFor('cookNow' as any)}
+                      style={{ width: '100%', background: 'none', border: 'none', color: P.muted, fontSize: '14px', fontWeight: 600, cursor: 'pointer', marginTop: '4px', padding: '4px' }}>
+                      📋 Browse all meals
+                    </button>
+                    {state.plan && homeDays.length > 0 && (
+                      <>
+                        <button onClick={() => setCookNowAddToPlan(x => !x)}
+                          style={{ width: '100%', background: 'none', border: 'none', color: P.muted, fontSize: '14px', fontWeight: 600, cursor: 'pointer', marginTop: '4px', padding: '4px' }}>
+                          📅 Add to this week's plan
+                        </button>
+                        {cookNowAddToPlan && (
+                          <div style={{ marginTop: '12px', background: P.card, borderRadius: '14px', padding: '10px 14px', border: `1px solid ${P.border}` }}>
+                            <div style={{ fontSize: '11px', color: P.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Replace which day?</div>
+                            {homeDays.map((d, idx) => {
+                              const existing = state.plan!.meals.find(m => m.day === d);
+                              return (
+                                <div key={d} onClick={() => { actions.replaceMealInPlan(d, cookNow); setCookNow(null); showToast(`${d}: ${cookNow.name}`); }}
+                                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 4px', cursor: 'pointer', borderBottom: idx < homeDays.length - 1 ? `1px solid ${P.border}` : 'none' }}>
+                                  <div style={{ fontWeight: 700, fontSize: '13px', minWidth: '72px' }}>{d}</div>
+                                  <div style={{ fontSize: '12px', color: P.muted, textAlign: 'right', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{existing ? existing.name : '—'}</div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {pickerFor && (
         <Modal onClose={() => setPickerFor(null)}>
           <MealPicker
             meals={ALL_RECIPES.concat(state.customMeals)}
             favourites={state.preferences.favourites}
             dislikes={state.preferences.dislikes}
-            onPick={meal => { actions.replaceMealInPlan(pickerFor, meal); setPickerFor(null); showToast(`Switched to ${meal.name}`); }}
+            onPick={meal => {
+              if (pickerFor === ('cookNow' as any)) {
+                setCookNow(meal); setCookNowExp(true); setPickerFor(null);
+              } else {
+                actions.replaceMealInPlan(pickerFor, meal); setPickerFor(null); showToast(`Switched to ${meal.name}`);
+              }
+            }}
             onToggleFav={actions.toggleFav}
             onDislike={name => { actions.addDislike(name); showToast('Marked as disliked'); }}
           />
