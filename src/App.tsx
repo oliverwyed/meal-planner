@@ -269,7 +269,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`,
         color: '#fff', border: 'none', borderRadius: '28px',
         padding: '14px 20px', fontSize: '15px', fontWeight: 700,
-        cursor: 'pointer', boxShadow: '0 4px 20px rgba(224,122,95,0.45)',
+        cursor: 'pointer', boxShadow: '0 4px 20px rgba(79,70,229,0.30)',
         display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}>
         🍴 Cook tonight
       </button>

@@ -10,10 +10,11 @@ export const DEFAULT_DAY_CONFIG: DayConfig = {
 export const HOUSEHOLD_ID_KEY = 'mp2_household_id';
 
 export const P = {
-  bg: '#FAFAF7', card: '#FFF',
-  accent: '#E07A5F', accentLight: '#F4D1C7', accentDark: '#C25B3F',
-  green: '#81B29A', greenLight: '#D4EDDA', greenDark: '#5A8A6E',
-  gold: '#D4A017', goldLight: '#FEF3DC',
-  text: '#2D3436', muted: '#636E72', border: '#E8E4DF',
-  shadow: '0 2px 16px rgba(0,0,0,0.06)', shadowMd: '0 4px 24px rgba(0,0,0,0.10)',
+  bg: '#F8FAFC', card: '#FFFFFF',
+  accent: '#4F46E5', accentLight: '#EEF2FF', accentDark: '#3730A3',
+  green: '#059669', greenLight: '#D1FAE5', greenDark: '#065F46',
+  gold: '#D97706', goldLight: '#FEF3C7',
+  text: '#0F172A', muted: '#64748B', border: '#E2E8F0',
+  shadow: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)',
+  shadowMd: '0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04)',
 } as const;

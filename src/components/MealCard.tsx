@@ -68,7 +68,7 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
               ...(overviewOpen || expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }) }}>{meal.description}</div>
             <div style={{ marginTop: '7px' }}>
               {meal.time && <Tag bg={P.accentLight} color={P.accentDark}>{meal.time}</Tag>}
-              {isSeasonal && <Tag bg="#EDF7ED" color="#2E7D32">{seasonLabel}</Tag>}
+              {isSeasonal && <Tag bg="#D1FAE5" color="#065F46">{seasonLabel}</Tag>}
               {isFav && <Tag bg={P.goldLight} color={P.gold}>⭐ Fav</Tag>}
               {meal.kidNote && <Tag bg={P.greenLight} color={P.greenDark}>👶 Kid-friendly</Tag>}
               {meal.sourceUrl && <Tag bg={P.border} color={P.muted}>🔗 Imported</Tag>}
@@ -164,7 +164,7 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
               <span style={{ fontSize: '16px', flexShrink: 0 }}>👨‍🍳</span>
               <div>
                 <div style={{ fontSize: '11px', fontWeight: 700, color: P.gold, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '3px' }}>Chef's tip</div>
-                <div style={{ fontSize: '13px', lineHeight: 1.5, color: '#5a4200' }}>{meal.tip}</div>
+                <div style={{ fontSize: '13px', lineHeight: 1.5, color: '#78350F' }}>{meal.tip}</div>
               </div>
             </div>
           )}
