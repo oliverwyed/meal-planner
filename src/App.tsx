@@ -46,6 +46,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [pickerFor, setPickerFor] = useState<DayName | null>(null);
   const [showImport, setShowImport] = useState(false);
   const [addMealOpen, setAddMealOpen] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const [inviteVisible, setInviteVisible] = useState(false);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -115,6 +116,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
             <div style={{ fontSize: '12px', color: P.muted, marginBottom: '6px' }}>Generated {formatLastUsed(state.plan.generatedAt) ?? 'today'}</div>
           </div>
           <div style={{ display: 'flex', gap: '8px', paddingTop: '4px' }}>
+            <IconBtn onClick={() => setShowHelp(true)} title="How it works">ℹ️</IconBtn>
             <IconBtn onClick={() => setStep('setup')} title="Settings">⚙️</IconBtn>
             <IconBtn onClick={() => setStep('prefs')} title="Preferences">👤</IconBtn>
           </div>
@@ -242,6 +244,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           />
         </Modal>
       )}
+
+      {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
     </Screen>
   );
 
@@ -595,6 +599,65 @@ function AddMealForm({ onSave, onCancel }: { onSave: (m: Meal) => Promise<void>;
           steps: f.steps.split('\n').map(s => s.trim()).filter(Boolean), custom: true });
       }}>Save meal</Primary>
       <Secondary muted onClick={onCancel}>Cancel</Secondary>
+    </div>
+  );
+}
+
+function HelpModal({ onClose }: { onClose: () => void }) {
+  const sections = [
+    { icon: '📅', title: 'Your week', items: [
+      'Tap any meal card to see its full description. Tap "Ingredients & recipe" to expand the full recipe with ingredients scaled to your family size.',
+      '☆ to favourite a meal — favourites are suggested 2.5× more often.',
+      '🔄 to swap a meal for a different suggestion.',
+      '👎 to skip a meal forever. It disappears from suggestions.',
+      '📋 to hand-pick any meal from the full library for that day.',
+    ]},
+    { icon: '🍴', title: 'Cook tonight', items: [
+      'Tap the orange button at the bottom-right to jump straight to today\'s meal.',
+      'If today isn\'t planned, it opens the first available day instead.',
+      'The full recipe and ingredients expand automatically.',
+    ]},
+    { icon: '🧠', title: 'Smart suggestions', items: [
+      'Meals you\'ve had recently are de-prioritised. After 3–5 weeks they\'re back in full rotation.',
+      'Favourites are suggested 2.5× more often. Seasonal meals get a boost in the right season.',
+      'Protein, cuisine and carb type are balanced across the week automatically.',
+      'Dislikes, time filters and kid-friendly settings all shape the suggestion pool.',
+    ]},
+    { icon: '🛒', title: 'Shopping list', items: [
+      'All ingredients are scaled to your family size. Identical items across meals are combined.',
+      'Add pantry staples during setup (oil, salt, garlic…) — they\'re removed from the list automatically.',
+      'Tap items to check them off. Share the remaining unchecked list to your notes or messages.',
+    ]},
+    { icon: '👥', title: 'Household sync', items: [
+      'Your plan, favourites, and shopping list sync in real time with anyone who joins your household.',
+      'Find the invite code under Preferences → Household. Share it so your partner can join on their device.',
+    ]},
+  ];
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 600, overflowY: 'auto', background: P.bg }}>
+      <div style={{ background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`, color: '#fff', padding: '48px 24px 24px' }}>
+        <div style={{ maxWidth: '480px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button onClick={onClose}
+            style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white', borderRadius: '10px', padding: '8px 14px', cursor: 'pointer', fontSize: '15px', fontWeight: 700 }}>
+            ← Back
+          </button>
+          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '22px' }}>How it works</div>
+        </div>
+      </div>
+      <div style={{ maxWidth: '480px', margin: '0 auto', padding: '24px 16px 60px' }}>
+        {sections.map(s => (
+          <div key={s.title} style={{ marginBottom: '28px' }}>
+            <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '18px', marginBottom: '10px' }}>{s.icon} {s.title}</div>
+            <div style={{ background: P.card, borderRadius: '14px', padding: '4px 16px', boxShadow: P.shadow, border: `1px solid ${P.border}` }}>
+              {s.items.map((item, i) => (
+                <div key={i} style={{ padding: '12px 0', borderBottom: i < s.items.length - 1 ? `1px solid ${P.border}` : 'none', fontSize: '14px', lineHeight: 1.6, color: P.text }}>
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
