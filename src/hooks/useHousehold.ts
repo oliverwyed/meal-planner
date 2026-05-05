@@ -75,7 +75,12 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
   useEffect(() => {
     const sub = subscribeToState(householdId, patch => {
       isRemoteUpdate.current = true;
-      setHs(prev => ({ ...prev, ...patch }));
+      setHs(prev => ({
+        ...prev,
+        ...patch,
+        plan: patch.plan ?? prev.plan,
+        preferences: patch.preferences ?? prev.preferences,
+      }));
     });
     return () => { sub.unsubscribe(); };
   }, [householdId]);

@@ -65,8 +65,7 @@ export async function saveState(
   if (!Object.keys(update).length) return;
   const { error } = await supabase
     .from('household_state')
-    .update(update)
-    .eq('household_id', householdId);
+    .upsert({ household_id: householdId, ...update }, { onConflict: 'household_id' });
   if (error) console.error(error);
 }
 
