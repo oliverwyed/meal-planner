@@ -45,11 +45,12 @@ export function MealCard({ meal, isFav, isSeasonal, seasonLabel, expanded, famil
       {/* Header */}
       <div style={{ padding: '15px 16px', cursor: 'pointer' }} onClick={onExpand}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: '28px', flexShrink: 0 }}>{getMealEmoji(meal)}</div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: '28px', flexShrink: 0, marginTop: '1px' }}>{getMealEmoji(meal)}</div>
             <div style={{ minWidth: 0 }}>
               <div style={{ fontWeight: 700, fontSize: '16px', lineHeight: 1.3, marginBottom: '3px' }}>{meal.name}</div>
-              <div style={{ fontSize: '13px', color: P.muted, lineHeight: 1.45 }}>{meal.description}</div>
+              <div style={{ fontSize: '13px', color: P.muted, lineHeight: 1.45,
+                display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{meal.description}</div>
             </div>
           </div>
           {!readOnly && (
