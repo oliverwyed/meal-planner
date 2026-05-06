@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { HouseholdGate } from './components/HouseholdGate';
 import { MealCard } from './components/MealCard';
+import { CookingMode } from './components/CookingMode';
 import { ImportRecipe } from './components/ImportRecipe';
 import { Primary, Secondary, Toast, Spinner, Section, TimeSlider, ActiveTimers } from './components/ui';
 import { useHousehold } from './hooks/useHousehold';
@@ -66,6 +67,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [timers, setTimers] = useState<{ id: string; label: string; remaining: number; total: number; done: boolean }[]>([]);
   const [nutritionCache, setNutritionCache] = useState<Record<string, { calories: number; protein: number; carbs: number; fat: number }>>({});
   const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= DESKTOP_BREAKPOINT);
+  const [cookingMeal, setCookingMeal] = useState<{ meal: Meal; familySize: number } | null>(null);
 
   const showToast = useCallback((msg: string, undo?: () => void) => {
     setToast(msg);
@@ -177,6 +179,18 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         {state.plan && <Secondary onClick={() => setStep('plan')}>Back to plan</Secondary>}
       </div>
     </Screen>
+  );
+
+  // ── Cooking mode overlay ─────────────────────────────────────────────────
+  if (cookingMeal) return (
+    <CookingMode
+      meal={cookingMeal.meal}
+      familySize={cookingMeal.familySize}
+      onClose={() => setCookingMeal(null)}
+      onStartTimer={addTimer}
+      timers={timers}
+      onDismissTimer={dismissTimer}
+    />
   );
 
   // ── Plan screen ───────────────────────────────────────────────────────────
@@ -319,6 +333,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               onStartTimer={addTimer}
               onEstimateNutrition={() => estimateNutrition(meal)}
               nutrition={meal.nutrition ?? nutritionCache[meal.name]}
+              onCookMode={() => setCookingMeal({ meal, familySize: daySize })}
             />
           </div>
         );

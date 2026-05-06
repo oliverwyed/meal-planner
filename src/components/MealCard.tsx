@@ -33,6 +33,7 @@ interface Props {
   onStartTimer?: (label: string, seconds: number) => void;
   onEstimateNutrition?: () => void;
   nutrition?: { calories: number; protein: number; carbs: number; fat: number };
+  onCookMode?: () => void;
 }
 
 function getMealEmoji(meal: Meal): string {
@@ -43,7 +44,7 @@ function getMealEmoji(meal: Meal): string {
 
 export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOpen, expanded, familySize, onOverview, onFullExpand, onFav,
   onSwap, onDislike, onChoose, onMarkGousto, onMarkOff, onMarkCooked, onChangeMealSize, kidsMode, onCycleKids, dayTimeFilter, onSetDayTime,
-  readOnly, lastUsedStr, onStartTimer, onEstimateNutrition, nutrition }: Props) {
+  readOnly, lastUsedStr, onStartTimer, onEstimateNutrition, nutrition, onCookMode }: Props) {
   const scale = familySize / (meal.serves ?? 4);
   const shopByCategory = useMemo(() => buildMealShop(meal, scale), [meal, scale]);
 
@@ -204,29 +205,34 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
             </div>
           )}
 
-          {/* Day-mode actions */}
-          {(onMarkGousto || onMarkOff || onMarkCooked) && (
-            <div style={{ display: 'flex', gap: '6px', marginTop: '16px', paddingTop: '12px', borderTop: `1px solid ${P.border}` }}>
-              {onMarkCooked && (
-                <button onClick={e => { e.stopPropagation(); onMarkCooked(); }}
-                  style={{ background: P.border, border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, color: P.text, cursor: 'pointer' }}>
-                  ✓ Cooked it
-                </button>
-              )}
-              {onMarkGousto && (
-                <button onClick={e => { e.stopPropagation(); onMarkGousto(); }}
-                  style={{ background: P.greenLight, border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, color: P.greenDark, cursor: 'pointer' }}>
-                  📦 Using Gousto
-                </button>
-              )}
-              {onMarkOff && (
-                <button onClick={e => { e.stopPropagation(); onMarkOff(); }}
-                  style={{ background: P.border, border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, color: P.muted, cursor: 'pointer' }}>
-                  — Day off
-                </button>
-              )}
-            </div>
-          )}
+          {/* Cook mode + day-mode actions */}
+          <div style={{ display: 'flex', gap: '6px', marginTop: '16px', paddingTop: '12px', borderTop: `1px solid ${P.border}`, flexWrap: 'wrap' }}>
+            {onCookMode && meal.steps && meal.steps.length > 0 && (
+              <button onClick={e => { e.stopPropagation(); onCookMode(); }}
+                style={{ background: P.accent, border: 'none', borderRadius: '8px', padding: '6px 14px',
+                  fontSize: '12px', fontWeight: 700, color: '#fff', cursor: 'pointer' }}>
+                👨‍🍳 Cook this
+              </button>
+            )}
+            {onMarkCooked && (
+              <button onClick={e => { e.stopPropagation(); onMarkCooked(); }}
+                style={{ background: P.border, border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, color: P.text, cursor: 'pointer' }}>
+                ✓ Cooked it
+              </button>
+            )}
+            {onMarkGousto && (
+              <button onClick={e => { e.stopPropagation(); onMarkGousto(); }}
+                style={{ background: P.greenLight, border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, color: P.greenDark, cursor: 'pointer' }}>
+                📦 Using Gousto
+              </button>
+            )}
+            {onMarkOff && (
+              <button onClick={e => { e.stopPropagation(); onMarkOff(); }}
+                style={{ background: P.border, border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, color: P.muted, cursor: 'pointer' }}>
+                — Day off
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
