@@ -83,22 +83,46 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
     <div style={{ background: P.card, borderRadius: '16px', marginBottom: '10px',
       boxShadow: P.shadow, border: `2px solid ${isFav ? P.gold : P.border}`, overflow: 'hidden' }}>
 
-      {/* Header */}
-      <div style={{ padding: '15px 16px', cursor: 'pointer' }} onClick={onOverview}>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <div style={{ fontSize: '26px', flexShrink: 0, paddingTop: '2px' }}>{getMealEmoji(displayMeal)}</div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-              <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '12px', color: P.accent, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{day ?? ''}</div>
-              {!readOnly && (
-                <div style={{ display: 'flex', gap: 0, marginRight: '-4px', flexShrink: 0 }}>
-                  <Btn onClick={onFav} title={isFav ? 'Remove favourite' : 'Add favourite'} fontSize="18px" color={isFav ? P.gold : P.muted}>{isFav ? '★' : '☆'}</Btn>
-                  {onSwap && <Btn onClick={onSwap} title="Swap">🔄</Btn>}
-                  {onDislike && <Btn onClick={onDislike} title="Never suggest again">👎</Btn>}
-                  {onChoose && <Btn onClick={onChoose} title="Choose from list" fontSize="15px" color={P.muted}>📋</Btn>}
-                </div>
-              )}
+      {/* Hero photo */}
+      {displayMeal.photo && (
+        <div style={{ position: 'relative', height: '160px', overflow: 'hidden', cursor: 'pointer' }} onClick={onOverview}>
+          <img src={displayMeal.photo} alt={displayMeal.name} loading="lazy"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 100%)' }} />
+          {/* Day label overlaid bottom-left */}
+          {day && <div style={{ position: 'absolute', bottom: '10px', left: '13px', fontFamily: "'DM Serif Display', serif",
+            fontSize: '11px', color: 'rgba(255,255,255,0.9)', textTransform: 'uppercase', letterSpacing: '0.8px', fontWeight: 700 }}>{day}</div>}
+          {/* Action buttons overlaid top-right */}
+          {!readOnly && (
+            <div style={{ position: 'absolute', top: '6px', right: '6px', display: 'flex', gap: 0 }}>
+              <Btn onClick={onFav} title={isFav ? 'Remove favourite' : 'Add favourite'} fontSize="18px"
+                color={isFav ? P.gold : 'rgba(255,255,255,0.8)'}>{isFav ? '★' : '☆'}</Btn>
+              {onSwap && <Btn onClick={onSwap} title="Swap" color="rgba(255,255,255,0.8)">🔄</Btn>}
+              {onDislike && <Btn onClick={onDislike} title="Never suggest again" color="rgba(255,255,255,0.8)">👎</Btn>}
+              {onChoose && <Btn onClick={onChoose} title="Choose from list" fontSize="15px" color="rgba(255,255,255,0.7)">📋</Btn>}
             </div>
+          )}
+        </div>
+      )}
+
+      {/* Header */}
+      <div style={{ padding: '13px 16px', cursor: 'pointer' }} onClick={onOverview}>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          {!displayMeal.photo && <div style={{ fontSize: '26px', flexShrink: 0, paddingTop: '2px' }}>{getMealEmoji(displayMeal)}</div>}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {!displayMeal.photo && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '12px', color: P.accent, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{day ?? ''}</div>
+                {!readOnly && (
+                  <div style={{ display: 'flex', gap: 0, marginRight: '-4px', flexShrink: 0 }}>
+                    <Btn onClick={onFav} title={isFav ? 'Remove favourite' : 'Add favourite'} fontSize="18px" color={isFav ? P.gold : P.muted}>{isFav ? '★' : '☆'}</Btn>
+                    {onSwap && <Btn onClick={onSwap} title="Swap">🔄</Btn>}
+                    {onDislike && <Btn onClick={onDislike} title="Never suggest again">👎</Btn>}
+                    {onChoose && <Btn onClick={onChoose} title="Choose from list" fontSize="15px" color={P.muted}>📋</Btn>}
+                  </div>
+                )}
+              </div>
+            )}
             <div style={{ fontWeight: 700, fontSize: '16px', lineHeight: 1.3, marginBottom: '3px' }}>{displayMeal.name}</div>
             <div style={{ fontSize: '13px', color: P.muted, lineHeight: 1.45,
               ...(overviewOpen || expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }) }}>{displayMeal.description}</div>
