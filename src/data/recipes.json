@@ -28,7 +28,13 @@
       "Reserve a small cup of pasta water, then drain. Add the pasta directly to the sauce pan and toss over the heat for 1 min, adding a splash of pasta water to bring it together.",
       "Serve in warmed bowls with parmesan grated over the top."
     ],
-    "tip": "A splash of the starchy pasta water is the secret to a glossy, clingy sauce — add it just before serving and toss vigorously so every piece of penne is coated."
+    "tip": "A splash of the starchy pasta water is the secret to a glossy, clingy sauce — add it just before serving and toss vigorously so every piece of penne is coated.",
+    "nutrition": {
+      "calories": 542,
+      "protein": 28,
+      "carbs": 68,
+      "fat": 14
+    }
   },
   {
     "name": "Soy-Glazed Chicken, Sweetcorn & Pea Rice Bowl",
@@ -59,7 +65,13 @@
       "Microwave rice per pack instructions. Add sweetcorn and peas to the chicken pan; stir-fry for 2 min until the veg is heated through and bright.",
       "Add rice and soy sauce; toss everything together over high heat for 1 min. Taste — it may need another splash of soy — and serve."
     ],
-    "tip": "The key to golden, not steamed, chicken is a screaming-hot pan and not overcrowding it — if the pieces touch and steam, they'll stay pale and soft rather than getting that caramelised crust."
+    "tip": "The key to golden, not steamed, chicken is a screaming-hot pan and not overcrowding it — if the pieces touch and steam, they'll stay pale and soft rather than getting that caramelised crust.",
+    "nutrition": {
+      "calories": 425,
+      "protein": 42,
+      "carbs": 38,
+      "fat": 9
+    }
   },
   {
     "name": "Crispy Fish Finger & Cucumber Wraps with Cheddar",
@@ -89,7 +101,13 @@
       "Spread a generous layer of mayo across each tortilla. Lay 2–3 fish fingers along the centre, then add cucumber sticks and cheese.",
       "Roll firmly, tucking in the sides, and halve on the diagonal. Serve with ketchup for dipping."
     ],
-    "tip": "Turning the fish fingers halfway through baking ensures even crunch on both sides — skipping this leaves one side soggy where it's been sitting in its own steam."
+    "tip": "Turning the fish fingers halfway through baking ensures even crunch on both sides — skipping this leaves one side soggy where it's been sitting in its own steam.",
+    "nutrition": {
+      "calories": 458,
+      "protein": 22,
+      "carbs": 32,
+      "fat": 28
+    }
   },
   {
     "name": "Creamy Ham & Sweetcorn Fusilli",
@@ -120,7 +138,13 @@
       "Roughly chop the ham and stir in along with the frozen sweetcorn. Return to a low heat for 1–2 min, stirring, until the sweetcorn is hot and the ham is warmed through.",
       "Taste and season with salt and plenty of black pepper. Serve topped with grated cheddar."
     ],
-    "tip": "Taking the pan off the heat before adding the cream cheese prevents it from splitting and going grainy — the pasta holds enough warmth to melt it into a beautifully smooth sauce."
+    "tip": "Taking the pan off the heat before adding the cream cheese prevents it from splitting and going grainy — the pasta holds enough warmth to melt it into a beautifully smooth sauce.",
+    "nutrition": {
+      "calories": 598,
+      "protein": 32,
+      "carbs": 62,
+      "fat": 22
+    }
   },
   {
     "name": "Smoky Chicken & Cheddar Quesadillas with Red Pepper",
@@ -146,7 +170,13 @@
       "Cook one quesadilla at a time for 2–3 min per side, pressing down gently with a spatula, until deep golden and crisp. You should hear it sizzling actively.",
       "Transfer to a board, rest for 1 min so the filling sets slightly, then slice into wedges with a sharp knife. Repeat with remaining quesadillas."
     ],
-    "tip": "A completely dry, hot pan gives you that audible crunch and golden colour — adding oil makes the tortilla greasy and soft rather than shatteringly crisp."
+    "tip": "A completely dry, hot pan gives you that audible crunch and golden colour — adding oil makes the tortilla greasy and soft rather than shatteringly crisp.",
+    "nutrition": {
+      "calories": 485,
+      "protein": 38,
+      "carbs": 32,
+      "fat": 22
+    }
   },
   {
     "name": "Teriyaki Salmon & Udon Noodle Stir-Fry",
@@ -178,7 +208,13 @@
       "Halve the pak choi lengthways and add cut-side down to the same hot pan with the sugar snap peas; cook over high heat for 2–3 min, turning the pak choi once, until charred on the cut face and tender, and the peas are bright green with a little bite.",
       "Add noodles and teriyaki sauce; toss together for 1 min until everything is coated and glossy. Flake the salmon over in large pieces and fold in gently so it doesn't break up entirely. Scatter with sliced spring onions and serve immediately."
     ],
-    "tip": "Patting the salmon completely dry before cooking is non-negotiable — any surface moisture creates steam that prevents the skin from crisping and gives you a pale, soft result instead."
+    "tip": "Patting the salmon completely dry before cooking is non-negotiable — any surface moisture creates steam that prevents the skin from crisping and gives you a pale, soft result instead.",
+    "nutrition": {
+      "calories": 485,
+      "protein": 38,
+      "carbs": 42,
+      "fat": 18
+    }
   },
   {
     "name": "Ham & Mozzarella Pitta Pizzas with Oregano",
@@ -204,7 +240,13 @@
       "Slide under the hot grill and cook for 4–5 min, watching closely, until the cheese is deeply golden and bubbling and the pitta edges have gone crisp and toasty.",
       "Leave to cool for a full minute before serving — molten mozzarella holds its heat and can burn small mouths."
     ],
-    "tip": "The closer the tray is to the grill element, the faster the cheese bubbles and the better the colour — if the cheese is melted but pale after 5 minutes, your grill isn't hot enough or the tray is too far away."
+    "tip": "The closer the tray is to the grill element, the faster the cheese bubbles and the better the colour — if the cheese is melted but pale after 5 minutes, your grill isn't hot enough or the tray is too far away.",
+    "nutrition": {
+      "calories": 385,
+      "protein": 22,
+      "carbs": 38,
+      "fat": 15
+    }
   },
   {
     "name": "Green Pesto Pasta Shells with Parmesan & Peas",
@@ -234,7 +276,13 @@
       "Add pesto and olive oil, then toss well. Add pasta water a splash at a time until the pesto loosens into a glossy coating sauce that clings to every shell.",
       "Taste for seasoning, then serve with parmesan freshly grated over the top."
     ],
-    "tip": "Never add pesto over heat — the basil turns bitter and brown almost immediately; off the heat, the colour stays vivid green and the flavour stays bright and fresh."
+    "tip": "Never add pesto over heat — the basil turns bitter and brown almost immediately; off the heat, the colour stays vivid green and the flavour stays bright and fresh.",
+    "nutrition": {
+      "calories": 485,
+      "protein": 18,
+      "carbs": 68,
+      "fat": 13
+    }
   },
   {
     "name": "Egg-Fried Rice with Peas, Sweetcorn & Soy",
@@ -261,7 +309,13 @@
       "Add frozen peas and sweetcorn; toss everything together over high heat for 2 min until the veg is hot and bright.",
       "Pour in soy sauce, toss for 30 seconds, then taste — you may want a little more soy. Finish with sesame oil if you have it, and serve immediately."
     ],
-    "tip": "Starting with properly microwaved (not freshly boiled) rice and drying it out in the hot pan first is what separates restaurant-style fried rice from the stodgy, steamed-vegetable version made with wet rice."
+    "tip": "Starting with properly microwaved (not freshly boiled) rice and drying it out in the hot pan first is what separates restaurant-style fried rice from the stodgy, steamed-vegetable version made with wet rice.",
+    "nutrition": {
+      "calories": 312,
+      "protein": 10,
+      "carbs": 42,
+      "fat": 9
+    }
   },
   {
     "name": "Creamy Tuna & Sweetcorn Pasta Bake",
@@ -292,7 +346,13 @@
       "Tip into an ovenproof dish in an even layer. Scatter the remaining cheddar evenly over the top.",
       "Grill for 5–7 min, watching closely, until the top is bubbling and deeply golden in patches. Leave to cool for 2 min before serving — the filling retains heat."
     ],
-    "tip": "Draining the pasta very thoroughly is essential here — any water clinging to the pasta thins out the crème fraîche and you end up with a loose, runny result instead of a creamy bake."
+    "tip": "Draining the pasta very thoroughly is essential here — any water clinging to the pasta thins out the crème fraîche and you end up with a loose, runny result instead of a creamy bake.",
+    "nutrition": {
+      "calories": 524,
+      "protein": 32,
+      "carbs": 52,
+      "fat": 18
+    }
   },
   {
     "name": "Sausage & Baked Bean One-Pot on Buttered Toast",
@@ -322,7 +382,13 @@
       "Reduce heat to medium-low and simmer for 3–4 min, stirring occasionally, until the sauce has thickened slightly and everything is piping hot.",
       "Toast and butter the bread. Serve the sausage and bean mixture spooned generously over the toast."
     ],
-    "tip": "Leaving the sausage coins undisturbed for a full 2–3 minutes develops a proper caramelised crust — the instinct to stir too soon robs you of the deep brown colour that gives this dish its flavour."
+    "tip": "Leaving the sausage coins undisturbed for a full 2–3 minutes develops a proper caramelised crust — the instinct to stir too soon robs you of the deep brown colour that gives this dish its flavour.",
+    "nutrition": {
+      "calories": 485,
+      "protein": 18,
+      "carbs": 42,
+      "fat": 24
+    }
   },
   {
     "name": "Golden Chicken Goujons with Oven Chips & Peas",
@@ -351,7 +417,13 @@
       "Cook peas in boiling water for 3 min or microwave with a splash of water; drain.",
       "Serve immediately with ketchup. Cut a goujon open and check the inside is white and steaming hot, with no pink, before giving to children."
     ],
-    "tip": "The chips need to go in 10 minutes before the goujons because they take longer to cook through — adding everything at once means either underdone chips or overdone chicken."
+    "tip": "The chips need to go in 10 minutes before the goujons because they take longer to cook through — adding everything at once means either underdone chips or overdone chicken.",
+    "nutrition": {
+      "calories": 435,
+      "protein": 38,
+      "carbs": 42,
+      "fat": 12
+    }
   },
   {
     "name": "Courgette, Tomato & Melted Cheddar Omelette with Toast",
@@ -382,7 +454,13 @@
       "Scatter the halved tomatoes and cheddar evenly over the top. Continue cooking over medium heat until the edges are set and the middle is just barely wobbly — about 2 min.",
       "Fold in half with a spatula and slide onto a board. Toast the bread while the omelette rests for 1 min. Serve cut into strips alongside the toast."
     ],
-    "tip": "Resist the urge to stir the eggs once they're in the pan — letting them set undisturbed from the bottom up gives you a tender, custardy texture rather than a scrambled mess."
+    "tip": "Resist the urge to stir the eggs once they're in the pan — letting them set undisturbed from the bottom up gives you a tender, custardy texture rather than a scrambled mess.",
+    "nutrition": {
+      "calories": 385,
+      "protein": 16,
+      "carbs": 32,
+      "fat": 21
+    }
   },
   {
     "name": "Quick Beef Bolognese Ragù with Spaghetti",
@@ -414,7 +492,13 @@
       "Add tomatoes, herbs, salt and plenty of black pepper. Stir well, scraping up the browned bits from the pan base. Simmer over medium heat for 8–10 min until the sauce thickens and deepens in colour.",
       "Cook spaghetti in well-salted boiling water per pack. Drain and serve topped with the bolognese."
     ],
-    "tip": "Resist stirring the mince for the first two minutes so it can develop a proper caramelised crust — that browning is where most of the flavour comes from and makes the difference between a flat sauce and a deeply savoury one."
+    "tip": "Resist stirring the mince for the first two minutes so it can develop a proper caramelised crust — that browning is where most of the flavour comes from and makes the difference between a flat sauce and a deeply savoury one.",
+    "nutrition": {
+      "calories": 542,
+      "protein": 32,
+      "carbs": 68,
+      "fat": 12
+    }
   },
   {
     "name": "Sweet Chilli King Prawn Udon Noodle Stir-Fry",
@@ -445,7 +529,13 @@
       "Add prawns, soy sauce and half the sweet chilli sauce. Toss for 1–2 min until the prawns are heated through and glossy — no longer, or they'll turn rubbery.",
       "Add noodles and toss everything together for 1 min. Serve with the remaining sweet chilli on the side."
     ],
-    "tip": "A smoking-hot wok is non-negotiable for stir-fry — if you add ingredients to a lukewarm pan, everything steams rather than frying, and you end up with soggy veg and waterlogged noodles."
+    "tip": "A smoking-hot wok is non-negotiable for stir-fry — if you add ingredients to a lukewarm pan, everything steams rather than frying, and you end up with soggy veg and waterlogged noodles.",
+    "nutrition": {
+      "calories": 342,
+      "protein": 24,
+      "carbs": 42,
+      "fat": 6
+    }
   },
   {
     "name": "Cheddar-Topped Baked Beans on Thick Buttered Toast",
@@ -470,7 +560,13 @@
       "Butter the toast generously right out of the toaster. Spoon the hot beans on top, then pile over the grated cheddar.",
       "For extra-melty cheese, slide under a hot grill for 1–2 min until bubbling and golden. Serve straight away."
     ],
-    "tip": "Well-buttered toast forms a barrier that slows sogginess — and serving immediately while both the toast and beans are piping hot makes all the difference between a disappointing and a brilliant result."
+    "tip": "Well-buttered toast forms a barrier that slows sogginess — and serving immediately while both the toast and beans are piping hot makes all the difference between a disappointing and a brilliant result.",
+    "nutrition": {
+      "calories": 485,
+      "protein": 18,
+      "carbs": 52,
+      "fat": 21
+    }
   },
   {
     "name": "Golden Chicken, Lettuce & Mayo Wraps",
@@ -501,7 +597,13 @@
       "Wrap tortillas in damp kitchen paper and microwave for 20–30 seconds until soft and pliable.",
       "Shred lettuce and slice cucumber into sticks. Spread mayo on each tortilla, add chicken strips, lettuce and cucumber, then roll firmly and halve on the diagonal."
     ],
-    "tip": "Cutting the chicken into strips of consistent thickness — not too thin — means they cook evenly and stay juicy; very thin strips overcook and turn dry in the pan before they colour properly."
+    "tip": "Cutting the chicken into strips of consistent thickness — not too thin — means they cook evenly and stay juicy; very thin strips overcook and turn dry in the pan before they colour properly.",
+    "nutrition": {
+      "calories": 385,
+      "protein": 38,
+      "carbs": 18,
+      "fat": 18
+    }
   },
   {
     "name": "Stovetop Cheddar & Mustard Mac & Cheese",
@@ -533,7 +635,13 @@
       "Return to medium heat and stir continuously until the sauce thickens enough to coat the back of a spoon, about 4–5 min. It should be smooth and glossy.",
       "Take off the heat again; stir in three-quarters of the cheddar and all the mustard. Season well with salt, white pepper and a pinch of nutmeg if you have it. Add the macaroni, stir to coat, and serve with the remaining cheese on top."
     ],
-    "tip": "Adding the milk off the heat and in small increments — whisking fully between each addition — is the technique that prevents a lumpy béchamel; patience here is the difference between a silky sauce and a grainy one."
+    "tip": "Adding the milk off the heat and in small increments — whisking fully between each addition — is the technique that prevents a lumpy béchamel; patience here is the difference between a silky sauce and a grainy one.",
+    "nutrition": {
+      "calories": 645,
+      "protein": 28,
+      "carbs": 72,
+      "fat": 26
+    }
   },
   {
     "name": "Crispy Bacon, Pea & Cream Penne",
@@ -564,7 +672,13 @@
       "Pour in the cream and add a good splash of pasta water. Toss everything together for 1–2 min until the sauce has emulsified into a glossy, clingy coating.",
       "Taste, season with black pepper (salt is likely not needed given the bacon), and serve with parmesan grated over the top."
     ],
-    "tip": "Adding pasta water to the cream loosens the sauce and, crucially, the starch helps it emulsify — without it, the cream can stay thick and pool at the bottom of the bowl rather than coating the pasta."
+    "tip": "Adding pasta water to the cream loosens the sauce and, crucially, the starch helps it emulsify — without it, the cream can stay thick and pool at the bottom of the bowl rather than coating the pasta.",
+    "nutrition": {
+      "calories": 621,
+      "protein": 24,
+      "carbs": 57,
+      "fat": 31
+    }
   },
   {
     "name": "Sweet & Sour Chicken with Pineapple & Steamed Rice",
@@ -591,7 +705,13 @@
       "Drain the pineapple chunks and add to the pan. Add sweet and sour sauce and stir to coat; cook for 2 min until the sauce is glossy and everything is evenly coated.",
       "Microwave rice per pack; serve the chicken and sauce over the rice."
     ],
-    "tip": "Cooking the chicken in a single layer without stirring for the first 2 minutes gets you a proper golden crust — piling it in and stirring immediately results in steamed, pale chicken with no colour or flavour development."
+    "tip": "Cooking the chicken in a single layer without stirring for the first 2 minutes gets you a proper golden crust — piling it in and stirring immediately results in steamed, pale chicken with no colour or flavour development.",
+    "nutrition": {
+      "calories": 445,
+      "protein": 38,
+      "carbs": 52,
+      "fat": 8
+    }
   },
   {
     "name": "Smoky Black Bean & Cheddar Quesadillas",
@@ -617,7 +737,13 @@
       "Cook for 2–3 min until the underside is deep golden and crisp. Flip carefully and cook 2 min more — listen for the sizzle; it should be active and consistent.",
       "Slide onto a board, rest 30 seconds, then slice into 3 wedges with a sharp knife. Repeat with the second tortilla. Serve with salsa."
     ],
-    "tip": "Mashing about a third of the beans lightly before combining helps the filling hold together inside the quesadilla — whole beans can roll out as you fold the tortilla, and mashed beans act as a natural binder."
+    "tip": "Mashing about a third of the beans lightly before combining helps the filling hold together inside the quesadilla — whole beans can roll out as you fold the tortilla, and mashed beans act as a natural binder.",
+    "nutrition": {
+      "calories": 385,
+      "protein": 16,
+      "carbs": 42,
+      "fat": 16
+    }
   },
   {
     "name": "Herby Turkey Ragù with Rigatoni",
@@ -649,7 +775,13 @@
       "Cook rigatoni in well-salted boiling water per pack instructions. Drain, reserving a splash of pasta water.",
       "Add pasta to the sauce with a splash of pasta water and toss to coat. Taste and adjust seasoning before serving."
     ],
-    "tip": "Turkey mince is leaner than beef and can turn grey and dry if overcooked — keep the heat medium-high and stop cooking as soon as it's no longer pink, then let the sauce do the rest of the work."
+    "tip": "Turkey mince is leaner than beef and can turn grey and dry if overcooked — keep the heat medium-high and stop cooking as soon as it's no longer pink, then let the sauce do the rest of the work.",
+    "nutrition": {
+      "calories": 542,
+      "protein": 38,
+      "carbs": 68,
+      "fat": 9
+    }
   },
   {
     "name": "Sesame Egg & Vegetable Udon Noodle Stir-Fry",
@@ -677,7 +809,13 @@
       "Add the noodles, soy sauce and garlic granules. Toss everything together vigorously over high heat for 1 min until the noodles are heated through and evenly coated.",
       "Taste — add a splash more soy if needed — and serve immediately. Noodles continue to absorb sauce as they sit, so eat while hot."
     ],
-    "tip": "The wok must be smoking before anything goes in — a lukewarm wok gives you steamed, waterlogged vegetables instead of the caramelised, charred edges that make a stir fry taste like a stir fry."
+    "tip": "The wok must be smoking before anything goes in — a lukewarm wok gives you steamed, waterlogged vegetables instead of the caramelised, charred edges that make a stir fry taste like a stir fry.",
+    "nutrition": {
+      "calories": 412,
+      "protein": 14,
+      "carbs": 52,
+      "fat": 16
+    }
   },
   {
     "name": "Gochujang Beef & Udon Noodles",
@@ -711,7 +849,13 @@
       "Add soy sauce and 2 tbsp water; stir to combine into a glossy sauce. Add the udon noodles and toss vigorously over high heat for 1 min until everything is coated.",
       "Add spinach in handfuls, tossing until just wilted, about 1 min. Drizzle with sesame oil, scatter sesame seeds over the top and serve immediately."
     ],
-    "tip": "Gochujang varies significantly in heat between brands — taste your sauce before adding the noodles and dilute with a splash of water and extra soy if it's sharper than you want."
+    "tip": "Gochujang varies significantly in heat between brands — taste your sauce before adding the noodles and dilute with a splash of water and extra soy if it's sharper than you want.",
+    "nutrition": {
+      "calories": 485,
+      "protein": 28,
+      "carbs": 48,
+      "fat": 16
+    }
   },
   {
     "name": "Miso Butter Salmon with Edamame & Rice",
@@ -744,7 +888,13 @@
       "Heat a non-stick pan over medium-high heat. Place salmon skin-side down and cook undisturbed for 3–4 min until the skin is crisp and the flesh is opaque about two-thirds of the way up the sides. Flip, spread the miso butter generously over the surface, and cook 2–3 min more until the glaze is deeply caramelised. The salmon is done when it yields gently when pressed at the thickest point — the very centre can have the faintest blush of pink, as it continues cooking off the heat.",
       "Serve salmon over rice with edamame alongside, spooning any remaining glaze from the pan over the top."
     ],
-    "tip": "White miso (shiro miso) is the one to use here — it's sweeter and gentler than red miso, which can be too intense and overpowering in a glaze going directly into a hot pan."
+    "tip": "White miso (shiro miso) is the one to use here — it's sweeter and gentler than red miso, which can be too intense and overpowering in a glaze going directly into a hot pan.",
+    "nutrition": {
+      "calories": 520,
+      "protein": 42,
+      "carbs": 48,
+      "fat": 16
+    }
   },
   {
     "name": "Smoky Paprika Chicken & Butter Bean Stew",
@@ -777,7 +927,13 @@
       "Stir well and simmer over medium heat for 8–10 min until the chicken is cooked through and the sauce has thickened into a rich, deep-red broth.",
       "Taste and adjust seasoning — it may want a pinch more salt or paprika. Serve in bowls with crusty bread for dipping."
     ],
-    "tip": "Letting the stew simmer uncovered for the full 8–10 minutes concentrates the sauce into something rich and intense — covering the pan traps steam and keeps it thin and watery."
+    "tip": "Letting the stew simmer uncovered for the full 8–10 minutes concentrates the sauce into something rich and intense — covering the pan traps steam and keeps it thin and watery.",
+    "nutrition": {
+      "calories": 385,
+      "protein": 42,
+      "carbs": 28,
+      "fat": 12
+    }
   },
   {
     "name": "Pan-Seared Sirloin Steak with Garlic Butter & Watercress",
@@ -811,7 +967,13 @@
       "Reduce heat to medium. Add butter, crushed garlic cloves and thyme. As the butter foams, tilt the pan and baste the steaks continuously with the garlicky butter for 1 full minute.",
       "Rest on a warm plate, uncovered, for at least 5 min. Place over watercress, pour the pan butter over generously, squeeze lemon all over and serve."
     ],
-    "tip": "Season the steaks far more heavily than you think — the thick salt crust on the surface is what forms the deeply savoury bark in the pan; an under-seasoned steak always tastes flat regardless of its quality."
+    "tip": "Season the steaks far more heavily than you think — the thick salt crust on the surface is what forms the deeply savoury bark in the pan; an under-seasoned steak always tastes flat regardless of its quality.",
+    "nutrition": {
+      "calories": 524,
+      "protein": 52,
+      "carbs": 2,
+      "fat": 32
+    }
   },
   {
     "name": "Seared King Scallops with Crushed Peas & Crispy Pancetta",
@@ -845,7 +1007,13 @@
       "Increase heat under the pancetta pan to very high. Add remaining butter and olive oil. When foaming, add scallops flat-side down with space between each. Cook completely undisturbed for 90 seconds until deep golden.",
       "Flip and cook 45–60 seconds more — they should feel firm with a little give. Serve immediately over the crushed peas, broken pancetta scattered over, with lemon wedges."
     ],
-    "tip": "The first 30 seconds after scallops hit the pan determines the outcome — if the pan is hot enough and they are dry enough, caramelisation begins immediately; if either condition isn't met, they steam and no amount of additional cooking recovers the crust."
+    "tip": "The first 30 seconds after scallops hit the pan determines the outcome — if the pan is hot enough and they are dry enough, caramelisation begins immediately; if either condition isn't met, they steam and no amount of additional cooking recovers the crust.",
+    "nutrition": {
+      "calories": 385,
+      "protein": 38,
+      "carbs": 18,
+      "fat": 18
+    }
   },
   {
     "name": "Nduja, Cherry Tomato & Burrata Tagliatelle",
@@ -879,7 +1047,13 @@
       "Add cherry tomatoes and a good pinch of salt. Cook over high heat, pressing occasionally, for 3–4 min until the tomatoes have burst and collapsed into a jammy sauce.",
       "Add the drained pasta to the sauce with a generous splash of pasta water; toss vigorously until every strand is coated and the liquid emulsifies into a glossy sauce. Tear burrata over the top, scatter basil, drizzle with olive oil and serve immediately."
     ],
-    "tip": "Nduja's fat is where all the flavour lives — melt it into the oil completely before any tomatoes go in, so the spiced fat coats the pasta directly and carries heat and smoke into every mouthful."
+    "tip": "Nduja's fat is where all the flavour lives — melt it into the oil completely before any tomatoes go in, so the spiced fat coats the pasta directly and carries heat and smoke into every mouthful.",
+    "nutrition": {
+      "calories": 645,
+      "protein": 22,
+      "carbs": 65,
+      "fat": 32
+    }
   },
   {
     "name": "Pork & Herb Bangers with Creamy Mash & Onion Gravy",
@@ -913,7 +1087,13 @@
       "Stir in the flour and cook for 1 min. Gradually pour in the beef stock and Worcestershire sauce, stirring constantly to prevent lumps. Bring to a simmer and cook for 3–4 min until the gravy coats the back of a spoon.",
       "Return sausages to the gravy and warm through for 2 min. Taste — the gravy should be deeply savoury with a hint of sweetness from the onions. Serve over a generous mound of mash."
     ],
-    "tip": "Cooking the onions low and slow in the residual sausage fat for the full 8–10 minutes — not rushing them — is what gives the gravy its depth and colour; pale, quickly cooked onions make a thin, flavourless sauce."
+    "tip": "Cooking the onions low and slow in the residual sausage fat for the full 8–10 minutes — not rushing them — is what gives the gravy its depth and colour; pale, quickly cooked onions make a thin, flavourless sauce.",
+    "nutrition": {
+      "calories": 542,
+      "protein": 24,
+      "carbs": 42,
+      "fat": 32
+    }
   },
   {
     "name": "Crispy Southern Fried Chicken Caesar Salad",
@@ -944,7 +1124,13 @@
       "Pile the dressed lettuce into bowls. Use a vegetable peeler to shave the parmesan directly over the top in large, generous shards — not the pre-grated dust. Scatter the croutons.",
       "Lay the hot chicken pieces on at the very last moment. Add a final squeeze of lemon and serve immediately while the chicken is blazing hot and crisp."
     ],
-    "tip": "The chicken must go on top while it's blazing hot and properly crispy — even five minutes of resting makes it soft and disappointing; time everything so the chicken hits the plate the moment it leaves the oven."
+    "tip": "The chicken must go on top while it's blazing hot and properly crispy — even five minutes of resting makes it soft and disappointing; time everything so the chicken hits the plate the moment it leaves the oven.",
+    "nutrition": {
+      "calories": 685,
+      "protein": 52,
+      "carbs": 28,
+      "fat": 38
+    }
   },
   {
     "name": "Chorizo, Cherry Tomato & Mascarpone Pasta",
@@ -978,7 +1164,13 @@
       "Add cherry tomatoes and cook over high heat for 4–5 min, pressing them down with the back of a spoon, until they burst and their juices mingle with the spiced chorizo fat into a rough, glossy sauce.",
       "Stir in the mascarpone until fully melted. Drain the pasta, reserving a large mug of pasta water. Add pasta to the sauce with a generous splash of cooking water and toss vigorously for 1 min until every piece is coated. Roughly chop the parsley and stir through. Serve with finely grated parmesan."
     ],
-    "tip": "The rendered chorizo fat is the engine of this sauce — it seasons and flavours the mascarpone from the inside, turning plain cream into a deeply smoky, spiced base that nothing else can replicate."
+    "tip": "The rendered chorizo fat is the engine of this sauce — it seasons and flavours the mascarpone from the inside, turning plain cream into a deeply smoky, spiced base that nothing else can replicate.",
+    "nutrition": {
+      "calories": 724,
+      "protein": 28,
+      "carbs": 68,
+      "fat": 35
+    }
   },
   {
     "name": "Crispy Chorizo, Spinach & Fried Egg Rice Bowl",
@@ -1007,7 +1199,13 @@
       "Add spinach in large handfuls, tossing between additions, until completely wilted, about 2 min. Add the soy sauce, toss again, and taste — it may want a pinch more salt.",
       "Fry the eggs in olive oil in a separate pan over medium heat, basting the tops with the hot oil until the whites are just set but the yolks are still runny, about 2 min. Serve rice in bowls with a fried egg on top."
     ],
-    "tip": "Frying the eggs in their own separate pan rather than pushing space in the rice pan means you can watch them precisely — the residual heat of the crowded rice pan overcooks them before you realise."
+    "tip": "Frying the eggs in their own separate pan rather than pushing space in the rice pan means you can watch them precisely — the residual heat of the crowded rice pan overcooks them before you realise.",
+    "nutrition": {
+      "calories": 485,
+      "protein": 22,
+      "carbs": 38,
+      "fat": 26
+    }
   },
   {
     "name": "White Bean, Leek & Bacon Soup with Crusty Bread",
@@ -1042,7 +1240,13 @@
       "Simmer for 5 min. Remove about a third of the soup and blend it until completely smooth, then return to the pan — this gives the soup a thick, creamy body while keeping satisfying whole beans for texture throughout.",
       "Stir in the double cream and simmer for 2 min. Taste and season generously with salt. Serve with crusty bread, and any remaining crispy lardons scattered over the surface."
     ],
-    "tip": "Blending only a third of the soup rather than all of it gives you the best of both worlds — a glossy, thick consistency from the blended beans, with enough whole beans to make every spoonful genuinely substantial."
+    "tip": "Blending only a third of the soup rather than all of it gives you the best of both worlds — a glossy, thick consistency from the blended beans, with enough whole beans to make every spoonful genuinely substantial.",
+    "nutrition": {
+      "calories": 412,
+      "protein": 22,
+      "carbs": 35,
+      "fat": 19
+    }
   },
   {
     "name": "Halloumi & Roasted Pepper Flatbreads",
@@ -1075,7 +1279,13 @@
       "Warm flatbreads in a dry pan over high heat for 30 seconds per side until lightly charred and pliable, or wrap in foil and heat in the oven for 5 min.",
       "Spread the garlic yoghurt generously over each flatbread. Lay on slices of roasted pepper, then the halloumi. Squeeze over the remaining lemon, scatter fresh herbs and serve immediately."
     ],
-    "tip": "Halloumi firms up and turns rubbery as it cools — serve it straight from the pan onto warm flatbreads and eat immediately; even five minutes' wait noticeably changes the texture."
+    "tip": "Halloumi firms up and turns rubbery as it cools — serve it straight from the pan onto warm flatbreads and eat immediately; even five minutes' wait noticeably changes the texture.",
+    "nutrition": {
+      "calories": 485,
+      "protein": 22,
+      "carbs": 38,
+      "fat": 28
+    }
   },
   {
     "name": "Garlic & Chilli King Prawn Linguine",
@@ -1109,7 +1319,13 @@
       "Increase heat to high. Add prawns in a single layer. Cook without stirring for 90 seconds until the underside is pink and opaque, then flip. Pour in the wine and cook for 1 min until the prawns are pink all the way through and the wine has reduced by half.",
       "Reserve a generous mug of pasta water before draining. Add drained linguine to the prawn pan with the remaining butter, a good splash of pasta water and the chopped parsley. Toss vigorously for 1–2 min until the sauce emulsifies and coats every strand. Squeeze over lemon generously, taste and serve."
     ],
-    "tip": "Prawns are cooked the moment they curl into a loose C-shape and turn uniformly pink — a tight coil means they've gone a few seconds too far and will be noticeably rubbery by the time they reach the bowl."
+    "tip": "Prawns are cooked the moment they curl into a loose C-shape and turn uniformly pink — a tight coil means they've gone a few seconds too far and will be noticeably rubbery by the time they reach the bowl.",
+    "nutrition": {
+      "calories": 536,
+      "protein": 24,
+      "carbs": 52,
+      "fat": 22
+    }
   },
   {
     "name": "Roasted Tomato & Butter Bean Soup",
@@ -1143,7 +1359,13 @@
       "Cook over medium heat for 10 min until the soup has thickened and the flavours have come together. Using a slotted spoon, scoop out about a third of the butter beans and set aside.",
       "Blend the remaining soup until completely smooth with a stick blender. Stir the reserved whole beans back in — this gives you a silky body with satisfying texture throughout. Taste and adjust seasoning. Serve with crusty bread."
     ],
-    "tip": "Reserving some whole butter beans to stir back in after blending gives the soup both a thick, creamy body from the blended portion and satisfying chunks — fully blended is smooth but one-dimensional."
+    "tip": "Reserving some whole butter beans to stir back in after blending gives the soup both a thick, creamy body from the blended portion and satisfying chunks — fully blended is smooth but one-dimensional.",
+    "nutrition": {
+      "calories": 287,
+      "protein": 9,
+      "carbs": 32,
+      "fat": 12
+    }
   },
   {
     "name": "Pork & Black Bean Stir-Fry with Rice",
@@ -1174,7 +1396,13 @@
       "Heat vegetable oil in a wide wok over high heat. Add pork mince and spread flat — resist stirring for 2–3 min until the underside is deeply browned. Break up and continue cooking until no pink remains and the mince has proper colour throughout.",
       "Add onion petals and green beans; stir-fry for 2–3 min until just softening. Add garlic and cook for 1–2 min until fragrant. Pour in the black bean sauce, stir to coat, and cook for 4–5 min until the sauce has thickened and clings to the mince. Serve over rice with a grind of black pepper."
     ],
-    "tip": "Resist moving the mince for the first 2–3 minutes — the deep brown crust on the base is what gives this dish its savoury depth, and it's completely lost if you stir too early."
+    "tip": "Resist moving the mince for the first 2–3 minutes — the deep brown crust on the base is what gives this dish its savoury depth, and it's completely lost if you stir too early.",
+    "nutrition": {
+      "calories": 548,
+      "protein": 32,
+      "carbs": 58,
+      "fat": 16
+    }
   },
   {
     "name": "Chorizo, Tomato & Tenderstem Spaghetti",
@@ -1207,7 +1435,13 @@
       "Add cherry tomatoes and cook for 2–3 min over high heat, pressing down with the back of a spoon, until they burst and collapse into a rough sauce.",
       "Add drained spaghetti and tenderstem. Add soft cheese and a generous splash of pasta water; toss vigorously for 1 min until the cheese melts into a glossy, coating sauce. Add more pasta water if it looks dry. Season with black pepper and serve topped with grated Italian hard cheese."
     ],
-    "tip": "The vivid orange chorizo oil is the engine of this sauce — never drain it away after rendering; it carries all the smoky, spiced flavour that transforms the soft cheese into something extraordinary."
+    "tip": "The vivid orange chorizo oil is the engine of this sauce — never drain it away after rendering; it carries all the smoky, spiced flavour that transforms the soft cheese into something extraordinary.",
+    "nutrition": {
+      "calories": 612,
+      "protein": 28,
+      "carbs": 72,
+      "fat": 19
+    }
   },
   {
     "name": "Prawn Saganaki with Feta & Crusty Bread",
@@ -1243,7 +1477,13 @@
       "Push the prawns into the sauce in a single layer. Crumble the feta generously over the top in rough chunks. Simmer for 3-4 min without stirring until the prawns are pink, just curled, and the feta is softening and catching gold at the edges.",
       "Drizzle with a little olive oil and serve straight from the pan with plenty of crusty bread for mopping."
     ],
-    "tip": "Do not stir once the feta is in — sitting undisturbed on the sauce surface it softens and catches colour at the edges, which gives far more flavour than dissolving it into the liquid."
+    "tip": "Do not stir once the feta is in — sitting undisturbed on the sauce surface it softens and catches colour at the edges, which gives far more flavour than dissolving it into the liquid.",
+    "nutrition": {
+      "calories": 385,
+      "protein": 28,
+      "carbs": 32,
+      "fat": 16
+    }
   },
   {
     "name": "Nduja Shakshuka with Sourdough",
@@ -1275,7 +1515,13 @@
       "Make 8 wells in the sauce with the back of a spoon. Crack an egg into each well. Reduce heat to low, cover the pan, and cook for 5-6 min until the whites are fully set but the yolks are still runny and trembling.",
       "Crumble feta generously over the top, drizzle with olive oil and serve straight from the pan with thick slices of sourdough."
     ],
-    "tip": "The nduja fat that renders into the sauce is irreplaceable — cooking it for the full 2 minutes before the tomatoes go in means the spiced oil coats everything and gives the sauce a depth that plain paprika alone cannot match."
+    "tip": "The nduja fat that renders into the sauce is irreplaceable — cooking it for the full 2 minutes before the tomatoes go in means the spiced oil coats everything and gives the sauce a depth that plain paprika alone cannot match.",
+    "nutrition": {
+      "calories": 482,
+      "protein": 22,
+      "carbs": 18,
+      "fat": 35
+    }
   },
   {
     "name": "Smoked Salmon, Caper & Lemon Tagliatelle",
@@ -1311,7 +1557,13 @@
       "Drain the pasta and add directly to the cream with a generous splash of pasta water. Toss over low heat for 1 min until the sauce coats every strand and looks glossy. Remove from the heat completely.",
       "Tear the smoked salmon into rough strips and fold gently into the pasta — the residual heat is enough; cooking it further makes it tough and grey. Add capers, a generous squeeze of lemon juice, the dill and plenty of black pepper. Serve immediately with grated parmesan."
     ],
-    "tip": "Take the pan fully off the heat before adding the smoked salmon — residual warmth gently brings it to temperature while keeping it silky and translucent; any active heat turns it tough, grey and disappointingly dry."
+    "tip": "Take the pan fully off the heat before adding the smoked salmon — residual warmth gently brings it to temperature while keeping it silky and translucent; any active heat turns it tough, grey and disappointingly dry.",
+    "nutrition": {
+      "calories": 612,
+      "protein": 28,
+      "carbs": 52,
+      "fat": 31
+    }
   },
   {
     "name": "Gorgonzola, Walnut & Pear Rigatoni",
@@ -1347,7 +1599,13 @@
       "Add white wine and let it bubble for 1 min. Crumble in the Gorgonzola and pour in the cream. Stir over low heat until the cheese has melted into a smooth, blue-streaked sauce. Season generously with black pepper — it needs very little salt given the cheese.",
       "Add drained rigatoni and a generous splash of pasta water. Toss for 1 min until every piece is coated and the sauce clings. Add more pasta water if needed. Serve topped with walnuts and a snow of finely grated parmesan."
     ],
-    "tip": "Add the Gorgonzola over the lowest possible heat and stir slowly — high heat splits the fat from the cheese and gives you a greasy, curdled sauce rather than the smooth, glossy cream you are aiming for."
+    "tip": "Add the Gorgonzola over the lowest possible heat and stir slowly — high heat splits the fat from the cheese and gives you a greasy, curdled sauce rather than the smooth, glossy cream you are aiming for.",
+    "nutrition": {
+      "calories": 782,
+      "protein": 28,
+      "carbs": 72,
+      "fat": 41
+    }
   },
   {
     "name": "Thai Green Prawn Curry with Jasmine Rice",
@@ -1381,7 +1639,13 @@
       "Add the aubergine first — it takes longest. Simmer for 8 min until completely tender. Add the red pepper and cook for 3 min more. Taste the broth — it should be fragrant, slightly sweet, richly coconut-flavoured with proper heat behind it. Adjust fish sauce and sugar to balance.",
       "Add prawns to the simmering curry. Cook for 3-4 min until pink and just curled. Serve over jasmine rice with coriander scattered over and lime wedges alongside."
     ],
-    "tip": "Frying the curry paste in oil for the full 1-2 minutes before the coconut milk goes in is what develops its fragrance — shortcut this step and you get a raw, grassy flavour that no amount of simmering later will fully cook out."
+    "tip": "Frying the curry paste in oil for the full 1-2 minutes before the coconut milk goes in is what develops its fragrance — shortcut this step and you get a raw, grassy flavour that no amount of simmering later will fully cook out.",
+    "nutrition": {
+      "calories": 520,
+      "protein": 22,
+      "carbs": 58,
+      "fat": 18
+    }
   },
   {
     "name": "Crispy Chicken Thigh & Roasted Tomato Orzo",
@@ -1413,7 +1677,13 @@
       "Nestle the chicken thighs skin-side up on top of the orzo — they should sit proud of the liquid. Transfer to the oven and roast, uncovered, for 25–30 min until the chicken skin is crisp and golden and the orzo has absorbed the stock.",
       "Remove from the oven, lay spinach over the top, and stir gently until just wilted — about 1 min. Taste the orzo and adjust seasoning. Serve straight from the pan."
     ],
-    "tip": "Searing the skin in a dry pan (no extra oil) before the oven renders out the fat and creates a golden crust that actually stays crispy — skipping this step gives you pale, flabby skin no matter how hot the oven."
+    "tip": "Searing the skin in a dry pan (no extra oil) before the oven renders out the fat and creates a golden crust that actually stays crispy — skipping this step gives you pale, flabby skin no matter how hot the oven.",
+    "nutrition": {
+      "calories": 520,
+      "protein": 42,
+      "carbs": 48,
+      "fat": 16
+    }
   },
   {
     "name": "Smoky Chicken Fajitas with Charred Peppers & Sour Cream",
@@ -1446,7 +1716,13 @@
       "Add the peppers and onion to the same pan over high heat. Cook, tossing occasionally, for 4–5 min until the edges have proper char marks and the onion has softened.",
       "Return chicken to the pan, toss everything together for 1 min, and bring the pan to the table. Warm tortillas in the microwave (30 seconds, wrapped in a damp cloth) and serve with grated cheddar and sour cream."
     ],
-    "tip": "Cooking the chicken and peppers separately in the same pan in sequence — rather than all at once — means each element gets proper charring rather than stewing together in their own juices."
+    "tip": "Cooking the chicken and peppers separately in the same pan in sequence — rather than all at once — means each element gets proper charring rather than stewing together in their own juices.",
+    "nutrition": {
+      "calories": 485,
+      "protein": 42,
+      "carbs": 38,
+      "fat": 18
+    }
   },
   {
     "name": "Build-Your-Own Mozzarella & Ham Pizzas",
@@ -1473,7 +1749,13 @@
       "Add ham, finely diced pepper and sweetcorn. Don't over-pile — too many toppings makes the base soggy.",
       "Bake for 10–12 min until the cheese is deeply golden and bubbling and the edges of the base have gone dark and crisp. Rest 2 min before slicing."
     ],
-    "tip": "Less is more with toppings — a thin layer of passata and a modest amount of cheese allows the base to crisp properly; loaded pizzas steam from the inside and stay pale and soft no matter how long you bake them."
+    "tip": "Less is more with toppings — a thin layer of passata and a modest amount of cheese allows the base to crisp properly; loaded pizzas steam from the inside and stay pale and soft no matter how long you bake them.",
+    "nutrition": {
+      "calories": 520,
+      "protein": 28,
+      "carbs": 52,
+      "fat": 18
+    }
   },
   {
     "name": "Creamy Fish Pie with Cheesy Mash Topping",
@@ -1505,7 +1787,13 @@
       "Gently fold the fish pie mix and frozen peas into the sauce — handle lightly so the fish stays in large flakes rather than breaking up completely. Pour into a 20×30cm ovenproof dish.",
       "Spoon the mash in an even layer over the filling, then use a fork to rough up the surface into ridges — these catch in the oven and become the crispy, golden peaks. Scatter with grated cheddar. Bake for 20–25 min until the topping is deep golden and the filling is bubbling at the edges."
     ],
-    "tip": "Roughing up the mash topping with a fork before baking dramatically increases the surface area that crisps and browns — a smooth, flat surface just stays pale while the ridges go golden and crunchy."
+    "tip": "Roughing up the mash topping with a fork before baking dramatically increases the surface area that crisps and browns — a smooth, flat surface just stays pale while the ridges go golden and crunchy.",
+    "nutrition": {
+      "calories": 425,
+      "protein": 32,
+      "carbs": 38,
+      "fat": 14
+    }
   },
   {
     "name": "Sausage Meatball & Tomato Sauce Pasta Bake",
@@ -1538,7 +1826,13 @@
       "Add the drained pasta and sausage balls to the sauce; stir to combine. Pour into a baking dish if not using an oven-safe pan. Taste and season the mixture before it goes under the cheese.",
       "Scatter cheddar evenly over the top. Bake for 15–20 min until the cheese is deep golden and the sauce is bubbling around the edges."
     ],
-    "tip": "Browning the sausage balls in batches with space between them — rather than adding them all at once — is essential; a crowded pan creates steam and you get grey, boiled sausage balls instead of caramelised, flavourful ones."
+    "tip": "Browning the sausage balls in batches with space between them — rather than adding them all at once — is essential; a crowded pan creates steam and you get grey, boiled sausage balls instead of caramelised, flavourful ones.",
+    "nutrition": {
+      "calories": 612,
+      "protein": 31,
+      "carbs": 58,
+      "fat": 26
+    }
   },
   {
     "name": "Spiced Lamb Kofta Pittas with Cucumber & Yoghurt",
@@ -1570,7 +1864,13 @@
       "While koftas cook, warm pittas in the oven or under the grill for 2–3 min. Slice cucumber into thin rounds or sticks. Season the yoghurt with a pinch of salt and a squeeze of lemon if you have it.",
       "Stuff pittas with koftas and cucumber, and drizzle with yoghurt. Eat immediately."
     ],
-    "tip": "Chilling the shaped koftas in the fridge for even 10 minutes before cooking helps them hold their shape under the heat — warm mince can fall apart in the pan if it goes straight from mixing to cooking."
+    "tip": "Chilling the shaped koftas in the fridge for even 10 minutes before cooking helps them hold their shape under the heat — warm mince can fall apart in the pan if it goes straight from mixing to cooking.",
+    "nutrition": {
+      "calories": 542,
+      "protein": 32,
+      "carbs": 48,
+      "fat": 22
+    }
   },
   {
     "name": "Crispy-Skin Jacket Potatoes with Tuna Mayo or Baked Beans",
@@ -1601,7 +1901,13 @@
       "While potatoes bake, drain and flake the tuna; mix with mayo and season well. Heat beans in a small pan until bubbling. Grate the cheddar.",
       "Remove from the oven and immediately cut a deep cross in each potato. Squeeze the sides to open up the centre, then add a knob of butter. Fill generously."
     ],
-    "tip": "Baking the potatoes directly on the oven rack (not on a tray) allows hot air to circulate underneath — baking on a tray traps steam under the potato and prevents the base from crisping."
+    "tip": "Baking the potatoes directly on the oven rack (not on a tray) allows hot air to circulate underneath — baking on a tray traps steam under the potato and prevents the base from crisping.",
+    "nutrition": {
+      "calories": 485,
+      "protein": 28,
+      "carbs": 52,
+      "fat": 16
+    }
   },
   {
     "name": "Paprika Chicken Drumstick & Baby Potato Traybake",
@@ -1633,7 +1939,13 @@
       "Roast for 20 min. Add peppers and courgette to the tin, toss with the pan juices, and return for a further 15 min until the chicken skin is deep golden and the vegetables are tender and caramelised at the edges.",
       "Check the chicken is cooked through — the juices should run completely clear when the thickest part of a drumstick is pierced with a skewer. Serve from the tray."
     ],
-    "tip": "Patting the drumsticks dry and giving them space in the tin — rather than packing them tightly — allows the oven's heat to circulate and the skin to roast rather than steam, which is the difference between crispy and flabby."
+    "tip": "Patting the drumsticks dry and giving them space in the tin — rather than packing them tightly — allows the oven's heat to circulate and the skin to roast rather than steam, which is the difference between crispy and flabby.",
+    "nutrition": {
+      "calories": 385,
+      "protein": 28,
+      "carbs": 32,
+      "fat": 15
+    }
   },
   {
     "name": "Smoky Beef Taco Night with Cheese, Salsa & Sour Cream",
@@ -1665,7 +1977,13 @@
       "Warm taco shells per pack (usually 2–3 min in a hot oven). Shred the lettuce; grate the cheddar. Set everything out in the middle of the table.",
       "Let everyone fill their own shells. The order matters: shell, mince, cheese (so it melts), then lettuce, salsa and sour cream on top."
     ],
-    "tip": "Browning the mince without stirring for the first couple of minutes — then draining the fat — concentrates the beef flavour and prevents the taco filling from being greasy and wet."
+    "tip": "Browning the mince without stirring for the first couple of minutes — then draining the fat — concentrates the beef flavour and prevents the taco filling from being greasy and wet.",
+    "nutrition": {
+      "calories": 485,
+      "protein": 28,
+      "carbs": 32,
+      "fat": 28
+    }
   },
   {
     "name": "Mild Chickpea & Sweet Potato Coconut Curry with Naan",
@@ -1697,7 +2015,13 @@
       "Pour in the coconut milk and stir well. Bring to a gentle simmer over medium heat and cook for 12–15 min, stirring occasionally, until the sauce has thickened slightly and the sweet potato is completely tender.",
       "Add the spinach in large handfuls, stirring between additions, and cook for 1–2 min until wilted. Taste and season with salt. Warm naan breads in the oven or microwave and serve alongside."
     ],
-    "tip": "Frying the korma paste in a dry pan for a full minute or two before adding any liquid — until it smells fragrant and deepens slightly — is the step that takes curry from flat and mild to genuinely aromatic."
+    "tip": "Frying the korma paste in a dry pan for a full minute or two before adding any liquid — until it smells fragrant and deepens slightly — is the step that takes curry from flat and mild to genuinely aromatic.",
+    "nutrition": {
+      "calories": 742,
+      "protein": 22,
+      "carbs": 108,
+      "fat": 18
+    }
   },
   {
     "name": "Baked Beef Ragù Rigatoni with Mozzarella",
@@ -1730,7 +2054,13 @@
       "Cook rigatoni in well-salted water for 2 min less than the pack instructions — it will finish in the oven. Drain and toss with the sauce in a large baking dish.",
       "Tear mozzarella into rough pieces and scatter over the top. Bake for 15–20 min until the mozzarella is golden and blistered and the sauce is bubbling at the edges. Rest 5 min before serving."
     ],
-    "tip": "Undercooking the rigatoni by 2 minutes before baking is essential — pasta that's fully cooked before going into the oven overcooks and turns soft and stodgy as it bakes in the sauce."
+    "tip": "Undercooking the rigatoni by 2 minutes before baking is essential — pasta that's fully cooked before going into the oven overcooks and turns soft and stodgy as it bakes in the sauce.",
+    "nutrition": {
+      "calories": 618,
+      "protein": 38,
+      "carbs": 71,
+      "fat": 18
+    }
   },
   {
     "name": "Honey & Soy Sticky Chicken Drumsticks with Rice",
@@ -1761,7 +2091,13 @@
       "Spoon any glaze pooled in the tin back over the drumsticks. Return to the oven for 12–15 min more until the glaze is deeply caramelised and the skin is lacquered and sticky. The juices should run clear.",
       "Cook rice per pack. Break broccoli into small florets and steam or boil for 4–5 min until just tender. Serve everything alongside."
     ],
-    "tip": "Basting the drumsticks halfway through with the pooled glaze in the tin builds up the lacquered, sticky layers — each baste adds another coat of caramelised flavour rather than leaving a thin, watery finish."
+    "tip": "Basting the drumsticks halfway through with the pooled glaze in the tin builds up the lacquered, sticky layers — each baste adds another coat of caramelised flavour rather than leaving a thin, watery finish.",
+    "nutrition": {
+      "calories": 562,
+      "protein": 38,
+      "carbs": 68,
+      "fat": 9
+    }
   },
   {
     "name": "Thai Green Coconut Chicken Curry with Jasmine Rice",
@@ -1793,7 +2129,13 @@
       "Add the curry paste to the pan and fry, stirring constantly, for 1–2 min until deeply fragrant — you'll smell the lemongrass and spices bloom. This step is what gives the curry its depth.",
       "Pour in coconut milk, scraping up any paste from the pan base. Add the chicken back and simmer gently for 8–10 min until cooked through. Add peas in the last 3 min. Squeeze in half the lime, taste and adjust seasoning. Serve over rice with remaining lime wedges."
     ],
-    "tip": "Frying the curry paste in a dry pan for a full 1–2 minutes before adding coconut milk releases the essential oils in the spices and aromatics, giving you a fragrant, layered curry rather than a one-dimensional one."
+    "tip": "Frying the curry paste in a dry pan for a full 1–2 minutes before adding coconut milk releases the essential oils in the spices and aromatics, giving you a fragrant, layered curry rather than a one-dimensional one.",
+    "nutrition": {
+      "calories": 586,
+      "protein": 42,
+      "carbs": 58,
+      "fat": 17
+    }
   },
   {
     "name": "Lemon Roasted Salmon with New Potatoes & Courgette",
@@ -1825,7 +2167,13 @@
       "Squeeze half the lemon over everything. Roast for a further 12–15 min until the salmon is just cooked through — it should be opaque all the way through but still slightly yielding when pressed.",
       "Squeeze over the remaining lemon and serve straight from the tray."
     ],
-    "tip": "Salmon is done the moment it turns opaque all the way through — a minute or two beyond this and it becomes dry and chalky; check at 12 minutes and remove it the moment it resists slightly when pressed in the thickest part."
+    "tip": "Salmon is done the moment it turns opaque all the way through — a minute or two beyond this and it becomes dry and chalky; check at 12 minutes and remove it the moment it resists slightly when pressed in the thickest part.",
+    "nutrition": {
+      "calories": 425,
+      "protein": 38,
+      "carbs": 28,
+      "fat": 18
+    }
   },
   {
     "name": "Smoky Tomato & Pepper Shakshuka with Crusty Bread",
@@ -1858,7 +2206,13 @@
       "Taste the sauce and adjust seasoning — it should be robustly flavoured. Make six shallow wells with the back of a spoon. Crack one egg carefully into each well.",
       "Cover the pan with a lid and cook over low-medium heat for 5–8 min. Check at 5 min — the whites should be just set and opaque but the yolks still soft and runny. Serve straight from the pan with plenty of crusty bread."
     ],
-    "tip": "Covering the pan with a lid (not foil) traps steam that gently sets the whites from above without overcooking the yolks — remove the lid at exactly the right moment for the classic set-white, runny-yolk result."
+    "tip": "Covering the pan with a lid (not foil) traps steam that gently sets the whites from above without overcooking the yolks — remove the lid at exactly the right moment for the classic set-white, runny-yolk result.",
+    "nutrition": {
+      "calories": 285,
+      "protein": 11,
+      "carbs": 24,
+      "fat": 15
+    }
   },
   {
     "name": "Pulled Spiced Chicken Tacos with Lime Slaw",
@@ -1891,7 +2245,13 @@
       "While chicken rests, finely shred the cabbage with a sharp knife or mandoline. Toss with the juice of the whole lime and a pinch of salt; set aside. The lime gently softens the cabbage.",
       "Shred the chicken using two forks, pulling against the grain of the meat. Warm tacos in the microwave for 30 seconds wrapped in damp kitchen paper. Build tacos: chicken, then slaw, salsa and sour cream on top."
     ],
-    "tip": "Resting the cooked chicken thighs for at least 5 minutes before shredding allows the internal juices to redistribute — shredding immediately means all those juices run out onto the board instead of staying in the meat."
+    "tip": "Resting the cooked chicken thighs for at least 5 minutes before shredding allows the internal juices to redistribute — shredding immediately means all those juices run out onto the board instead of staying in the meat.",
+    "nutrition": {
+      "calories": 585,
+      "protein": 42,
+      "carbs": 38,
+      "fat": 28
+    }
   },
   {
     "name": "Vivid Green Pea & Ham Soup with Crusty Bread",
@@ -1923,7 +2283,13 @@
       "Pass through a sieve if you want a very silky result. Season generously with salt and white pepper — peas need salt to taste of themselves. Stir in most of the cream.",
       "Tear the ham into rough pieces and stir through. Serve in bowls with a swirl of remaining cream and crusty bread alongside."
     ],
-    "tip": "Blending the soup immediately while it's very hot — and serving or cooling it fast — is what preserves the vivid green colour; letting it sit on the heat after blending turns it a dull, khaki colour within minutes."
+    "tip": "Blending the soup immediately while it's very hot — and serving or cooling it fast — is what preserves the vivid green colour; letting it sit on the heat after blending turns it a dull, khaki colour within minutes.",
+    "nutrition": {
+      "calories": 312,
+      "protein": 22,
+      "carbs": 18,
+      "fat": 16
+    }
   },
   {
     "name": "Creamy Chicken & Mushroom Stroganoff with Rice",
@@ -1957,7 +2323,13 @@
       "Stir in the flour and remaining paprika; cook for 1 min. Remove the pan from the heat and stir in the sour cream and Dijon mustard until smooth — adding it off the heat prevents the sauce from splitting.",
       "Return to low heat, add the chicken back, and stir gently to combine. Simmer on low for 3–4 min until the sauce is glossy and coats everything. Taste and adjust seasoning. Serve over rice."
     ],
-    "tip": "Adding sour cream off the heat — or over the gentlest possible heat — stops it splitting into grainy curds; high heat causes the proteins to seize and the sauce loses its silky texture immediately."
+    "tip": "Adding sour cream off the heat — or over the gentlest possible heat — stops it splitting into grainy curds; high heat causes the proteins to seize and the sauce loses its silky texture immediately.",
+    "nutrition": {
+      "calories": 623,
+      "protein": 48,
+      "carbs": 62,
+      "fat": 14
+    }
   },
   {
     "name": "Saucy Onion Gravy Beef Meatballs with Crushed Potatoes",
@@ -1991,7 +2363,13 @@
       "Slice onions into thin half-moons. Add the remaining oil to the same pan over medium heat and cook onions, stirring frequently, for 8–10 min until very soft, sweet and deeply golden. Stir in the flour and cook for 1 min.",
       "Gradually add the beef stock and Worcestershire sauce, stirring constantly to prevent lumps. Bring to a gentle simmer. Return meatballs to the pan; simmer for 8–10 min until the gravy coats the back of a spoon and the meatballs are cooked through. Serve over crushed potatoes."
     ],
-    "tip": "The browned bits (fond) left in the pan after frying the meatballs are the foundation of the gravy's colour and flavour — dissolve them into the stock by scraping the pan base as you stir."
+    "tip": "The browned bits (fond) left in the pan after frying the meatballs are the foundation of the gravy's colour and flavour — dissolve them into the stock by scraping the pan base as you stir.",
+    "nutrition": {
+      "calories": 520,
+      "protein": 32,
+      "carbs": 35,
+      "fat": 26
+    }
   },
   {
     "name": "Herby Pork Gnocchi Bolognese",
@@ -2025,7 +2403,13 @@
       "Cook gnocchi in a large pan of well-salted boiling water — they're ready 30 seconds after they float to the surface. Reserve a mug of pasta water, then drain.",
       "Add gnocchi to the ragù with a splash of pasta water; toss gently to coat — the starchy water helps the sauce cling. Taste and adjust seasoning. Serve with finely grated parmesan."
     ],
-    "tip": "Fennel seeds are what give Italian sausage its distinctive character — add them to plain pork mince and you get that same depth of flavour without using sausages at all."
+    "tip": "Fennel seeds are what give Italian sausage its distinctive character — add them to plain pork mince and you get that same depth of flavour without using sausages at all.",
+    "nutrition": {
+      "calories": 548,
+      "protein": 28,
+      "carbs": 58,
+      "fat": 18
+    }
   },
   {
     "name": "Sticky Tamarind Pork & Udon Noodle Bowl",
@@ -2056,7 +2440,13 @@
       "Heat vegetable oil in a wok over the highest heat possible until just starting to smoke. Add pork strips in a single layer — do not stir for 90 seconds so they sear and caramelise. Toss and cook 2 min more until cooked through and golden at the edges.",
       "Pour the tamarind sauce over the pork; toss vigorously for 1 min until the sauce reduces and coats every strip in a glossy lacquer. Add udon noodles and toss over high heat for 1 min until evenly coated and steaming. Serve topped with sliced spring onions and sesame seeds."
     ],
-    "tip": "Letting the pork sit untouched for 90 seconds before tossing creates the caramelised surface that the tamarind glaze grips onto — stir immediately and you get pale, steamed pork with no crust for the sauce to cling to."
+    "tip": "Letting the pork sit untouched for 90 seconds before tossing creates the caramelised surface that the tamarind glaze grips onto — stir immediately and you get pale, steamed pork with no crust for the sauce to cling to.",
+    "nutrition": {
+      "calories": 562,
+      "protein": 38,
+      "carbs": 58,
+      "fat": 16
+    }
   },
   {
     "name": "Steamed Mussels in White Wine, Garlic & Cream with Sourdough",
@@ -2091,7 +2481,13 @@
       "Add the mussels and cream. Cover immediately with a tight-fitting lid. Cook for 3–5 min, shaking the pan once halfway through, until all mussels have opened. Discard any that remain firmly closed.",
       "Scatter roughly chopped parsley over the pan. Squeeze over lemon, taste the broth and season. Bring the pot to the table with torn sourdough alongside."
     ],
-    "tip": "Once the lid goes on, resist opening it — the mussels cook in concentrated steam and every time you lift the lid you release heat and extend cooking time, making the mussels tough and rubbery."
+    "tip": "Once the lid goes on, resist opening it — the mussels cook in concentrated steam and every time you lift the lid you release heat and extend cooking time, making the mussels tough and rubbery.",
+    "nutrition": {
+      "calories": 520,
+      "protein": 28,
+      "carbs": 42,
+      "fat": 18
+    }
   },
   {
     "name": "Lamb Cutlets with Herby Salsa Verde & Roasted Cherry Tomatoes",
@@ -2127,7 +2523,13 @@
       "Heat remaining olive oil in a heavy pan over very high heat. Stand the cutlets fat-side down in the pan and press for 2 min until the fat is rendered and golden. Lay flat and cook 2–3 min per side for medium-rare, basting with the rendered fat.",
       "Rest 4 min before plating. Serve with roasted tomatoes and a generous spoonful of salsa verde, the rest in a bowl alongside."
     ],
-    "tip": "Rendering the fat cap first — by standing cutlets fat-side down — is the step that takes lamb from pale and fatty to crisp-edged and deeply flavoured; rush this step and the fat stays chewy and unpleasant."
+    "tip": "Rendering the fat cap first — by standing cutlets fat-side down — is the step that takes lamb from pale and fatty to crisp-edged and deeply flavoured; rush this step and the fat stays chewy and unpleasant.",
+    "nutrition": {
+      "calories": 485,
+      "protein": 38,
+      "carbs": 8,
+      "fat": 35
+    }
   },
   {
     "name": "Roast Pork Tenderloin with Wholegrain Mustard Cream & Wilted Spinach",
@@ -2158,7 +2560,13 @@
       "Stir in both mustards and the cream. Simmer for 3–4 min, stirring, until the sauce coats the back of a spoon. Season well.",
       "Wilt spinach in a separate pan with a splash of water for 1–2 min; season. Slice the pork into medallions and serve over spinach with the mustard cream poured over generously."
     ],
-    "tip": "Pork tenderloin continues cooking after it leaves the oven — pull it at 63°C internal (or the moment the centre is barely pink) and the rest does the work; wait for it to look done before resting and it will be dry by the time it's sliced."
+    "tip": "Pork tenderloin continues cooking after it leaves the oven — pull it at 63°C internal (or the moment the centre is barely pink) and the rest does the work; wait for it to look done before resting and it will be dry by the time it's sliced.",
+    "nutrition": {
+      "calories": 547,
+      "protein": 52,
+      "carbs": 6,
+      "fat": 32
+    }
   },
   {
     "name": "Sausage, Squash & Taleggio Traybake",
@@ -2193,7 +2601,13 @@
       "Scatter the kale over the tray. Tear the taleggio into rough chunks — it's a very soft, slightly sticky cheese, so don't worry about neatness — and distribute across the top.",
       "Return to the oven for 8–10 min until the taleggio has melted into glossy, golden-edged puddles and the kale has crisped at its edges. Squeeze lemon over the tray and serve straight from it — the caramelised bits on the bottom are the best part."
     ],
-    "tip": "Taleggio melts quickly and can go oily if overcooked — check at exactly 8 minutes and pull the tray the moment it's pooled into glossy puddles; another 2–3 minutes past perfect and the fat splits from the cheese."
+    "tip": "Taleggio melts quickly and can go oily if overcooked — check at exactly 8 minutes and pull the tray the moment it's pooled into glossy puddles; another 2–3 minutes past perfect and the fat splits from the cheese.",
+    "nutrition": {
+      "calories": 582,
+      "protein": 28,
+      "carbs": 24,
+      "fat": 42
+    }
   },
   {
     "name": "Smash Burgers with Special Sauce & Crispy Fries",
@@ -2228,7 +2642,13 @@
       "Lay a slice of cheese on each patty, flip, and cook for 30 more seconds. Total cooking time is about 2.5 min per batch. Cook remaining patties.",
       "Toast the cut sides of the buns in the same pan for 30 seconds until golden. Build: special sauce on both halves, lettuce on the base, then 2 stacked patties. Serve immediately alongside the fries."
     ],
-    "tip": "High-fat mince over screaming heat is non-negotiable — the fat renders on contact and creates the lacy, caramelised crust you cannot get from lean mince or a moderately hot pan; this is the only technique that works."
+    "tip": "High-fat mince over screaming heat is non-negotiable — the fat renders on contact and creates the lacy, caramelised crust you cannot get from lean mince or a moderately hot pan; this is the only technique that works.",
+    "nutrition": {
+      "calories": 892,
+      "protein": 38,
+      "carbs": 68,
+      "fat": 52
+    }
   },
   {
     "name": "Harissa Lamb Flatbreads with Cucumber Tzatziki",
@@ -2265,7 +2685,13 @@
       "Warm the flatbreads directly over a gas flame for 30 seconds per side until charred in patches and pliable — or in a dry pan over high heat. They should have real colour.",
       "Spread a very generous layer of tzatziki over each flatbread. Pile on the spiced lamb, scatter with fresh mint leaves, squeeze lemon over generously, and drizzle with olive oil. Eat immediately."
     ],
-    "tip": "Squeezing the grated cucumber completely dry is not optional — the excess water dilutes the yoghurt from a thick, creamy tzatziki into a thin, runny sauce that soaks through the flatbread rather than sitting on it."
+    "tip": "Squeezing the grated cucumber completely dry is not optional — the excess water dilutes the yoghurt from a thick, creamy tzatziki into a thin, runny sauce that soaks through the flatbread rather than sitting on it.",
+    "nutrition": {
+      "calories": 645,
+      "protein": 38,
+      "carbs": 42,
+      "fat": 34
+    }
   },
   {
     "name": "Creamy Butter Chicken with Pilau Rice",
@@ -2302,7 +2728,13 @@
       "Add the butter chicken paste and fry, stirring constantly, for 1–2 min until it deepens in colour and smells genuinely fragrant — this is the step that blooms the spices and gives the curry real depth.",
       "Add chopped tomatoes, season well, and simmer 8 min until thickened. Return the chicken and pour in the cream. Simmer gently for 5–6 min until the chicken is cooked through. Add the spinach in handfuls, stirring until just wilted, about 1 min. Stir in garam masala, taste and adjust seasoning generously. Serve over the pilau rice."
     ],
-    "tip": "Browning the chicken separately before building the sauce creates a caramelised surface that enriches the finished dish — adding raw chicken directly to the sauce gives you pale, poached pieces with none of the depth."
+    "tip": "Browning the chicken separately before building the sauce creates a caramelised surface that enriches the finished dish — adding raw chicken directly to the sauce gives you pale, poached pieces with none of the depth.",
+    "nutrition": {
+      "calories": 724,
+      "protein": 48,
+      "carbs": 62,
+      "fat": 28
+    }
   },
   {
     "name": "Pea, Pancetta & Lemon Risotto",
@@ -2339,7 +2771,13 @@
       "Add the frozen peas in the final 2 min of cooking. The risotto is ready when the rice is just tender with a tiny bite in the centre, and the whole thing moves in a slow, glossy wave when you shake the pan.",
       "Remove from the heat. Beat in the butter and most of the parmesan — the risotto should look loose and flowing. Add the zest of both lemons and juice of one. Taste and season very generously. Serve topped with crispy pancetta, remaining parmesan and chopped parsley."
     ],
-    "tip": "The risotto is ready when it flows like slow lava when you tilt the pan — if it holds a mound shape in the centre it's too tight; beat in another ladleful of hot stock before serving."
+    "tip": "The risotto is ready when it flows like slow lava when you tilt the pan — if it holds a mound shape in the centre it's too tight; beat in another ladleful of hot stock before serving.",
+    "nutrition": {
+      "calories": 612,
+      "protein": 22,
+      "carbs": 68,
+      "fat": 22
+    }
   },
   {
     "name": "Lemon & Herb Chicken Thigh Traybake with New Potatoes",
@@ -2373,7 +2811,13 @@
       "Roast for 25 min. Add the cherry tomatoes, tuck them around the chicken and return for a further 15–20 min until the chicken skin is deeply golden and crisp, and the tomatoes have burst and collapsed.",
       "Check the chicken is cooked by piercing the thickest part of a thigh — the juices must run completely clear with no trace of pink. Squeeze the roasted lemon halves over everything, scatter with parsley, and serve straight from the tray."
     ],
-    "tip": "A very hot oven (220°C) is what crisps the skin in the first 25 minutes before the tomatoes go in — once they're added, the moisture they release means the oven temperature drops naturally and everything finishes gently."
+    "tip": "A very hot oven (220°C) is what crisps the skin in the first 25 minutes before the tomatoes go in — once they're added, the moisture they release means the oven temperature drops naturally and everything finishes gently.",
+    "nutrition": {
+      "calories": 520,
+      "protein": 42,
+      "carbs": 28,
+      "fat": 24
+    }
   },
   {
     "name": "Duck Breast with Port & Cherry Sauce",
@@ -2409,7 +2853,13 @@
       "Drain all but 1 tbsp fat from the pan. Finely slice the shallots and cook in the duck fat over medium heat for 3-4 min until soft. Add port and vinegar and let bubble fiercely for 2 min until syrupy. Add stock and cherries and simmer 5 min. Whisk the cornflour with 1 tbsp cold water and stir in to thicken. Beat in butter off the heat.",
       "Slice the duck at a sharp angle into thick pieces — the flesh should be rosy pink throughout. Arrange on warm plates and spoon the glossy cherry sauce over generously."
     ],
-    "tip": "Starting the duck in a cold pan and bringing it up to temperature gradually is what gives you evenly rendered, properly crisp skin — a hot pan shrinks the skin before the fat beneath has a chance to render out."
+    "tip": "Starting the duck in a cold pan and bringing it up to temperature gradually is what gives you evenly rendered, properly crisp skin — a hot pan shrinks the skin before the fat beneath has a chance to render out.",
+    "nutrition": {
+      "calories": 485,
+      "protein": 35,
+      "carbs": 18,
+      "fat": 28
+    }
   },
   {
     "name": "Whole Sea Bream Baked with Fennel, Lemon & White Wine",
@@ -2445,7 +2895,13 @@
       "Drizzle the fish all over with the remaining olive oil and lay lemon slices on top. Cover the tin tightly with foil and bake for 20 min.",
       "Remove the foil and return to the oven for a further 10-12 min until the skin is lightly golden and the flesh at the thickest part comes away cleanly from the bone when pressed. Scatter fennel fronds and fresh herbs over, squeeze over any remaining lemon, and serve straight from the tin."
     ],
-    "tip": "Covering tightly with foil for the first 20 minutes creates a steam environment inside the tin — the fish cooks gently and evenly from all sides before the final uncovered blast gives the skin colour without drying the flesh."
+    "tip": "Covering tightly with foil for the first 20 minutes creates a steam environment inside the tin — the fish cooks gently and evenly from all sides before the final uncovered blast gives the skin colour without drying the flesh.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 42,
+      "carbs": 8,
+      "fat": 18
+    }
   },
   {
     "name": "Ribeye Steak with Béarnaise Sauce & Oven Chips",
@@ -2476,7 +2932,13 @@
       "Take steaks from the fridge 15 min before cooking. Pat completely dry and season very generously on both sides with flaky salt and pepper. Heat a heavy pan over the highest heat until smoking. Add a small amount of oil.",
       "Lay steaks in the pan and cook 2-3 min without moving until a deep, dark crust has formed. Flip and cook 2 min more for medium-rare. Rest uncovered on a warm plate for 5 min. Serve with chips and a generous spoonful of béarnaise alongside."
     ],
-    "tip": "Whisk the egg yolks until they triple in volume and leave a thick ribbon before any butter goes in — starting with properly aerated yolks is what gives the béarnaise its body; add butter to under-whisked yolks and the sauce will always be thin."
+    "tip": "Whisk the egg yolks until they triple in volume and leave a thick ribbon before any butter goes in — starting with properly aerated yolks is what gives the béarnaise its body; add butter to under-whisked yolks and the sauce will always be thin.",
+    "nutrition": {
+      "calories": 1124,
+      "protein": 68,
+      "carbs": 32,
+      "fat": 82
+    }
   },
   {
     "name": "Chicken Thighs with Preserved Lemon, Olives & White Wine",
@@ -2513,7 +2975,13 @@
       "Return the chicken thighs skin-side up to the pan. Bring to a simmer, then reduce heat to low. Cook partially covered for 25-30 min until the chicken is cooked through and the sauce has reduced and thickened around the chicken.",
       "Check the skin is still crispy — if it has softened, remove the lid completely for the final 5 min. Taste the sauce — it should be savoury, slightly salty from the lemon and olives, and fragrant. Scatter herbs over generously and serve from the pan."
     ],
-    "tip": "Browning the chicken skin-side down for the full 8-10 minutes without moving is what renders the fat and builds a crust — skin that goes into the braise golden stays crispy; pale skin going in always comes out flabby."
+    "tip": "Browning the chicken skin-side down for the full 8-10 minutes without moving is what renders the fat and builds a crust — skin that goes into the braise golden stays crispy; pale skin going in always comes out flabby.",
+    "nutrition": {
+      "calories": 485,
+      "protein": 42,
+      "carbs": 8,
+      "fat": 28
+    }
   },
   {
     "name": "Saffron, Prawn & Chorizo Risotto",
@@ -2552,6 +3020,12 @@
       "Pour in the wine and stir until fully absorbed. Add the saffron and its soaking liquid. Then add hot stock one ladleful at a time, stirring almost constantly and waiting for each addition to be absorbed before adding the next. This takes 18-20 min. The risotto is ready when the rice is just tender with a faint bite at the centre.",
       "Remove from the heat. Beat in the butter and parmesan. Add the raw prawns, cover the pan tightly and leave for 3-4 min — the residual heat cooks the prawns perfectly without toughening them. Stir in the chorizo, squeeze over lemon, scatter with parsley and serve immediately."
     ],
-    "tip": "Cooking the prawns in the residual heat of the covered pan rather than over direct heat is the key to keeping them plump and tender — even 1-2 minutes of active heat overcooks them to a rubbery, compacted texture."
+    "tip": "Cooking the prawns in the residual heat of the covered pan rather than over direct heat is the key to keeping them plump and tender — even 1-2 minutes of active heat overcooks them to a rubbery, compacted texture.",
+    "nutrition": {
+      "calories": 612,
+      "protein": 28,
+      "carbs": 68,
+      "fat": 18
+    }
   }
 ]

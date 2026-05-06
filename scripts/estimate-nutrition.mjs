@@ -9,6 +9,9 @@ import { dirname, join } from 'path';
 const __dir = dirname(fileURLToPath(import.meta.url));
 const RECIPES_PATH = join(__dir, '../src/data/recipes.json');
 const API_KEY = process.env.ANTHROPIC_API_KEY;
+const AUTH_HEADER = API_KEY?.startsWith('sk-ant-si')
+  ? { 'Authorization': `Bearer ${API_KEY}`, 'anthropic-beta': 'claude-code-20250219' }
+  : { 'x-api-key': API_KEY };
 const CONCURRENCY = 3;
 
 if (!API_KEY) {
@@ -21,8 +24,8 @@ async function estimateNutrition(recipe) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': API_KEY,
       'anthropic-version': '2023-06-01',
+      ...AUTH_HEADER,
     },
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
