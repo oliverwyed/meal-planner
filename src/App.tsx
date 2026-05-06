@@ -72,7 +72,9 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   // Find-a-recipe modal tabs
   const [findRecipeTab, setFindRecipeTab] = useState<'suggest' | 'fridge'>('suggest');
   const [fridgeQuery, setFridgeQuery] = useState('');
+  const [fridgeLoading, setFridgeLoading] = useState(false);
   const [fridgeMatches, setFridgeMatches] = useState<Meal[] | null>(null);
+  const [fridgeAI, setFridgeAI] = useState(false);
 
   const showToast = useCallback((msg: string, undo?: () => void) => {
     setToast(msg);
@@ -137,7 +139,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     }
   }, [nutritionCache, nutritionLoading, showToast]);
 
-  const searchFridge = useCallback((query: string) => {
+  const keywordMatchFridge = useCallback((query: string, allMeals: Meal[]): Meal[] => {
     const STOPWORDS = new Set(['a', 'an', 'the', 'of', 'with', 'and', 'or', 'some', 'fresh', 'dried',
       'large', 'small', 'medium', 'big', 'whole', 'sliced', 'chopped', 'diced', 'minced', 'grated',
       'cooked', 'raw', 'frozen', 'canned', 'tin', 'bag', 'bunch', 'handful', 'tbsp', 'tsp', 'g', 'kg', 'ml']);
@@ -145,20 +147,52 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       .split(/[\s,]+/)
       .map(t => t.replace(/[^a-z]/g, ''))
       .filter(t => t.length > 2 && !STOPWORDS.has(t));
-    if (tokens.length === 0) { setFridgeMatches([]); return; }
-    const allMeals = ALL_RECIPES.concat(state.customMeals);
-    const scored = allMeals.map(meal => {
-      const ingText = (meal.ingredients ?? []).join(' ').toLowerCase();
-      const hits = tokens.filter(t => ingText.includes(t)).length;
-      return { meal, hits };
-    });
-    const matches = scored
+    if (tokens.length === 0) return [];
+    return allMeals
+      .map(meal => {
+        const ingText = (meal.ingredients ?? []).join(' ').toLowerCase();
+        const hits = tokens.filter(t => ingText.includes(t)).length;
+        return { meal, hits };
+      })
       .filter(s => s.hits > 0)
       .sort((a, b) => b.hits - a.hits)
       .slice(0, 5)
       .map(s => s.meal);
-    setFridgeMatches(matches);
-  }, [state.customMeals]);
+  }, []);
+
+  const searchFridge = useCallback(async (query: string) => {
+    const allMeals = ALL_RECIPES.concat(state.customMeals);
+    setFridgeLoading(true);
+    setFridgeMatches(null);
+    setFridgeAI(false);
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const res = await fetch(`${supabaseUrl}/functions/v1/suggest-meals`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
+        body: JSON.stringify({
+          ingredients: query,
+          recipes: allMeals.map(m => ({ name: m.name, ingredients: m.ingredients ?? [] })),
+        }),
+        signal: AbortSignal.timeout(12000),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const names: string[] = data.matches ?? [];
+        const matches = names.map(n => allMeals.find(m => m.name === n)).filter(Boolean) as Meal[];
+        if (matches.length > 0) {
+          setFridgeMatches(matches);
+          setFridgeAI(true);
+          setFridgeLoading(false);
+          return;
+        }
+      }
+    } catch { /* fall through to keyword match */ }
+    // Fallback: client-side keyword matching
+    setFridgeMatches(keywordMatchFridge(query, allMeals));
+    setFridgeLoading(false);
+  }, [state.customMeals, keywordMatchFridge]);
 
   const adaptRecipe = useCallback(async (meal: Meal, request: string): Promise<Meal> => {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -478,9 +512,9 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                         rows={3}
                         style={{ width: '100%', padding: '11px 14px', border: `2px solid ${P.border}`, borderRadius: '10px', fontSize: '14px', background: P.card, boxSizing: 'border-box', resize: 'none', lineHeight: 1.5, marginBottom: '10px' }}
                       />
-                      <button onClick={() => searchFridge(fridgeQuery)} disabled={!fridgeQuery.trim()}
-                        style={{ width: '100%', background: P.accent, color: '#fff', border: 'none', borderRadius: '10px', padding: '12px', fontSize: '14px', fontWeight: 700, cursor: !fridgeQuery.trim() ? 'default' : 'pointer', opacity: !fridgeQuery.trim() ? 0.6 : 1, marginBottom: '16px' }}>
-                        🔍 Find meals
+                      <button onClick={() => searchFridge(fridgeQuery)} disabled={fridgeLoading || !fridgeQuery.trim()}
+                        style={{ width: '100%', background: P.accent, color: '#fff', border: 'none', borderRadius: '10px', padding: '12px', fontSize: '14px', fontWeight: 700, cursor: fridgeLoading || !fridgeQuery.trim() ? 'default' : 'pointer', opacity: fridgeLoading || !fridgeQuery.trim() ? 0.6 : 1, marginBottom: '16px' }}>
+                        {fridgeLoading ? '✨ Asking AI…' : '🔍 Find meals'}
                       </button>
 
                       {fridgeMatches !== null && fridgeMatches.length === 0 && (
@@ -495,8 +529,11 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
 
                       {fridgeMatches && fridgeMatches.length > 0 && (
                         <div>
-                          <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>
-                            {fridgeMatches.length} match{fridgeMatches.length !== 1 ? 'es' : ''} found
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                            <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                              {fridgeMatches.length} match{fridgeMatches.length !== 1 ? 'es' : ''} found
+                            </div>
+                            {fridgeAI && <span style={{ background: '#EDE9FE', color: '#5B21B6', borderRadius: '6px', padding: '2px 7px', fontSize: '10px', fontWeight: 700 }}>✨ AI</span>}
                           </div>
                           {fridgeMatches.map(match => (
                             <div key={match.name}
