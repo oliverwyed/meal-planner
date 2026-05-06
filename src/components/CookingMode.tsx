@@ -24,8 +24,10 @@ export function CookingMode({ meal, familySize, onClose, onStartTimer, timers, o
   const [stepIdx, setStepIdx] = useState(0);
   const [showIngredients, setShowIngredients] = useState(false);
   const [checked, setChecked] = useState<Set<number>>(new Set());
+  const [panelOffset, setPanelOffset] = useState(0);
   const wakeLockRef = useRef<any>(null);
   const touchStartX = useRef<number | null>(null);
+  const panelTouchStartY = useRef<number | null>(null);
 
   const steps = meal.steps ?? [];
   const scale = familySize / (meal.serves ?? 4);
@@ -81,6 +83,25 @@ export function CookingMode({ meal, familySize, onClose, onStartTimer, timers, o
     touchStartX.current = null;
   }, [steps.length]);
 
+  const handlePanelDragStart = useCallback((e: React.TouchEvent) => {
+    panelTouchStartY.current = e.touches[0].clientY;
+    setPanelOffset(0);
+  }, []);
+
+  const handlePanelDragMove = useCallback((e: React.TouchEvent) => {
+    if (panelTouchStartY.current === null) return;
+    const dy = e.touches[0].clientY - panelTouchStartY.current;
+    if (dy > 0) setPanelOffset(dy);
+  }, []);
+
+  const handlePanelDragEnd = useCallback(() => {
+    if (panelOffset > 80) {
+      setShowIngredients(false);
+    }
+    setPanelOffset(0);
+    panelTouchStartY.current = null;
+  }, [panelOffset]);
+
   const progress = steps.length > 1 ? (stepIdx / (steps.length - 1)) * 100 : 100;
   const currentStep = steps[stepIdx] ?? '';
   const stepTimers = timers.filter(t => !t.done);
@@ -109,7 +130,7 @@ export function CookingMode({ meal, familySize, onClose, onStartTimer, timers, o
             </div>
           )}
         </div>
-        <button onClick={() => setShowIngredients(s => !s)}
+        <button onClick={() => { setShowIngredients(s => !s); setPanelOffset(0); }}
           style={{ background: showIngredients ? '#4F46E5' : 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '10px',
             color: showIngredients ? '#fff' : '#94A3B8', fontSize: '14px', fontWeight: 600,
             padding: '8px 12px', cursor: 'pointer', flexShrink: 0 }}>
@@ -237,13 +258,19 @@ export function CookingMode({ meal, familySize, onClose, onStartTimer, timers, o
       {/* Ingredients panel — slides up from bottom */}
       {showIngredients && (
         <div style={{ position: 'absolute', inset: 0, zIndex: 10 }}
-          onClick={() => setShowIngredients(false)}>
+          onClick={() => { setShowIngredients(false); setPanelOffset(0); }}>
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0,
             background: '#1E293B', borderRadius: '20px 20px 0 0',
-            maxHeight: '70vh', overflowY: 'auto', padding: '16px 20px 32px' }}
+            maxHeight: '70vh', overflowY: 'auto', padding: '16px 20px 32px',
+            transform: `translateY(${panelOffset}px)`,
+            transition: panelOffset > 0 ? 'none' : 'transform 0.25s ease' }}
             onClick={e => e.stopPropagation()}>
+            {/* Drag handle */}
             <div style={{ width: '36px', height: '4px', background: 'rgba(255,255,255,0.15)',
-              borderRadius: '2px', margin: '0 auto 16px' }} />
+              borderRadius: '2px', margin: '0 auto 16px', cursor: 'grab', touchAction: 'none' }}
+              onTouchStart={handlePanelDragStart}
+              onTouchMove={handlePanelDragMove}
+              onTouchEnd={handlePanelDragEnd} />
             <div style={{ fontSize: '13px', fontWeight: 700, color: '#94A3B8', letterSpacing: '1px',
               textTransform: 'uppercase', marginBottom: '14px' }}>
               Ingredients — serves {familySize}
