@@ -279,21 +279,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                 <div style={{ fontWeight: 700, fontSize: '16px', color: P.muted }}>Day off</div>
               </div>
             </div>
-            <DayActions onHome={() => actions.setDayMode(day, 'home')} onGousto={() => actions.setDayMode(day, 'gousto')} />
-          </div>
-        );
-
-        if (mode === 'gousto') return (
-          <div key={day} style={{ background: P.card, borderRadius: '16px', padding: '15px 16px', marginBottom: '10px', boxShadow: P.shadow, border: `1px solid ${P.border}`, opacity: 0.6 }}>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <div style={{ fontSize: '26px', flexShrink: 0, paddingTop: '2px' }}>📦</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '12px', color: P.accent, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{day}</div>
-                <div style={{ fontWeight: 700, fontSize: '16px' }}>Gousto</div>
-                <div style={{ fontSize: '13px', color: P.muted }}>Meal kit — sorted!</div>
-              </div>
-            </div>
-            <DayActions onHome={() => actions.setDayMode(day, 'home')} onOff={() => actions.setDayMode(day, 'off')} />
+            <DayActions onHome={() => actions.setDayMode(day, 'home')} />
           </div>
         );
 
@@ -339,7 +325,6 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                 });
               }}
               onChoose={() => setPickerFor(day)}
-              onMarkGousto={() => actions.setDayMode(day, 'gousto')}
               onMarkOff={() => actions.setDayMode(day, 'off')}
               onMarkCooked={() => { actions.addToHistory([{ name: meal.name }]); showToast('Logged as cooked!'); }}
               onChangeMealSize={d => actions.setDaySize(day, Math.max(1, Math.min(20, daySize + d)))}
@@ -812,11 +797,10 @@ function Chip({ children, active, onClick }: { children: React.ReactNode; active
 }
 
 
-function DayActions({ onHome, onGousto, onOff }: { onHome?: () => void; onGousto?: () => void; onOff?: () => void }) {
+function DayActions({ onHome, onOff }: { onHome?: () => void; onOff?: () => void }) {
   return (
     <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
       {onHome && <ActionBtn bg={P.accentLight} color={P.accentDark} onClick={onHome}>🍽️ Use a recipe</ActionBtn>}
-      {onGousto && <ActionBtn bg={P.greenLight} color={P.greenDark} onClick={onGousto}>📦 Gousto</ActionBtn>}
       {onOff && <ActionBtn bg={P.border} color={P.muted} onClick={onOff}>— Day off</ActionBtn>}
     </div>
   );
@@ -832,9 +816,9 @@ function ActionBtn({ children, bg, color, onClick }: { children: React.ReactNode
 }
 
 function DayToggle({ day, mode, onChange }: { day: DayName; mode: DayMode; onChange: (m: DayMode) => void }) {
-  const cycle: Record<DayMode, DayMode> = { home: 'gousto', gousto: 'off', off: 'home' };
-  const labels: Record<DayMode, string> = { home: '🍽️ Home', gousto: '📦 Gousto', off: '— Off' };
-  const colors: Record<DayMode, [string, string]> = { home: [P.accentLight, P.accentDark], gousto: [P.greenLight, P.greenDark], off: ['#F0F0F0', P.muted] };
+  const cycle: Record<DayMode, DayMode> = { home: 'off', off: 'home' };
+  const labels: Record<DayMode, string> = { home: '🍽️ Home', off: '— Off' };
+  const colors: Record<DayMode, [string, string]> = { home: [P.accentLight, P.accentDark], off: ['#F0F0F0', P.muted] };
   const [bg, fg] = colors[mode];
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: P.card, borderRadius: '12px', padding: '10px 14px', marginBottom: '6px', boxShadow: P.shadow, border: `1px solid ${P.border}` }}>

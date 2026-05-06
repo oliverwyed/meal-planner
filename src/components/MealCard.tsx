@@ -20,7 +20,6 @@ interface Props {
   onSwap?: () => void;
   onDislike?: () => void;
   onChoose?: () => void;
-  onMarkGousto?: () => void;
   onMarkOff?: () => void;
   onMarkCooked?: () => void;
   onChangeMealSize?: (delta: number) => void;
@@ -43,7 +42,7 @@ function getMealEmoji(meal: Meal): string {
 }
 
 export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOpen, expanded, familySize, onOverview, onFullExpand, onFav,
-  onSwap, onDislike, onChoose, onMarkGousto, onMarkOff, onMarkCooked, onChangeMealSize, kidsMode, onCycleKids, dayTimeFilter, onSetDayTime,
+  onSwap, onDislike, onChoose, onMarkOff, onMarkCooked, onChangeMealSize, kidsMode, onCycleKids, dayTimeFilter, onSetDayTime,
   readOnly, lastUsedStr, onStartTimer, onEstimateNutrition, nutrition, onCookMode }: Props) {
   const scale = familySize / (meal.serves ?? 4);
   const shopByCategory = useMemo(() => buildMealShop(meal, scale), [meal, scale]);
@@ -217,17 +216,11 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
           )}
 
           {/* Day-mode actions */}
-          {(onMarkCooked || onMarkGousto || onMarkOff) && <div style={{ display: 'flex', gap: '6px', marginTop: '16px', paddingTop: '12px', borderTop: `1px solid ${P.border}`, flexWrap: 'wrap' }}>
+          {(onMarkCooked || onMarkOff) && <div style={{ display: 'flex', gap: '6px', marginTop: '16px', paddingTop: '12px', borderTop: `1px solid ${P.border}`, flexWrap: 'wrap' }}>
             {onMarkCooked && (
               <button onClick={e => { e.stopPropagation(); onMarkCooked(); }}
                 style={{ background: P.border, border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, color: P.text, cursor: 'pointer' }}>
                 ✓ Cooked it
-              </button>
-            )}
-            {onMarkGousto && (
-              <button onClick={e => { e.stopPropagation(); onMarkGousto(); }}
-                style={{ background: P.greenLight, border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, color: P.greenDark, cursor: 'pointer' }}>
-                📦 Using Gousto
               </button>
             )}
             {onMarkOff && (

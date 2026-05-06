@@ -1,5 +1,5 @@
 export type DayName = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
-export type DayMode = 'home' | 'gousto' | 'off';
+export type DayMode = 'home' | 'off';
 export type KidsMode = 'kids' | 'adults' | 'either';
 export type DietaryMode = 'none' | 'noFish' | 'noPork' | 'noRed' | 'veggie';
 export type Season = 'spring' | 'summer' | 'autumn' | 'winter';
