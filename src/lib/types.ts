@@ -23,6 +23,7 @@ export interface Meal {
   steps: string[];
   kidNote?: string;
   tip?: string;
+  nutrition?: { calories: number; protein: number; carbs: number; fat: number };
   sourceUrl?: string;           // set when imported from a URL
   custom?: boolean;
 }

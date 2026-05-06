@@ -67,6 +67,42 @@ export function Section({ children, style }: { children: React.ReactNode; style?
   );
 }
 
+export function ActiveTimers({ timers, onDismiss }: {
+  timers: { id: string; label: string; remaining: number; total: number; done: boolean }[];
+  onDismiss: (id: string) => void;
+}) {
+  if (timers.length === 0) return null;
+  return (
+    <div style={{ position: 'fixed', bottom: '84px', left: '50%', transform: 'translateX(-50%)', zIndex: 300,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', pointerEvents: 'none' }}>
+      {timers.map(t => {
+        const pct = t.total > 0 ? Math.max(0, t.remaining / t.total) : 0;
+        return (
+          <div key={t.id}
+            onClick={t.done ? () => onDismiss(t.id) : undefined}
+            style={{ background: '#1E293B', color: '#fff', borderRadius: '20px', padding: '7px 14px',
+              display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 600,
+              boxShadow: '0 4px 16px rgba(0,0,0,0.25)', pointerEvents: 'auto',
+              cursor: t.done ? 'pointer' : 'default', whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: '11px', opacity: 0.7, maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.label}</span>
+            {t.done
+              ? <span style={{ color: '#4ADE80', fontWeight: 700 }}>Done ✓</span>
+              : <>
+                  <div style={{ width: '40px', height: '4px', background: 'rgba(255,255,255,0.2)', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ width: `${pct * 100}%`, height: '100%', background: pct < 0.25 ? '#F87171' : '#818CF8', borderRadius: '2px', transition: 'width 1s linear' }} />
+                  </div>
+                  <span style={{ fontVariantNumeric: 'tabular-nums', minWidth: '36px' }}>
+                    {Math.floor(t.remaining / 60)}:{String(t.remaining % 60).padStart(2, '0')}
+                  </span>
+                </>
+            }
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function TimeSlider({ value, onChange, onCommit, label }: {
   value: string; onChange: (v: string) => void; onCommit?: (v: string) => void; label?: string;
 }) {

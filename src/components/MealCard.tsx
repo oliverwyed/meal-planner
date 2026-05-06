@@ -3,6 +3,7 @@ import type { Meal, KidsMode } from '../lib/types';
 import { P } from '../lib/constants';
 import { Tag, TimeSlider } from './ui';
 import { buildMealShop, getCookedNote, CAT_EMOJI } from '../lib/shopping';
+import { parseTimerParts } from '../lib/timers';
 
 interface Props {
   meal: Meal;
@@ -29,6 +30,9 @@ interface Props {
   onSetDayTime?: (tf: string) => void;
   readOnly?: boolean;
   lastUsedStr?: string | null;
+  onStartTimer?: (label: string, seconds: number) => void;
+  onEstimateNutrition?: () => void;
+  nutrition?: { calories: number; protein: number; carbs: number; fat: number };
 }
 
 function getMealEmoji(meal: Meal): string {
@@ -39,7 +43,7 @@ function getMealEmoji(meal: Meal): string {
 
 export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOpen, expanded, familySize, onOverview, onFullExpand, onFav,
   onSwap, onDislike, onChoose, onMarkGousto, onMarkOff, onMarkCooked, onChangeMealSize, kidsMode, onCycleKids, dayTimeFilter, onSetDayTime,
-  readOnly, lastUsedStr }: Props) {
+  readOnly, lastUsedStr, onStartTimer, onEstimateNutrition, nutrition }: Props) {
   const scale = familySize / (meal.serves ?? 4);
   const shopByCategory = useMemo(() => buildMealShop(meal, scale), [meal, scale]);
 
@@ -139,11 +143,42 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
             : <div style={{ fontSize: '14px', color: P.muted, marginBottom: '16px' }}>No ingredients listed</div>
           }
 
+          {/* Nutrition row */}
+          {nutrition ? (
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '14px' }}>
+              <span style={{ background: P.accentLight, color: P.accentDark, borderRadius: '8px', padding: '3px 8px', fontSize: '11px', fontWeight: 700 }}>🔥 {nutrition.calories} cal</span>
+              <span style={{ background: P.accentLight, color: P.accentDark, borderRadius: '8px', padding: '3px 8px', fontSize: '11px', fontWeight: 700 }}>🥩 {nutrition.protein}g protein</span>
+              <span style={{ background: P.accentLight, color: P.accentDark, borderRadius: '8px', padding: '3px 8px', fontSize: '11px', fontWeight: 700 }}>🍞 {nutrition.carbs}g carbs</span>
+              <span style={{ background: P.accentLight, color: P.accentDark, borderRadius: '8px', padding: '3px 8px', fontSize: '11px', fontWeight: 700 }}>🫙 {nutrition.fat}g fat</span>
+            </div>
+          ) : onEstimateNutrition ? (
+            <div style={{ marginBottom: '14px' }}>
+              <button onClick={e => { e.stopPropagation(); onEstimateNutrition(); }}
+                style={{ background: 'none', border: 'none', color: P.muted, fontSize: '12px', fontWeight: 600, cursor: 'pointer', padding: 0 }}>
+                Estimate nutrition
+              </button>
+            </div>
+          ) : null}
+
           {/* Steps */}
           {meal.steps && meal.steps.length > 0 && <>
             <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, letterSpacing: '1.2px', marginBottom: '8px', textTransform: 'uppercase' }}>Recipe</div>
             <ol style={{ paddingLeft: '18px' }}>
-              {meal.steps.map((s, i) => <li key={i} style={{ fontSize: '14px', lineHeight: 1.6, marginBottom: '6px' }}>{s}</li>)}
+              {meal.steps.map((s, i) => (
+                <li key={i} style={{ fontSize: '14px', lineHeight: 1.6, marginBottom: '6px' }}>
+                  {parseTimerParts(s).map((part, j) =>
+                    part.seconds ? (
+                      <button key={j} onClick={e => { e.stopPropagation(); onStartTimer?.(part.text, part.seconds!); }}
+                        style={{ background: P.accentLight, color: P.accentDark, border: 'none', borderRadius: '6px',
+                          padding: '1px 6px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', margin: '0 1px' }}>
+                        ⏱ {part.text}
+                      </button>
+                    ) : (
+                      <span key={j}>{part.text}</span>
+                    )
+                  )}
+                </li>
+              ))}
             </ol>
           </>}
 

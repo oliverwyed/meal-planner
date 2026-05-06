@@ -20,7 +20,8 @@ const SYSTEM = `You extract recipe data from structured or plain text. Return ON
   "ingredients": string[] (each: "QTY UNIT ingredient", e.g. "400g pasta" or "2 chicken breasts"),
   "steps": string[] (5-7 concise steps, each with sensory doneness cues),
   "kidNote": string | null,
-  "tip": string | null (one chef technique tip, 18-35 words)
+  "tip": string | null (one chef technique tip, 18-35 words),
+  "nutrition": { "calories": number, "protein": number, "carbs": number, "fat": number }
 }
 If you cannot determine a field use a sensible default. Never return markdown or explanation.`;
 

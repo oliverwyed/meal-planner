@@ -9,6 +9,8 @@ export const DEFAULT_DAY_CONFIG: DayConfig = {
 
 export const HOUSEHOLD_ID_KEY = 'mp2_household_id';
 
+export const DESKTOP_BREAKPOINT = 768;
+
 export const P = {
   bg: '#F8FAFC', card: '#FFFFFF',
   accent: '#4F46E5', accentLight: '#EEF2FF', accentDark: '#3730A3',

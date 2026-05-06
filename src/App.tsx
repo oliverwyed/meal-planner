@@ -2,10 +2,11 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { HouseholdGate } from './components/HouseholdGate';
 import { MealCard } from './components/MealCard';
 import { ImportRecipe } from './components/ImportRecipe';
-import { Primary, Secondary, Toast, Spinner, Section, TimeSlider } from './components/ui';
+import { Primary, Secondary, Toast, Spinner, Section, TimeSlider, ActiveTimers } from './components/ui';
 import { useHousehold } from './hooks/useHousehold';
-import { DAYS, HOUSEHOLD_ID_KEY, P } from './lib/constants';
+import { DAYS, HOUSEHOLD_ID_KEY, P, DESKTOP_BREAKPOINT } from './lib/constants';
 import type { DayName, DayMode, KidsMode, Meal } from './lib/types';
+import { playBeep } from './lib/timers';
 import { CAT_EMOJI } from './lib/shopping';
 import RECIPES from './data/recipes.json';
 
@@ -62,6 +63,9 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [cookNowOpts, setCookNowOpts] = useState<{ kids: string; size: number; time: string; dietary: string }>({
     kids: 'either', size: 4, time: 'any', dietary: 'none',
   });
+  const [timers, setTimers] = useState<{ id: string; label: string; remaining: number; total: number; done: boolean }[]>([]);
+  const [nutritionCache, setNutritionCache] = useState<Record<string, { calories: number; protein: number; carbs: number; fat: number }>>({});
+  const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= DESKTOP_BREAKPOINT);
 
   const showToast = useCallback((msg: string, undo?: () => void) => {
     setToast(msg);
@@ -69,6 +73,56 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => { setToast(null); toastUndoRef.current = null; }, 2500);
   }, []);
+
+  const addTimer = useCallback((label: string, seconds: number) => {
+    const id = `${Date.now()}-${Math.random()}`;
+    setTimers(prev => [...prev, { id, label, remaining: seconds, total: seconds, done: false }]);
+  }, []);
+
+  const dismissTimer = useCallback((id: string) => {
+    setTimers(prev => prev.filter(t => t.id !== id));
+  }, []);
+
+  useEffect(() => {
+    const hasActive = timers.some(t => !t.done);
+    if (!hasActive) return;
+    const interval = setInterval(() => {
+      setTimers(prev => prev.map(t => {
+        if (t.done) return t;
+        const remaining = t.remaining - 1;
+        if (remaining <= 0) {
+          playBeep();
+          return { ...t, remaining: 0, done: true };
+        }
+        return { ...t, remaining };
+      }));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [timers]);
+
+  useEffect(() => {
+    const handler = () => setIsDesktop(window.innerWidth >= DESKTOP_BREAKPOINT);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+
+  const estimateNutrition = useCallback(async (meal: Meal) => {
+    if (nutritionCache[meal.name]) return;
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const res = await fetch(`${supabaseUrl}/functions/v1/get-nutrition`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
+        body: JSON.stringify({ ingredients: meal.ingredients, serves: meal.serves, name: meal.name }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      setNutritionCache(prev => ({ ...prev, [meal.name]: data }));
+    } catch {
+      // silently fail
+    }
+  }, [nutritionCache]);
 
   const didAutoNav = useRef(false);
 
@@ -127,7 +181,28 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
 
   // ── Plan screen ───────────────────────────────────────────────────────────
   if (step === 'plan' && state.plan) return (
-    <Screen padBottom="100px">
+    <div style={{ display: isDesktop ? 'flex' : 'block', minHeight: '100vh', background: P.bg }}>
+      {/* Desktop sidebar */}
+      {isDesktop && (
+        <div style={{ width: '220px', background: P.card, borderRight: `1px solid ${P.border}`, position: 'sticky', top: 0, height: '100vh', display: 'flex', flexDirection: 'column', padding: '24px 0', flexShrink: 0 }}>
+          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', padding: '0 20px 20px', borderBottom: `1px solid ${P.border}`, marginBottom: '12px' }}>🍽️ Meal Planner</div>
+          {(['plan', 'shopping', 'setup'] as const).map(s => {
+            const labels: Record<string, string> = { plan: '📅 Plan', shopping: '🛒 Shopping', setup: '⚙️ Settings' };
+            const active = s === 'plan';
+            return (
+              <button key={s} onClick={() => setStep(s === 'shopping' ? 'shopping' : s === 'setup' ? 'setup' : 'plan')}
+                style={{ background: active ? P.accentLight : 'none', border: 'none', borderRadius: '10px', margin: '2px 12px', padding: '9px 12px', fontSize: '14px', fontWeight: 700, color: active ? P.accentDark : P.muted, cursor: 'pointer', textAlign: 'left' }}>
+                {labels[s]}
+              </button>
+            );
+          })}
+          <button onClick={() => setStep('prefs')}
+            style={{ background: 'none', border: 'none', borderRadius: '10px', margin: '2px 12px', padding: '9px 12px', fontSize: '14px', fontWeight: 700, color: P.muted, cursor: 'pointer', textAlign: 'left' }}>
+            👤 Preferences
+          </button>
+        </div>
+      )}
+      <div style={{ flex: 1, maxWidth: isDesktop ? 'none' : '480px', margin: isDesktop ? '0' : '0 auto', padding: '0 16px', paddingBottom: '100px', overflowX: 'hidden' }}>
       <div style={{ padding: '24px 0 16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
@@ -159,6 +234,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         )}
       </div>
 
+      <div style={isDesktop ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '12px' } : {}}>
       {DAYS.map(day => {
         const mode = (state.dayConfig[day] as DayMode) ?? 'home';
 
@@ -240,10 +316,16 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               dayTimeFilter={dayTF}
               onSetDayTime={tf => actions.setDayTime(day, tf)}
               lastUsedStr={lastUsedStr}
+              onStartTimer={addTimer}
+              onEstimateNutrition={() => estimateNutrition(meal)}
+              nutrition={meal.nutrition ?? nutritionCache[meal.name]}
             />
           </div>
         );
       })}
+      </div>
+
+      <ActiveTimers timers={timers} onDismiss={dismissTimer} />
 
       <div style={{ marginTop: '6px' }}>
         <Primary onClick={() => setStep('shopping')}>View shopping list</Primary>
@@ -425,7 +507,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       )}
 
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
-    </Screen>
+      </div>
+    </div>
   );
 
   // ── Shopping screen ───────────────────────────────────────────────────────
@@ -735,6 +818,19 @@ function DayToggle({ day, mode, onChange }: { day: DayName; mode: DayMode; onCha
 }
 
 function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
+  const desktop = window.innerWidth >= 768;
+  if (desktop) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 500 }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.35)' } as React.CSSProperties} onClick={onClose} />
+        <div style={{ position: 'fixed', right: 0, top: 0, bottom: 0, width: '480px', background: P.card, padding: '24px', overflowY: 'auto', boxShadow: '-4px 0 24px rgba(0,0,0,0.12)', zIndex: 501 }}
+          onClick={e => e.stopPropagation()}>
+          <button onClick={onClose} style={{ position: 'absolute', top: '16px', right: '16px', background: P.border, border: 'none', borderRadius: '8px', padding: '6px 10px', cursor: 'pointer', fontSize: '16px', color: P.muted }}>✕</button>
+          {children}
+        </div>
+      </div>
+    );
+  }
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 500 }}>
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', overflowY: 'auto', padding: '24px 0 40px' } as React.CSSProperties}
@@ -818,24 +914,39 @@ function AddMealForm({ onSave, onCancel, initial }: { onSave: (m: Meal) => Promi
   const set = (k: string, v: string) => setF(p => ({ ...p, [k]: v }));
   const ss: React.CSSProperties = { width: '100%', padding: '10px 12px', border: `2px solid ${P.border}`, borderRadius: '10px', fontSize: '14px', background: P.card, boxSizing: 'border-box' };
   const valid = f.name.trim().length > 0;
-  const fields: [string, React.ReactNode][] = [
-    ['Meal name', <input key="n" value={f.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Leftover Curry Rice" style={ss} />],
-    ['Cook time (min)', <select key="m" value={f.minutes} onChange={e => set('minutes', e.target.value)} style={ss}>{[10,15,20,25,30,35,40,45,50,60,75,90].map(n => <option key={n} value={n}>{n}</option>)}</select>],
-    ['Protein', <select key="p" value={f.protein} onChange={e => set('protein', e.target.value)} style={ss}>{['chicken','beef','fish','pork','lamb','seafood','eggs','veggie'].map(p => <option key={p}>{p}</option>)}</select>],
-    ['Cuisine', <select key="c" value={f.cuisine} onChange={e => set('cuisine', e.target.value)} style={ss}>{['british','italian','asian','mexican','indian','american','middleeastern','other'].map(c => <option key={c}>{c}</option>)}</select>],
-    ['Description (optional)', <textarea key="d" value={f.description} onChange={e => set('description', e.target.value)} placeholder="A short summary shown on the meal card" style={{ ...ss, resize: 'vertical', minHeight: '60px' }} />],
-    ['Ingredients (one per line)', <textarea key="i" value={f.ingredients} onChange={e => set('ingredients', e.target.value)} placeholder={'400g pasta\n2 x chicken breasts'} style={{ ...ss, resize: 'vertical', minHeight: '80px' }} />],
-    ['Steps (one per line)', <textarea key="s" value={f.steps} onChange={e => set('steps', e.target.value)} style={{ ...ss, resize: 'vertical', minHeight: '80px' }} />],
-  ];
+  const desktop = window.innerWidth >= 768;
+  const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
+    <div style={{ marginBottom: '14px' }}>
+      <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '1px' }}>{label}</div>
+      {children}
+    </div>
+  );
   return (
     <div>
       <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', marginBottom: '20px' }}>{initial ? 'Edit meal' : 'Add a meal'}</div>
-      {fields.map(([label, child]) => (
-        <div key={label as string} style={{ marginBottom: '14px' }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '1px' }}>{label}</div>
-          {child}
-        </div>
-      ))}
+      {desktop ? (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <Field label="Meal name"><input value={f.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Leftover Curry Rice" style={ss} /></Field>
+            <Field label="Cook time (min)"><select value={f.minutes} onChange={e => set('minutes', e.target.value)} style={ss}>{[10,15,20,25,30,35,40,45,50,60,75,90].map(n => <option key={n} value={n}>{n}</option>)}</select></Field>
+            <Field label="Protein"><select value={f.protein} onChange={e => set('protein', e.target.value)} style={ss}>{['chicken','beef','fish','pork','lamb','seafood','eggs','veggie'].map(p => <option key={p}>{p}</option>)}</select></Field>
+            <Field label="Cuisine"><select value={f.cuisine} onChange={e => set('cuisine', e.target.value)} style={ss}>{['british','italian','asian','mexican','indian','american','middleeastern','other'].map(c => <option key={c}>{c}</option>)}</select></Field>
+          </div>
+          <Field label="Description (optional)"><textarea value={f.description} onChange={e => set('description', e.target.value)} placeholder="A short summary shown on the meal card" style={{ ...ss, resize: 'vertical', minHeight: '60px' }} /></Field>
+          <Field label="Ingredients (one per line)"><textarea value={f.ingredients} onChange={e => set('ingredients', e.target.value)} placeholder={'400g pasta\n2 x chicken breasts'} style={{ ...ss, resize: 'vertical', minHeight: '80px' }} /></Field>
+          <Field label="Steps (one per line)"><textarea value={f.steps} onChange={e => set('steps', e.target.value)} style={{ ...ss, resize: 'vertical', minHeight: '80px' }} /></Field>
+        </>
+      ) : (
+        <>
+          <Field label="Meal name"><input value={f.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Leftover Curry Rice" style={ss} /></Field>
+          <Field label="Cook time (min)"><select value={f.minutes} onChange={e => set('minutes', e.target.value)} style={ss}>{[10,15,20,25,30,35,40,45,50,60,75,90].map(n => <option key={n} value={n}>{n}</option>)}</select></Field>
+          <Field label="Protein"><select value={f.protein} onChange={e => set('protein', e.target.value)} style={ss}>{['chicken','beef','fish','pork','lamb','seafood','eggs','veggie'].map(p => <option key={p}>{p}</option>)}</select></Field>
+          <Field label="Cuisine"><select value={f.cuisine} onChange={e => set('cuisine', e.target.value)} style={ss}>{['british','italian','asian','mexican','indian','american','middleeastern','other'].map(c => <option key={c}>{c}</option>)}</select></Field>
+          <Field label="Description (optional)"><textarea value={f.description} onChange={e => set('description', e.target.value)} placeholder="A short summary shown on the meal card" style={{ ...ss, resize: 'vertical', minHeight: '60px' }} /></Field>
+          <Field label="Ingredients (one per line)"><textarea value={f.ingredients} onChange={e => set('ingredients', e.target.value)} placeholder={'400g pasta\n2 x chicken breasts'} style={{ ...ss, resize: 'vertical', minHeight: '80px' }} /></Field>
+          <Field label="Steps (one per line)"><textarea value={f.steps} onChange={e => set('steps', e.target.value)} style={{ ...ss, resize: 'vertical', minHeight: '80px' }} /></Field>
+        </>
+      )}
       <Primary disabled={!valid} onClick={async () => {
         await onSave({ name: f.name.trim(), time: `${f.minutes} min`, minutes: parseInt(f.minutes) || 20,
           protein: f.protein as any, cuisine: f.cuisine as any, carb: f.carb as any, serves: initial?.serves ?? 4,
