@@ -1,5 +1,5 @@
 import Anthropic from 'npm:@anthropic-ai/sdk';
-// v2
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -57,7 +57,7 @@ function extractJsonLd(html: string): string | null {
       return JSON.stringify({
         name: recipe.name,
         description: recipe.description ?? '',
-        totalTime: recipe.totalTime ?? recipe.cookTime ?? '',
+        totalTime: parseDuration(recipe.totalTime ?? recipe.cookTime ?? ''),
         yield: recipe.recipeYield ?? '4',
         ingredients: recipe.recipeIngredient ?? [],
         steps,
@@ -86,9 +86,33 @@ Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
-    const { url } = await req.json() as { url: string };
+    const body = await req.json() as { url?: string; text?: string };
+
+    // Text paste mode — skip fetch entirely
+    if (body.text?.trim()) {
+      const context = body.text.trim().slice(0, 28000);
+      const message = await client.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 2048,
+        system: SYSTEM,
+        messages: [{ role: 'user', content: `Extract the recipe from this text:\n\n${context}` }],
+      });
+      const text = message.content[0].type === 'text' ? message.content[0].text : '';
+      const jsonMatch = text.match(/\{[\s\S]+\}/);
+      if (!jsonMatch) return new Response(
+        JSON.stringify({ error: 'Could not find a recipe in that text. Make sure you copied the full recipe.' }),
+        { status: 422, headers: corsHeaders }
+      );
+      const recipe = JSON.parse(jsonMatch[0]);
+      recipe.time = `${recipe.minutes} min`;
+      return new Response(JSON.stringify(recipe), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { url } = body;
     if (!url) return new Response(
-      JSON.stringify({ error: 'url required' }),
+      JSON.stringify({ error: 'url or text required' }),
       { status: 400, headers: corsHeaders }
     );
 
@@ -105,22 +129,21 @@ Deno.serve(async (req: Request) => {
         signal: AbortSignal.timeout(12000),
       });
       if (!res.ok) return new Response(
-        JSON.stringify({ error: `The site returned ${res.status}. It may block imports — try pasting the recipe text manually.` }),
+        JSON.stringify({ error: `blocked`, status: res.status }),
         { status: 422, headers: corsHeaders }
       );
       html = await res.text();
     } catch {
       return new Response(
-        JSON.stringify({ error: 'Could not reach that page. Check the URL and your internet connection.' }),
+        JSON.stringify({ error: 'Could not reach that page. Check the URL or paste the recipe text instead.' }),
         { status: 422, headers: corsHeaders }
       );
     }
 
-    // Prefer structured JSON-LD (fast, reliable on major sites)
     const context = extractJsonLd(html) ?? cleanHtml(html);
 
     if (!context.trim()) return new Response(
-      JSON.stringify({ error: 'The page appears empty. Try a different URL.' }),
+      JSON.stringify({ error: 'blocked' }),
       { status: 422, headers: corsHeaders }
     );
 
