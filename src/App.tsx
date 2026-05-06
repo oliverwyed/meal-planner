@@ -69,6 +69,12 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= DESKTOP_BREAKPOINT);
   const [cookingMeal, setCookingMeal] = useState<{ meal: Meal; familySize: number } | null>(null);
 
+  // Find-a-recipe modal tabs
+  const [findRecipeTab, setFindRecipeTab] = useState<'suggest' | 'fridge'>('suggest');
+  const [fridgeQuery, setFridgeQuery] = useState('');
+  const [fridgeLoading, setFridgeLoading] = useState(false);
+  const [fridgeMatches, setFridgeMatches] = useState<Meal[] | null>(null);
+
   const showToast = useCallback((msg: string, undo?: () => void) => {
     setToast(msg);
     toastUndoRef.current = undo ?? null;
@@ -131,6 +137,48 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       setNutritionLoading(prev => { const n = new Set(prev); n.delete(meal.name); return n; });
     }
   }, [nutritionCache, nutritionLoading, showToast]);
+
+  const searchFridge = useCallback(async (query: string) => {
+    setFridgeLoading(true);
+    setFridgeMatches(null);
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const allMeals = ALL_RECIPES.concat(state.customMeals);
+      const res = await fetch(`${supabaseUrl}/functions/v1/suggest-meals`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
+        body: JSON.stringify({
+          ingredients: query,
+          recipes: allMeals.map(m => ({ name: m.name, ingredients: m.ingredients ?? [] })),
+        }),
+      });
+      if (!res.ok) throw new Error('Request failed');
+      const data = await res.json();
+      const names: string[] = data.matches ?? [];
+      const matches = names.map(n => allMeals.find(m => m.name === n)).filter(Boolean) as Meal[];
+      setFridgeMatches(matches);
+      if (matches.length === 0) showToast('No matches — try generating a custom recipe');
+    } catch {
+      showToast('Could not search — check your connection');
+    } finally {
+      setFridgeLoading(false);
+    }
+  }, [state.customMeals, showToast]);
+
+  const adaptRecipe = useCallback(async (meal: Meal, request: string): Promise<Meal> => {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const res = await fetch(`${supabaseUrl}/functions/v1/adapt-recipe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
+      body: JSON.stringify({ recipe: meal, request }),
+    });
+    if (!res.ok) throw new Error('Adaptation failed');
+    const adapted = await res.json();
+    if (adapted.error) throw new Error(adapted.error);
+    return adapted as Meal;
+  }, []);
 
   const didAutoNav = useRef(false);
 
@@ -345,6 +393,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               nutritionLoading={nutritionLoading.has(meal.name)}
               nutrition={meal.nutrition ?? nutritionCache[meal.name]}
               onCookMode={() => setCookingMeal({ meal, familySize: daySize })}
+              onAdapt={request => adaptRecipe(meal, request)}
+              onSaveAdapted={adapted => { actions.addMeal(adapted); showToast(`Saved: ${adapted.name}`); }}
             />
           </div>
         );
@@ -399,16 +449,79 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               <div style={{ maxWidth: '480px', margin: '0 auto', padding: '0 16px' }} onClick={e => e.stopPropagation()}>
                 <div style={{ background: P.bg, borderRadius: '20px', boxShadow: '0 8px 40px rgba(0,0,0,0.22)', overflow: 'hidden' }}>
                   {/* Header */}
-                  <div style={{ background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`, padding: '20px 20px 16px', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontSize: '11px', opacity: 0.85, fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase' }}>Find a recipe</div>
-                      <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '22px', marginTop: '3px' }}>What shall we make?</div>
+                  <div style={{ background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`, padding: '20px 20px 12px', color: '#fff' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                      <div>
+                        <div style={{ fontSize: '11px', opacity: 0.85, fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase' }}>Find a recipe</div>
+                        <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '22px', marginTop: '3px' }}>What shall we make?</div>
+                      </div>
+                      <button onClick={() => setCookNow(null)}
+                        style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: '10px', padding: '8px 12px', cursor: 'pointer', fontSize: '18px', fontWeight: 700 }}>✕</button>
                     </div>
-                    <button onClick={() => setCookNow(null)}
-                      style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: '10px', padding: '8px 12px', cursor: 'pointer', fontSize: '18px', fontWeight: 700 }}>✕</button>
+                    {/* Tab bar */}
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      {([['🎲 Suggested', 'suggest'], ['🧊 From my fridge', 'fridge']] as [string, 'suggest' | 'fridge'][]).map(([label, tab]) => (
+                        <button key={tab} onClick={() => { setFindRecipeTab(tab); setFridgeMatches(null); setFridgeQuery(''); }}
+                          style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', fontSize: '13px', fontWeight: 700, cursor: 'pointer',
+                            background: findRecipeTab === tab ? '#fff' : 'rgba(255,255,255,0.2)',
+                            color: findRecipeTab === tab ? P.accent : '#fff' }}>
+                          {label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
-                  {/* Filters */}
+                  {/* Fridge search tab */}
+                  {findRecipeTab === 'fridge' && (
+                    <div style={{ padding: '16px' }}>
+                      <div style={{ fontSize: '13px', color: P.muted, marginBottom: '12px', lineHeight: 1.5 }}>
+                        Tell us what you have and we'll find the best matches from your recipe library.
+                      </div>
+                      <textarea
+                        value={fridgeQuery}
+                        onChange={e => setFridgeQuery(e.target.value)}
+                        placeholder="e.g. chicken thighs, broccoli, canned tomatoes, pasta, garlic"
+                        rows={3}
+                        style={{ width: '100%', padding: '11px 14px', border: `2px solid ${P.border}`, borderRadius: '10px', fontSize: '14px', background: P.card, boxSizing: 'border-box', resize: 'none', lineHeight: 1.5, marginBottom: '10px' }}
+                      />
+                      <button onClick={() => searchFridge(fridgeQuery)} disabled={fridgeLoading || !fridgeQuery.trim()}
+                        style={{ width: '100%', background: P.accent, color: '#fff', border: 'none', borderRadius: '10px', padding: '12px', fontSize: '14px', fontWeight: 700, cursor: fridgeLoading || !fridgeQuery.trim() ? 'default' : 'pointer', opacity: fridgeLoading || !fridgeQuery.trim() ? 0.6 : 1, marginBottom: '16px' }}>
+                        {fridgeLoading ? '⏳ Finding meals…' : '🔍 Find meals'}
+                      </button>
+
+                      {fridgeMatches !== null && fridgeMatches.length === 0 && (
+                        <div style={{ textAlign: 'center', color: P.muted, fontSize: '14px', marginBottom: '12px' }}>
+                          No close matches found.
+                          <button onClick={() => { setFindRecipeTab('suggest'); setShowImport(true); setCookNow(null); }}
+                            style={{ display: 'block', margin: '10px auto 0', background: P.accentLight, color: P.accentDark, border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
+                            Generate a custom recipe →
+                          </button>
+                        </div>
+                      )}
+
+                      {fridgeMatches && fridgeMatches.length > 0 && (
+                        <div>
+                          <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>
+                            {fridgeMatches.length} match{fridgeMatches.length !== 1 ? 'es' : ''} found
+                          </div>
+                          {fridgeMatches.map(match => (
+                            <div key={match.name}
+                              onClick={() => { setCookNow(match); setCookNowExp(false); setFindRecipeTab('suggest'); setFridgeMatches(null); }}
+                              style={{ background: P.card, border: `1.5px solid ${P.border}`, borderRadius: '12px', padding: '12px 14px', marginBottom: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <div>
+                                <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>{match.name}</div>
+                                <div style={{ fontSize: '12px', color: P.muted }}>{match.time} · {match.cuisine}</div>
+                              </div>
+                              <div style={{ fontSize: '20px', marginLeft: '10px', flexShrink: 0 }}>→</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Filters + meal card + actions (suggested tab only) */}
+                  {findRecipeTab === 'suggest' && <>
                   <div style={{ padding: '12px 16px', borderBottom: `1px solid ${P.border}`, background: P.card }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                       <div style={{ display: 'flex', gap: '5px' }}>
@@ -468,6 +581,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                       nutritionLoading={nutritionLoading.has(cookNow.name)}
                       nutrition={cookNow.nutrition ?? nutritionCache[cookNow.name]}
                       onCookMode={() => { setCookNow(null); setCookingMeal({ meal: cookNow, familySize: cookNowOpts.size }); }}
+                      onAdapt={request => adaptRecipe(cookNow, request)}
+                      onSaveAdapted={adapted => { actions.addMeal(adapted); showToast(`Saved: ${adapted.name}`); }}
                     />
                   </div>
 
@@ -503,6 +618,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                       </>
                     )}
                   </div>
+                  </>}
                 </div>
               </div>
             </div>

@@ -26,3 +26,9 @@ jobs:
           supabase functions deploy get-nutrition \
             --project-ref ejinmxvbeaolypwmkuhh \
             --no-verify-jwt
+          supabase functions deploy suggest-meals \
+            --project-ref ejinmxvbeaolypwmkuhh \
+            --no-verify-jwt
+          supabase functions deploy adapt-recipe \
+            --project-ref ejinmxvbeaolypwmkuhh \
+            --no-verify-jwt

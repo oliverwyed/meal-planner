@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import type { Meal, KidsMode } from '../lib/types';
 import { P } from '../lib/constants';
 import { Tag, TimeSlider } from './ui';
@@ -34,6 +34,8 @@ interface Props {
   nutritionLoading?: boolean;
   nutrition?: { calories: number; protein: number; carbs: number; fat: number };
   onCookMode?: () => void;
+  onAdapt?: (request: string) => Promise<Meal>;
+  onSaveAdapted?: (adapted: Meal) => void;
 }
 
 function getMealEmoji(meal: Meal): string {
@@ -44,9 +46,35 @@ function getMealEmoji(meal: Meal): string {
 
 export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOpen, expanded, familySize, onOverview, onFullExpand, onFav,
   onSwap, onDislike, onChoose, onMarkOff, onMarkCooked, onChangeMealSize, kidsMode, onCycleKids, dayTimeFilter, onSetDayTime,
-  readOnly, lastUsedStr, onStartTimer, onEstimateNutrition, nutritionLoading, nutrition, onCookMode }: Props) {
-  const scale = familySize / (meal.serves ?? 4);
-  const shopByCategory = useMemo(() => buildMealShop(meal, scale), [meal, scale]);
+  readOnly, lastUsedStr, onStartTimer, onEstimateNutrition, nutritionLoading, nutrition, onCookMode, onAdapt, onSaveAdapted }: Props) {
+
+  const [adaptedMeal, setAdaptedMeal] = useState<Meal | null>(null);
+  const [adaptRequest, setAdaptRequest] = useState('');
+  const [showAdaptInput, setShowAdaptInput] = useState(false);
+  const [adaptInput, setAdaptInput] = useState('');
+  const [adaptLoading, setAdaptLoading] = useState(false);
+  const [adaptError, setAdaptError] = useState('');
+
+  const displayMeal = adaptedMeal ?? meal;
+  const scale = familySize / (displayMeal.serves ?? 4);
+  const shopByCategory = useMemo(() => buildMealShop(displayMeal, scale), [displayMeal, scale]);
+
+  const handleAdapt = async () => {
+    if (!adaptInput.trim() || !onAdapt) return;
+    setAdaptLoading(true);
+    setAdaptError('');
+    try {
+      const result = await onAdapt(adaptInput.trim());
+      setAdaptedMeal(result);
+      setAdaptRequest(adaptInput.trim());
+      setShowAdaptInput(false);
+      setAdaptInput('');
+    } catch (err: any) {
+      setAdaptError(err?.message ?? 'Could not adapt recipe');
+    } finally {
+      setAdaptLoading(false);
+    }
+  };
 
   return (
     <div style={{ background: P.card, borderRadius: '16px', marginBottom: '10px',
@@ -55,7 +83,7 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
       {/* Header */}
       <div style={{ padding: '15px 16px', cursor: 'pointer' }} onClick={onOverview}>
         <div style={{ display: 'flex', gap: '12px' }}>
-          <div style={{ fontSize: '26px', flexShrink: 0, paddingTop: '2px' }}>{getMealEmoji(meal)}</div>
+          <div style={{ fontSize: '26px', flexShrink: 0, paddingTop: '2px' }}>{getMealEmoji(displayMeal)}</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
               <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '12px', color: P.accent, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{day ?? ''}</div>
@@ -68,15 +96,16 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
                 </div>
               )}
             </div>
-            <div style={{ fontWeight: 700, fontSize: '16px', lineHeight: 1.3, marginBottom: '3px' }}>{meal.name}</div>
+            <div style={{ fontWeight: 700, fontSize: '16px', lineHeight: 1.3, marginBottom: '3px' }}>{displayMeal.name}</div>
             <div style={{ fontSize: '13px', color: P.muted, lineHeight: 1.45,
-              ...(overviewOpen || expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }) }}>{meal.description}</div>
+              ...(overviewOpen || expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }) }}>{displayMeal.description}</div>
             <div style={{ marginTop: '7px' }}>
-              {meal.time && <Tag bg={P.accentLight} color={P.accentDark}>{meal.time}</Tag>}
+              {displayMeal.time && <Tag bg={P.accentLight} color={P.accentDark}>{displayMeal.time}</Tag>}
               {isSeasonal && <Tag bg="#D1FAE5" color="#065F46">{seasonLabel}</Tag>}
               {isFav && <Tag bg={P.goldLight} color={P.gold}>⭐ Fav</Tag>}
-              {meal.kidNote && <Tag bg={P.greenLight} color={P.greenDark}>👶 Kid-friendly</Tag>}
+              {displayMeal.kidNote && <Tag bg={P.greenLight} color={P.greenDark}>👶 Kid-friendly</Tag>}
               {meal.sourceUrl && <Tag bg={P.border} color={P.muted}>🔗 Imported</Tag>}
+              {adaptedMeal && <Tag bg="#EDE9FE" color="#5B21B6">✨ Adapted</Tag>}
               {lastUsedStr && <Tag bg={P.border} color={P.muted}>🕐 {lastUsedStr}</Tag>}
             </div>
             <div onClick={e => { e.stopPropagation(); onFullExpand(); }}
@@ -92,7 +121,7 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
         <div style={{ borderTop: `1px solid ${P.border}`, padding: '14px 16px 18px' }}>
 
           {/* Cook this — prominent CTA at top */}
-          {onCookMode && meal.steps && meal.steps.length > 0 && (
+          {onCookMode && displayMeal.steps && displayMeal.steps.length > 0 && (
             <button onClick={e => { e.stopPropagation(); onCookMode(); }}
               style={{ width: '100%', background: P.accent, border: 'none', borderRadius: '12px',
                 padding: '13px', fontSize: '15px', fontWeight: 700, color: '#fff',
@@ -100,6 +129,25 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
                 justifyContent: 'center', gap: '8px' }}>
               👨‍🍳 Cook this now
             </button>
+          )}
+
+          {/* Adapted recipe banner */}
+          {adaptedMeal && (
+            <div style={{ background: '#EDE9FE', borderRadius: '10px', padding: '10px 14px', marginBottom: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: '12px', color: '#5B21B6', fontWeight: 700 }}>✨ Adapted: {adaptRequest}</div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {onSaveAdapted && (
+                  <button onClick={e => { e.stopPropagation(); onSaveAdapted(adaptedMeal); }}
+                    style={{ background: '#5B21B6', color: '#fff', border: 'none', borderRadius: '8px', padding: '4px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
+                    Save
+                  </button>
+                )}
+                <button onClick={e => { e.stopPropagation(); setAdaptedMeal(null); setAdaptRequest(''); }}
+                  style={{ background: 'none', border: 'none', color: '#5B21B6', fontSize: '11px', fontWeight: 700, cursor: 'pointer', padding: '4px 6px' }}>
+                  Undo
+                </button>
+              </div>
+            </div>
           )}
 
           {/* Serving size + time override */}
@@ -144,8 +192,8 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
                   const lines = Object.entries(shopByCategory).map(([cat, items]) =>
                     `${CAT_EMOJI[cat] ?? '•'} ${cat}\n${items.map(x => `  • ${x.display}`).join('\n')}`
                   ).join('\n\n');
-                  const body = `🛒 ${meal.name} — serves ${familySize}\n\n${lines}`;
-                  if (navigator.share) navigator.share({ title: meal.name, text: body }).catch(() => {});
+                  const body = `🛒 ${displayMeal.name} — serves ${familySize}\n\n${lines}`;
+                  if (navigator.share) navigator.share({ title: displayMeal.name, text: body }).catch(() => {});
                   else navigator.clipboard?.writeText(body);
                 }} style={{ background: 'none', border: `1px solid ${P.border}`, borderRadius: '8px',
                   padding: '5px 12px', fontSize: '12px', color: P.muted, cursor: 'pointer', marginTop: '4px' }}>
@@ -156,12 +204,16 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
           }
 
           {/* Nutrition row */}
-          {nutrition ? (
+          {(adaptedMeal?.nutrition ?? nutrition) ? (
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '14px' }}>
-              <span style={{ background: P.accentLight, color: P.accentDark, borderRadius: '8px', padding: '3px 8px', fontSize: '11px', fontWeight: 700 }}>🔥 {nutrition.calories} cal</span>
-              <span style={{ background: P.accentLight, color: P.accentDark, borderRadius: '8px', padding: '3px 8px', fontSize: '11px', fontWeight: 700 }}>🥩 {nutrition.protein}g protein</span>
-              <span style={{ background: P.accentLight, color: P.accentDark, borderRadius: '8px', padding: '3px 8px', fontSize: '11px', fontWeight: 700 }}>🍞 {nutrition.carbs}g carbs</span>
-              <span style={{ background: P.accentLight, color: P.accentDark, borderRadius: '8px', padding: '3px 8px', fontSize: '11px', fontWeight: 700 }}>🫙 {nutrition.fat}g fat</span>
+              {[
+                ['🔥', `${(adaptedMeal?.nutrition ?? nutrition)!.calories} cal`],
+                ['🥩', `${(adaptedMeal?.nutrition ?? nutrition)!.protein}g protein`],
+                ['🍞', `${(adaptedMeal?.nutrition ?? nutrition)!.carbs}g carbs`],
+                ['🫙', `${(adaptedMeal?.nutrition ?? nutrition)!.fat}g fat`],
+              ].map(([icon, label]) => (
+                <span key={label} style={{ background: P.accentLight, color: P.accentDark, borderRadius: '8px', padding: '3px 8px', fontSize: '11px', fontWeight: 700 }}>{icon} {label}</span>
+              ))}
             </div>
           ) : onEstimateNutrition ? (
             <div style={{ marginBottom: '14px' }}>
@@ -176,10 +228,10 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
           ) : null}
 
           {/* Steps */}
-          {meal.steps && meal.steps.length > 0 && <>
+          {displayMeal.steps && displayMeal.steps.length > 0 && <>
             <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, letterSpacing: '1.2px', marginBottom: '8px', textTransform: 'uppercase' }}>Recipe</div>
             <ol style={{ paddingLeft: '18px' }}>
-              {meal.steps.map((s, i) => (
+              {displayMeal.steps.map((s, i) => (
                 <li key={i} style={{ fontSize: '14px', lineHeight: 1.6, marginBottom: '6px' }}>
                   {parseTimerParts(s).map((part, j) =>
                     part.seconds ? (
@@ -198,24 +250,59 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
           </>}
 
           {/* Kid note */}
-          {meal.kidNote && (
+          {displayMeal.kidNote && (
             <div style={{ marginTop: '14px', background: P.greenLight, borderRadius: '10px', padding: '11px 14px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
               <span style={{ fontSize: '16px', flexShrink: 0 }}>👶</span>
               <div>
                 <div style={{ fontSize: '11px', fontWeight: 700, color: P.greenDark, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '3px' }}>For kids</div>
-                <div style={{ fontSize: '13px', lineHeight: 1.5, color: P.greenDark }}>{meal.kidNote}</div>
+                <div style={{ fontSize: '13px', lineHeight: 1.5, color: P.greenDark }}>{displayMeal.kidNote}</div>
               </div>
             </div>
           )}
 
           {/* Chef tip */}
-          {meal.tip && (
+          {displayMeal.tip && (
             <div style={{ marginTop: '14px', background: P.goldLight, borderRadius: '10px', padding: '11px 14px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
               <span style={{ fontSize: '16px', flexShrink: 0 }}>👨‍🍳</span>
               <div>
                 <div style={{ fontSize: '11px', fontWeight: 700, color: P.gold, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '3px' }}>Chef's tip</div>
-                <div style={{ fontSize: '13px', lineHeight: 1.5, color: '#78350F' }}>{meal.tip}</div>
+                <div style={{ fontSize: '13px', lineHeight: 1.5, color: '#78350F' }}>{displayMeal.tip}</div>
               </div>
+            </div>
+          )}
+
+          {/* Adapt recipe */}
+          {onAdapt && (
+            <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: `1px solid ${P.border}` }}>
+              {!showAdaptInput ? (
+                <button onClick={e => { e.stopPropagation(); setShowAdaptInput(true); setAdaptError(''); }}
+                  style={{ background: '#EDE9FE', border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '13px', fontWeight: 700, color: '#5B21B6', cursor: 'pointer' }}>
+                  ✨ Adapt this recipe
+                </button>
+              ) : (
+                <div onClick={e => e.stopPropagation()}>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: P.muted, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>How would you like to adapt it?</div>
+                  <input
+                    value={adaptInput}
+                    onChange={e => setAdaptInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleAdapt()}
+                    placeholder="e.g. make it dairy-free, scale to 2, make it veggie"
+                    autoFocus
+                    style={{ width: '100%', padding: '10px 12px', border: `2px solid #C4B5FD`, borderRadius: '10px', fontSize: '14px', background: P.card, boxSizing: 'border-box', marginBottom: '8px', outline: 'none' }}
+                  />
+                  {adaptError && <div style={{ color: '#c0392b', fontSize: '12px', marginBottom: '8px' }}>{adaptError}</div>}
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={handleAdapt} disabled={adaptLoading || !adaptInput.trim()}
+                      style={{ flex: 1, background: '#5B21B6', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px', fontSize: '13px', fontWeight: 700, cursor: adaptLoading || !adaptInput.trim() ? 'default' : 'pointer', opacity: adaptLoading || !adaptInput.trim() ? 0.6 : 1 }}>
+                      {adaptLoading ? '⏳ Adapting…' : '✨ Adapt'}
+                    </button>
+                    <button onClick={() => { setShowAdaptInput(false); setAdaptInput(''); setAdaptError(''); }}
+                      style={{ background: P.border, border: 'none', borderRadius: '8px', padding: '9px 14px', fontSize: '13px', fontWeight: 700, color: P.muted, cursor: 'pointer' }}>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
