@@ -470,6 +470,10 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                         });
                       }}
                       lastUsedStr={lastUsedStr}
+                      onStartTimer={addTimer}
+                      onEstimateNutrition={() => estimateNutrition(cookNow)}
+                      nutrition={cookNow.nutrition ?? nutritionCache[cookNow.name]}
+                      onCookMode={() => { setCookNow(null); setCookingMeal({ meal: cookNow, familySize: cookNowOpts.size }); }}
                     />
                   </div>
 
