@@ -29,8 +29,9 @@ export function ImportRecipe({ onImport, onCancel }: Props) {
       headers: { 'Content-Type': 'application/json', 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY },
       body: JSON.stringify(body),
     });
-    const data = await res.json();
-    if (!res.ok) throw data;
+    let data: any;
+    try { data = await res.json(); } catch { throw new Error(`Server error ${res.status}`); }
+    if (!res.ok) throw new Error(data?.error ?? `Server error ${res.status}`);
     return data as Meal;
   };
 
@@ -43,10 +44,11 @@ export function ImportRecipe({ onImport, onCancel }: Props) {
       const meal = await callFn({ url: trimmed });
       setPreview(meal);
     } catch (err: any) {
-      if (err?.error === 'blocked' || err?.status === 403 || err?.status === 429) {
+      const msg = err?.message ?? '';
+      if (msg.includes('blocked') || msg.includes('403') || msg.includes('429')) {
         setMode('text');
       } else {
-        setError(err?.error ?? 'Import failed.');
+        setError(msg || 'Import failed.');
       }
     } finally {
       setLoading(false);
@@ -60,7 +62,7 @@ export function ImportRecipe({ onImport, onCancel }: Props) {
       const meal = await callFn({ text: pasteText.trim() });
       setPreview(meal);
     } catch (err: any) {
-      setError(err?.error ?? 'Could not extract a recipe from that text.');
+      setError(err?.message ?? 'Could not extract a recipe from that text.');
     } finally {
       setLoading(false);
     }
