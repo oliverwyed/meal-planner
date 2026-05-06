@@ -31,6 +31,7 @@ interface Props {
   lastUsedStr?: string | null;
   onStartTimer?: (label: string, seconds: number) => void;
   onEstimateNutrition?: () => void;
+  nutritionLoading?: boolean;
   nutrition?: { calories: number; protein: number; carbs: number; fat: number };
   onCookMode?: () => void;
 }
@@ -43,7 +44,7 @@ function getMealEmoji(meal: Meal): string {
 
 export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOpen, expanded, familySize, onOverview, onFullExpand, onFav,
   onSwap, onDislike, onChoose, onMarkOff, onMarkCooked, onChangeMealSize, kidsMode, onCycleKids, dayTimeFilter, onSetDayTime,
-  readOnly, lastUsedStr, onStartTimer, onEstimateNutrition, nutrition, onCookMode }: Props) {
+  readOnly, lastUsedStr, onStartTimer, onEstimateNutrition, nutritionLoading, nutrition, onCookMode }: Props) {
   const scale = familySize / (meal.serves ?? 4);
   const shopByCategory = useMemo(() => buildMealShop(meal, scale), [meal, scale]);
 
@@ -165,8 +166,11 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
           ) : onEstimateNutrition ? (
             <div style={{ marginBottom: '14px' }}>
               <button onClick={e => { e.stopPropagation(); onEstimateNutrition(); }}
-                style={{ background: 'none', border: 'none', color: P.muted, fontSize: '12px', fontWeight: 600, cursor: 'pointer', padding: 0 }}>
-                Estimate nutrition
+                disabled={nutritionLoading}
+                style={{ background: P.border, border: 'none', borderRadius: '8px',
+                  padding: '6px 12px', fontSize: '12px', fontWeight: 700,
+                  color: nutritionLoading ? P.muted : P.text, cursor: nutritionLoading ? 'default' : 'pointer' }}>
+                {nutritionLoading ? '⏳ Estimating…' : '📊 Estimate nutrition'}
               </button>
             </div>
           ) : null}

@@ -108,8 +108,11 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     return () => window.removeEventListener('resize', handler);
   }, []);
 
+  const [nutritionLoading, setNutritionLoading] = useState<Set<string>>(new Set());
+
   const estimateNutrition = useCallback(async (meal: Meal) => {
-    if (nutritionCache[meal.name]) return;
+    if (nutritionCache[meal.name] || nutritionLoading.has(meal.name)) return;
+    setNutritionLoading(prev => new Set(prev).add(meal.name));
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -118,13 +121,16 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
         body: JSON.stringify({ ingredients: meal.ingredients, serves: meal.serves, name: meal.name }),
       });
-      if (!res.ok) return;
+      if (!res.ok) { showToast('Could not estimate nutrition'); return; }
       const data = await res.json();
+      if (data.error) { showToast('Could not estimate nutrition'); return; }
       setNutritionCache(prev => ({ ...prev, [meal.name]: data }));
     } catch {
-      // silently fail
+      showToast('Could not estimate nutrition');
+    } finally {
+      setNutritionLoading(prev => { const n = new Set(prev); n.delete(meal.name); return n; });
     }
-  }, [nutritionCache]);
+  }, [nutritionCache, nutritionLoading, showToast]);
 
   const didAutoNav = useRef(false);
 
@@ -336,6 +342,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               lastUsedStr={lastUsedStr}
               onStartTimer={addTimer}
               onEstimateNutrition={() => estimateNutrition(meal)}
+              nutritionLoading={nutritionLoading.has(meal.name)}
               nutrition={meal.nutrition ?? nutritionCache[meal.name]}
               onCookMode={() => setCookingMeal({ meal, familySize: daySize })}
             />
@@ -458,6 +465,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                       lastUsedStr={lastUsedStr}
                       onStartTimer={addTimer}
                       onEstimateNutrition={() => estimateNutrition(cookNow)}
+                      nutritionLoading={nutritionLoading.has(cookNow.name)}
                       nutrition={cookNow.nutrition ?? nutritionCache[cookNow.name]}
                       onCookMode={() => { setCookNow(null); setCookingMeal({ meal: cookNow, familySize: cookNowOpts.size }); }}
                     />
