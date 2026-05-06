@@ -9,7 +9,7 @@ import { DAYS, HOUSEHOLD_ID_KEY, P, DESKTOP_BREAKPOINT } from './lib/constants';
 import type { DayName, DayMode, KidsMode, Meal } from './lib/types';
 import { playBeep } from './lib/timers';
 import { CAT_EMOJI } from './lib/shopping';
-import { log, logFetch, getLogs, clearLogs } from './lib/logger';
+import { log, logFetch, getLogs, clearLogs, recordCost, getTotalCost } from './lib/logger';
 import RECIPES from './data/recipes.json';
 
 const ALL_RECIPES = RECIPES as Meal[];
@@ -132,7 +132,9 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       if (!res.ok) { showToast('Could not estimate nutrition'); return; }
       const data = await res.json();
       if (data.error) { log.error('get-nutrition', 'API error', { error: data.error }); showToast('Could not estimate nutrition'); return; }
-      setNutritionCache(prev => ({ ...prev, [meal.name]: data }));
+      if (data._usage) recordCost('get-nutrition', data._usage.input_tokens, data._usage.output_tokens);
+      const { _usage: _u1, ...nutrition } = data;
+      setNutritionCache(prev => ({ ...prev, [meal.name]: nutrition }));
     } catch (err) {
       log.error('get-nutrition', 'Unexpected error', { err: String(err) });
       showToast('Could not estimate nutrition');
@@ -181,6 +183,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       });
       if (res.ok) {
         const data = await res.json();
+        if (data._usage) recordCost('suggest-meals', data._usage.input_tokens, data._usage.output_tokens);
         const names: string[] = data.matches ?? [];
         const matches = names.map(n => allMeals.find(m => m.name === n)).filter(Boolean) as Meal[];
         if (matches.length > 0) {
@@ -212,8 +215,10 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     if (!res.ok) throw new Error(`Adaptation failed (${res.status})`);
     const adapted = await res.json();
     if (adapted.error) { log.error('adapt-recipe', adapted.error); throw new Error(adapted.error); }
-    log.info('adapt-recipe', `Success → "${adapted.name}"`);
-    return adapted as Meal;
+    if (adapted._usage) recordCost('adapt-recipe', adapted._usage.input_tokens, adapted._usage.output_tokens);
+    const { _usage: _u2, ...adaptedMeal } = adapted;
+    log.info('adapt-recipe', `Success → "${adaptedMeal.name}"`);
+    return adaptedMeal as Meal;
   }, []);
 
   const didAutoNav = useRef(false);
@@ -1205,8 +1210,9 @@ function HelpModal({ onClose }: { onClose: () => void }) {
 function LogsPanel() {
   const [open, setOpen] = useState(false);
   const [entries, setEntries] = useState(() => getLogs());
+  const [totalCost, setTotalCost] = useState(() => getTotalCost());
 
-  const refresh = () => setEntries(getLogs());
+  const refresh = () => { setEntries(getLogs()); setTotalCost(getTotalCost()); };
 
   const copyAll = () => {
     const text = entries.map(e =>
@@ -1224,6 +1230,11 @@ function LogsPanel() {
           style={{ background: 'none', border: 'none', fontWeight: 700, fontSize: '14px', color: P.text, cursor: 'pointer', padding: 0 }}>
           {open ? '▲' : '▼'} Debug logs ({entries.length})
         </button>
+        {!open && totalCost > 0 && (
+          <span style={{ fontSize: '12px', color: P.muted }}>
+            API cost: <strong>${totalCost.toFixed(4)}</strong>
+          </span>
+        )}
         {open && (
           <div style={{ display: 'flex', gap: '8px' }}>
             <button onClick={copyAll}
@@ -1237,6 +1248,11 @@ function LogsPanel() {
           </div>
         )}
       </div>
+      {open && totalCost > 0 && (
+        <div style={{ background: '#EDE9FE', borderRadius: '8px', padding: '8px 12px', marginBottom: '8px', fontSize: '12px', color: '#5B21B6', fontWeight: 600 }}>
+          Estimated API cost (this device): ${totalCost.toFixed(4)} — based on Haiku 4.5 pricing ($0.80/MTok in, $4.00/MTok out)
+        </div>
+      )}
       {open && (
         <div style={{ background: '#1a1a1a', borderRadius: '10px', padding: '10px 12px', maxHeight: '280px', overflowY: 'auto', fontFamily: 'monospace' }}>
           {entries.length === 0

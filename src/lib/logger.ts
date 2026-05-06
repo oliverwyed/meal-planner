@@ -1,5 +1,10 @@
 const KEY = 'mp_logs';
+const COST_KEY = 'mp_cost';
 const MAX = 100;
+
+// Haiku 4.5 pricing per million tokens
+const PRICE_INPUT  = 0.80;
+const PRICE_OUTPUT = 4.00;
 
 export interface LogEntry {
   ts: number;
@@ -7,6 +12,14 @@ export interface LogEntry {
   ctx: string;
   msg: string;
   data?: Record<string, unknown>;
+}
+
+export interface CostEntry {
+  ts: number;
+  ctx: string;
+  inputTokens: number;
+  outputTokens: number;
+  costUsd: number;
 }
 
 function read(): LogEntry[] {
@@ -31,6 +44,16 @@ export const log = {
   error: (ctx: string, msg: string, data?: Record<string, unknown>) => append({ ts: Date.now(), level: 'error', ctx, msg, data }),
 };
 
+export function recordCost(ctx: string, inputTokens: number, outputTokens: number) {
+  const costUsd = (inputTokens / 1_000_000) * PRICE_INPUT + (outputTokens / 1_000_000) * PRICE_OUTPUT;
+  const entry: CostEntry = { ts: Date.now(), ctx, inputTokens, outputTokens, costUsd };
+  try {
+    const prev: CostEntry[] = JSON.parse(localStorage.getItem(COST_KEY) ?? '[]');
+    localStorage.setItem(COST_KEY, JSON.stringify([...prev, entry]));
+  } catch {}
+  log.info(ctx, `tokens: ${inputTokens} in / ${outputTokens} out — $${costUsd.toFixed(5)}`);
+}
+
 export async function logFetch(ctx: string, url: string, init: RequestInit): Promise<Response> {
   const start = Date.now();
   log.info(ctx, `→ ${init.method ?? 'GET'} ${url}`);
@@ -53,4 +76,12 @@ export async function logFetch(ctx: string, url: string, init: RequestInit): Pro
 }
 
 export function getLogs(): LogEntry[] { return read(); }
-export function clearLogs() { try { localStorage.removeItem(KEY); } catch {} }
+export function getCosts(): CostEntry[] {
+  try { return JSON.parse(localStorage.getItem(COST_KEY) ?? '[]'); } catch { return []; }
+}
+export function getTotalCost(): number {
+  return getCosts().reduce((sum, e) => sum + e.costUsd, 0);
+}
+export function clearLogs() {
+  try { localStorage.removeItem(KEY); localStorage.removeItem(COST_KEY); } catch {}
+}
