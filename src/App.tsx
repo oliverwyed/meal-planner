@@ -3,7 +3,7 @@ import { HouseholdGate } from './components/HouseholdGate';
 import { MealCard } from './components/MealCard';
 import { CookingMode } from './components/CookingMode';
 import { ImportRecipe } from './components/ImportRecipe';
-import { Primary, Secondary, Toast, Spinner, Section, TimeSlider, ActiveTimers, BottomNav } from './components/ui';
+import { Primary, Secondary, Toast, Spinner, Section, TimeSlider, ActiveTimers, BottomNav, BackBar } from './components/ui';
 import { useHousehold } from './hooks/useHousehold';
 import { DAYS, HOUSEHOLD_ID_KEY, P, DESKTOP_BREAKPOINT } from './lib/constants';
 import type { DayName, DayMode, KidsMode, Meal } from './lib/types';
@@ -176,8 +176,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       ))}
       <div style={{ marginTop: '16px' }}>
         <Primary onClick={() => { actions.generate(); setStep('plan'); }}>Generate this week's meals</Primary>
-        {state.plan && <Secondary onClick={() => setStep('plan')}>Back to plan</Secondary>}
       </div>
+      {state.plan && <BackBar onClick={() => setStep('plan')} />}
     </Screen>
   );
 
@@ -539,7 +539,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   // ── Shopping screen ───────────────────────────────────────────────────────
   if (step === 'shopping' && state.shopList) return (
     <Screen>
-      <Header eyebrow="Shopping" title="What to buy" actions={<IconBtn onClick={() => setStep('plan')} title="Back">←</IconBtn>} />
+      <Header eyebrow="Shopping" title="What to buy" />
       <div style={{ fontSize: '13px', color: P.muted, marginBottom: '16px' }}>
         {Object.values(state.shopList).flat().length} items · {Object.values(checked).filter(Boolean).length} checked
       </div>
@@ -578,15 +578,15 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         if (navigator.share) navigator.share({ title: 'Shopping List', text: body }).catch(() => {});
         else navigator.clipboard?.writeText(body).then(() => showToast('Copied!'));
       }}>🔗 Share list</Primary>
-      <Secondary muted onClick={() => setStep('plan')}>Back to meals</Secondary>
       {toast && <Toast message={toast} onUndo={toastUndoRef.current ?? undefined} />}
+      <BackBar onClick={() => setStep('plan')} />
     </Screen>
   );
 
   // ── Prefs screen ──────────────────────────────────────────────────────────
   if (step === 'prefs') return (
     <Screen>
-      <Header eyebrow="Preferences" title="Your settings" actions={<IconBtn onClick={() => setStep('plan')} title="Back">←</IconBtn>} />
+      <Header eyebrow="Preferences" title="Your settings" />
 
       <Section>
         <div style={{ fontWeight: 700, marginBottom: '8px' }}>Household</div>
@@ -737,6 +737,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           />
         </Modal>
       )}
+      <BackBar onClick={() => setStep('plan')} />
     </Screen>
   );
 
@@ -747,7 +748,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
 
 function Screen({ children, padBottom }: { children: React.ReactNode; padBottom?: string }) {
   return (
-    <div style={{ minHeight: '100vh', background: P.bg, padding: `0 0 ${padBottom ?? '40px'}` }}>
+    <div style={{ minHeight: '100vh', background: P.bg, padding: `0 0 ${padBottom ?? '80px'}` }}>
       <div style={{ maxWidth: '480px', margin: '0 auto', padding: '0 16px' }}>{children}</div>
     </div>
   );

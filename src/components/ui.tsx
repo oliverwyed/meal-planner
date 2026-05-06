@@ -167,3 +167,19 @@ export function BottomNav({ onShopping, onFindRecipe, onRegenerate, onSettings, 
     </div>
   );
 }
+
+export function BackBar({ onClick, label = '← Back to plan' }: { onClick: () => void; label?: string }) {
+  return (
+    <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
+      background: P.card, borderTop: `1px solid ${P.border}`,
+      padding: `10px 16px calc(10px + env(safe-area-inset-bottom, 0px))` }}>
+      <div style={{ maxWidth: '480px', margin: '0 auto' }}>
+        <button onClick={onClick}
+          style={{ background: 'none', border: 'none', color: P.accent, fontSize: '15px',
+            fontWeight: 700, cursor: 'pointer', padding: '4px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          {label}
+        </button>
+      </div>
+    </div>
+  );
+}
