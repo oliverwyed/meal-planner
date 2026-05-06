@@ -35,6 +35,7 @@ export interface PlanMeal extends Meal {
 export interface Plan {
   meals: PlanMeal[];
   generatedAt: number;
+  shopChecked?: Record<string, boolean>; // persisted alongside plan in DB
 }
 
 export interface DayConfig {
@@ -74,6 +75,7 @@ export interface HouseholdState {
   preferences: Preferences;
   cookHistory: CookHistoryEntry[];
   customMeals: Meal[];
+  shopChecked: Record<string, boolean>;
   updatedAt?: number;
 }
 

@@ -42,6 +42,7 @@ export type AppActions = {
   clearHistory: () => void;
   addToHistory: (meals: { name: string }[]) => void;
   pickCookNow: (time: string, kidsMode: KidsMode, dietary: string) => Meal | null;
+  setShopChecked: (checked: Record<string, boolean>) => void;
 };
 
 export function useHousehold(householdId: string): { state: AppState; actions: AppActions; loading: boolean } {
@@ -55,6 +56,7 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
     preferences: { favourites: [], dislikes: [], pantry: '', dietaryMode: 'none', timeFilter: 'any' },
     cookHistory: [],
     customMeals: [],
+    shopChecked: {},
   });
 
   const isRemoteUpdate = useRef(false);
@@ -97,7 +99,9 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
     saveTimer.current = setTimeout(() => {
       const p = prevHs.current;
       const patch: Partial<Omit<HouseholdState, 'customMeals' | 'familySize'>> = {};
-      if (hs.plan !== p.plan)               patch.plan         = hs.plan;
+      if (hs.plan !== p.plan || hs.shopChecked !== p.shopChecked) {
+        patch.plan = hs.plan ? { ...hs.plan, shopChecked: hs.shopChecked } : null;
+      }
       if (hs.dayConfig !== p.dayConfig)     patch.dayConfig    = hs.dayConfig;
       if (hs.kidsConfig !== p.kidsConfig)   patch.kidsConfig   = hs.kidsConfig;
       if (hs.dayOverrides !== p.dayOverrides) patch.dayOverrides = hs.dayOverrides;
@@ -138,7 +142,7 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
     const now = Date.now();
     const newHistory = [...hs.cookHistory, ...selected.map(m => ({ name: m.name, date: now }))]
       .filter(h => now - h.date < 60 * 24 * 60 * 60 * 1000);
-    setHs(prev => ({ ...prev, plan: newPlan, dayOverrides: {}, cookHistory: newHistory }));
+    setHs(prev => ({ ...prev, plan: newPlan, dayOverrides: {}, cookHistory: newHistory, shopChecked: {} }));
   }, [hs.dayConfig, hs.cookHistory, pool, smartOpts]);
 
   const swap = useCallback((day: DayName, extraDislikes: string[] = []) => {
@@ -267,6 +271,10 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
     });
   }, []);
 
+  const setShopChecked = useCallback((checked: Record<string, boolean>) => {
+    setHs(prev => ({ ...prev, shopChecked: checked }));
+  }, []);
+
   const pickCookNow = useCallback((time: string, kidsMode: KidsMode, dietary: string): Meal | null => {
     const p = getPool(allMeals, time, kidsMode, dietary as any);
     const used = hs.plan?.meals.map(m => m.name) ?? [];
@@ -280,7 +288,7 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
 
   return {
     state: { ...hs, householdId, shopList, season },
-    actions: { generate, swap, setDayMode, setKidsMode, cycleKids, setFamilySize, setDaySize, setDayTime, setPreferences, toggleFav, addDislike, addMeal, editMeal, removeMeal, replaceMealInPlan, restorePlan, clearHistory, addToHistory, pickCookNow },
+    actions: { generate, swap, setDayMode, setKidsMode, cycleKids, setFamilySize, setDaySize, setDayTime, setPreferences, toggleFav, addDislike, addMeal, editMeal, removeMeal, replaceMealInPlan, restorePlan, clearHistory, addToHistory, pickCookNow, setShopChecked },
     loading,
   };
 }

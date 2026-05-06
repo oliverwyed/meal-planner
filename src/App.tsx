@@ -46,9 +46,6 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [previewDay, setPreviewDay] = useState<DayName | null>(null);
   const [expandedDay, setExpandedDay] = useState<DayName | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const [checked, setChecked] = useState<Record<string, boolean>>(() => {
-    try { return JSON.parse(localStorage.getItem('shopChecked') ?? '{}'); } catch { return {}; }
-  });
   const [pickerFor, setPickerFor] = useState<DayName | 'cookNow' | null>(null);
   const [showImport, setShowImport] = useState(false);
   const [addMealOpen, setAddMealOpen] = useState(false);
@@ -238,10 +235,6 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     if (step === 'shopping' && !state.shopList && !loading) setStep('plan');
   }, [step, state.plan, state.shopList, loading]);
 
-  useEffect(() => {
-    localStorage.setItem('shopChecked', JSON.stringify(checked));
-  }, [checked]);
-
   useEffect(() => { setPantryDraft(state.preferences.pantry); }, [state.preferences.pantry]);
 
   const si = SEASON_INFO[state.season] ?? { label: '' };
@@ -326,8 +319,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               const prevPlan = state.plan;
               const prevOverrides = state.dayOverrides;
               actions.generate();
-              setChecked({});
-              showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); setChecked({}); } : undefined);
+              actions.setShopChecked({});
+              showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); actions.setShopChecked({}); } : undefined);
             }} style={{ background: 'none', border: 'none', borderRadius: '10px', padding: '9px 12px', fontSize: '14px', fontWeight: 700, color: P.muted, cursor: 'pointer', textAlign: 'left' }}>
               🔄 Regenerate
             </button>
@@ -354,8 +347,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               const prevPlan = state.plan;
               const prevOverrides = state.dayOverrides;
               actions.generate();
-              setChecked({});
-              showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); setChecked({}); } : undefined);
+              actions.setShopChecked({});
+              showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); actions.setShopChecked({}); } : undefined);
             }} title="Regenerate plan">🔄</IconBtn>
             <IconBtn onClick={() => downloadICS(state.plan!, state.familySize)} title="Export to calendar">📅</IconBtn>
             <IconBtn onClick={() => setShowHelp(true)} title="How it works">ℹ️</IconBtn>
@@ -783,7 +776,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     <Screen>
       <Header eyebrow="Shopping" title="What to buy" />
       <div style={{ fontSize: '13px', color: P.muted, marginBottom: '16px' }}>
-        {Object.values(state.shopList).flat().length} items · {Object.values(checked).filter(Boolean).length} checked
+        {Object.values(state.shopList).flat().length} items · {Object.values(state.shopChecked).filter(Boolean).length} checked
       </div>
       {Object.entries(state.shopList).map(([cat, items]) => (
         <Section key={cat}>
@@ -791,16 +784,16 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           {items.map((item, i) => {
             const key = `${cat}:${item.display}`;
             return (
-              <div key={i} onClick={() => setChecked(prev => ({ ...prev, [key]: !prev[key] }))}
+              <div key={i} onClick={() => actions.setShopChecked({ ...state.shopChecked, [key]: !state.shopChecked[key] })}
                 style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0',
                   borderBottom: i < items.length - 1 ? `1px solid ${P.border}` : 'none', cursor: 'pointer' }}>
-                <div style={{ width: '24px', height: '24px', borderRadius: '7px', border: `2px solid ${checked[key] ? P.green : P.border}`,
-                  background: checked[key] ? P.greenLight : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                <div style={{ width: '24px', height: '24px', borderRadius: '7px', border: `2px solid ${state.shopChecked[key] ? P.green : P.border}`,
+                  background: state.shopChecked[key] ? P.greenLight : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0, fontSize: '13px', color: P.greenDark, fontWeight: 700 }}>
-                  {checked[key] ? '✓' : ''}
+                  {state.shopChecked[key] ? '✓' : ''}
                 </div>
-                <div style={{ fontSize: '14px', textDecoration: checked[key] ? 'line-through' : 'none',
-                  color: checked[key] ? P.muted : P.text, flex: 1 }}>
+                <div style={{ fontSize: '14px', textDecoration: state.shopChecked[key] ? 'line-through' : 'none',
+                  color: state.shopChecked[key] ? P.muted : P.text, flex: 1 }}>
                   {item.display}
                 </div>
               </div>
@@ -808,17 +801,17 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           })}
         </Section>
       ))}
-      {Object.values(checked).some(Boolean) && (
-        <Secondary muted onClick={() => setChecked({})}>Clear checks</Secondary>
+      {Object.values(state.shopChecked).some(Boolean) && (
+        <Secondary muted onClick={() => actions.setShopChecked({})}>Clear checks</Secondary>
       )}
       <Primary onClick={() => {
         const mealLines = state.plan!.meals.map(m => `${m.day}: ${m.name}`).join('\n');
         const lines = Object.entries(state.shopList!).map(([cat, items]) => {
-          const unchecked = items.filter(item => !checked[`${cat}:${item.display}`]);
+          const unchecked = items.filter(item => !state.shopChecked[`${cat}:${item.display}`]);
           if (!unchecked.length) return '';
           return `${CAT_EMOJI[cat] ?? '•'} ${cat}\n${unchecked.map(i => `  • ${i.display}`).join('\n')}`;
         }).filter(Boolean).join('\n\n');
-        const hasChecked = Object.values(checked).some(Boolean);
+        const hasChecked = Object.values(state.shopChecked).some(Boolean);
         const body = `🛒 Shopping list${hasChecked ? ' (remaining)' : ''} — serves ${state.familySize}\n\n📅 This week\n${mealLines}\n\n${lines}`;
         if (navigator.share) navigator.share({ title: 'Shopping List', text: body }).catch(() => {});
         else navigator.clipboard?.writeText(body).then(() => showToast('Copied!'));

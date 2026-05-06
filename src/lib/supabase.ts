@@ -39,8 +39,10 @@ export async function loadState(householdId: string): Promise<HouseholdState | n
   if (stateRes.error) { console.error(stateRes.error); return null; }
   const s = stateRes.data;
   const customMeals: Meal[] = (mealsRes.data ?? []).map((r: any) => ({ ...r.meal_data, id: r.id, sourceUrl: r.source_url }));
+  const rawPlan = s.plan ?? null;
+  const { shopChecked: loadedChecked, ...cleanPlan } = rawPlan ?? {};
   return {
-    plan: s.plan ?? null,
+    plan: rawPlan ? (cleanPlan as import('./types').Plan) : null,
     dayConfig: s.day_config ?? {},
     kidsConfig: s.kids_config ?? {},
     dayOverrides: s.day_overrides ?? {},
@@ -48,6 +50,7 @@ export async function loadState(householdId: string): Promise<HouseholdState | n
     preferences: s.preferences ?? { favourites: [], dislikes: [], pantry: '', dietaryMode: 'none', timeFilter: 'any' },
     cookHistory: s.cook_history ?? [],
     customMeals,
+    shopChecked: (loadedChecked as Record<string, boolean>) ?? {},
   };
 }
 
@@ -109,13 +112,16 @@ export function subscribeToState(householdId: string, onUpdate: (state: Partial<
     .channel(`household:${householdId}`)
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'household_state', filter: `household_id=eq.${householdId}` }, payload => {
       const s = payload.new as any;
+      const rawPlan = s.plan ?? null;
+      const { shopChecked: remoteChecked, ...cleanPlan } = rawPlan ?? {};
       onUpdate({
-        plan: s.plan ?? null,
+        plan: rawPlan ? cleanPlan : null,
         dayConfig: s.day_config ?? {},
         kidsConfig: s.kids_config ?? {},
         dayOverrides: s.day_overrides ?? {},
         preferences: s.preferences,
         cookHistory: s.cook_history ?? [],
+        shopChecked: (remoteChecked as Record<string, boolean>) ?? {},
       });
     })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'custom_meals', filter: `household_id=eq.${householdId}` }, async () => {
