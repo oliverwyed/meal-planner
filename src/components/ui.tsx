@@ -79,11 +79,10 @@ export function ActiveTimers({ timers, onDismiss }: {
         const pct = t.total > 0 ? Math.max(0, t.remaining / t.total) : 0;
         return (
           <div key={t.id}
-            onClick={t.done ? () => onDismiss(t.id) : undefined}
             style={{ background: '#1E293B', color: '#fff', borderRadius: '20px', padding: '7px 14px',
               display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 600,
               boxShadow: '0 4px 16px rgba(0,0,0,0.25)', pointerEvents: 'auto',
-              cursor: t.done ? 'pointer' : 'default', whiteSpace: 'nowrap' }}>
+              whiteSpace: 'nowrap' }}>
             <span style={{ fontSize: '11px', opacity: 0.7, maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.label}</span>
             {t.done
               ? <span style={{ color: '#4ADE80', fontWeight: 700 }}>Done ✓</span>
@@ -96,6 +95,10 @@ export function ActiveTimers({ timers, onDismiss }: {
                   </span>
                 </>
             }
+            <button onClick={() => onDismiss(t.id)}
+              style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer',
+                fontSize: '16px', lineHeight: 1, padding: '0 0 0 2px', display: 'flex', alignItems: 'center' }}
+              aria-label="Cancel timer">×</button>
           </div>
         );
       })}
