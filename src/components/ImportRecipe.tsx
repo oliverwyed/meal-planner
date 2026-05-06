@@ -26,7 +26,7 @@ export function ImportRecipe({ onImport, onCancel }: Props) {
     const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/import-recipe`;
     const res = await fetch(fnUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`, 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY },
       body: JSON.stringify(body),
     });
     let data: any;
