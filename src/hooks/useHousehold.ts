@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { HouseholdState, DayName, DayMode, KidsMode, Meal, Plan, PlanMeal, DayConfig, DayOverrides, Preferences } from '../lib/types';
 import { DEFAULT_DAY_CONFIG, DAYS } from '../lib/constants';
-import { loadState, saveState, saveFamilySize, addCustomMeal, deleteCustomMeal, subscribeToState } from '../lib/supabase';
+import { loadState, saveState, saveFamilySize, addCustomMeal, updateCustomMeal, deleteCustomMeal, subscribeToState } from '../lib/supabase';
 import { getPool, smartPick } from '../lib/scoring';
 import { buildShop } from '../lib/shopping';
 import RECIPES from '../data/recipes.json';
@@ -35,6 +35,7 @@ export type AppActions = {
   toggleFav: (name: string) => void;
   addDislike: (name: string) => void;
   addMeal: (meal: Meal) => Promise<void>;
+  editMeal: (meal: Meal) => Promise<void>;
   removeMeal: (id: string) => Promise<void>;
   replaceMealInPlan: (day: DayName, meal: Meal) => void;
   restorePlan: (plan: Plan, dayOverrides?: DayOverrides) => void;
@@ -224,6 +225,12 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
     if (saved) setHs(prev => ({ ...prev, customMeals: [...prev.customMeals, saved] }));
   }, [householdId]);
 
+  const editMeal = useCallback(async (meal: Meal) => {
+    if (!meal.id) return;
+    const saved = await updateCustomMeal(meal.id, meal);
+    if (saved) setHs(prev => ({ ...prev, customMeals: prev.customMeals.map(m => m.id === meal.id ? saved : m) }));
+  }, []);
+
   const removeMeal = useCallback(async (id: string) => {
     await deleteCustomMeal(id);
     setHs(prev => ({ ...prev, customMeals: prev.customMeals.filter(m => m.id !== id) }));
@@ -273,7 +280,7 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
 
   return {
     state: { ...hs, householdId, shopList, season },
-    actions: { generate, swap, setDayMode, setKidsMode, cycleKids, setFamilySize, setDaySize, setDayTime, setPreferences, toggleFav, addDislike, addMeal, removeMeal, replaceMealInPlan, restorePlan, clearHistory, addToHistory, pickCookNow },
+    actions: { generate, swap, setDayMode, setKidsMode, cycleKids, setFamilySize, setDaySize, setDayTime, setPreferences, toggleFav, addDislike, addMeal, editMeal, removeMeal, replaceMealInPlan, restorePlan, clearHistory, addToHistory, pickCookNow },
     loading,
   };
 }

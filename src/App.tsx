@@ -48,6 +48,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [pickerFor, setPickerFor] = useState<DayName | 'cookNow' | null>(null);
   const [showImport, setShowImport] = useState(false);
   const [addMealOpen, setAddMealOpen] = useState(false);
+  const [editMealTarget, setEditMealTarget] = useState<Meal | null>(null);
   const [showHelp, setShowHelp] = useState(false);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [inviteLoading, setInviteLoading] = useState(false);
@@ -517,8 +518,12 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               <div style={{ fontSize: '14px', fontWeight: 600 }}>{m.name}</div>
               <div style={{ fontSize: '11px', color: P.muted }}>{m.time} · {m.cuisine}{m.sourceUrl ? ' · 🔗 Imported' : ''}</div>
             </div>
-            <button onClick={() => { if (m.id) actions.removeMeal(m.id); }}
-              style={{ background: 'none', border: 'none', color: P.muted, cursor: 'pointer', fontSize: '18px' }}>✕</button>
+            <div style={{ display: 'flex', gap: '4px' }}>
+              <button onClick={() => setEditMealTarget(m)}
+                style={{ background: 'none', border: 'none', color: P.accent, cursor: 'pointer', fontSize: '15px', padding: '4px 6px' }}>✎</button>
+              <button onClick={() => { if (m.id) actions.removeMeal(m.id); }}
+                style={{ background: 'none', border: 'none', color: P.muted, cursor: 'pointer', fontSize: '18px', padding: '4px 6px' }}>✕</button>
+            </div>
           </div>
         ))}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '12px' }}>
@@ -611,6 +616,16 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           <AddMealForm
             onSave={async meal => { await actions.addMeal(meal); setAddMealOpen(false); showToast(`${meal.name} added!`); }}
             onCancel={() => setAddMealOpen(false)}
+          />
+        </Modal>
+      )}
+
+      {editMealTarget && (
+        <Modal onClose={() => setEditMealTarget(null)}>
+          <AddMealForm
+            initial={editMealTarget}
+            onSave={async meal => { await actions.editMeal({ ...meal, id: editMealTarget.id }); setEditMealTarget(null); showToast(`${meal.name} updated!`); }}
+            onCancel={() => setEditMealTarget(null)}
           />
         </Modal>
       )}
@@ -789,14 +804,23 @@ function MealPicker({ meals, favourites, dislikes, onPick, onToggleFav, onDislik
   );
 }
 
-function AddMealForm({ onSave, onCancel }: { onSave: (m: Meal) => Promise<void>; onCancel: () => void }) {
-  const [f, setF] = useState({ name: '', minutes: '20', protein: 'chicken', cuisine: 'british', carb: 'none', description: '', ingredients: '', steps: '' });
+function AddMealForm({ onSave, onCancel, initial }: { onSave: (m: Meal) => Promise<void>; onCancel: () => void; initial?: Meal }) {
+  const [f, setF] = useState({
+    name: initial?.name ?? '',
+    minutes: String(initial?.minutes ?? 20),
+    protein: initial?.protein ?? 'chicken',
+    cuisine: initial?.cuisine ?? 'british',
+    carb: initial?.carb ?? 'none',
+    description: initial?.description ?? '',
+    ingredients: initial?.ingredients?.join('\n') ?? '',
+    steps: initial?.steps?.join('\n') ?? '',
+  });
   const set = (k: string, v: string) => setF(p => ({ ...p, [k]: v }));
   const ss: React.CSSProperties = { width: '100%', padding: '10px 12px', border: `2px solid ${P.border}`, borderRadius: '10px', fontSize: '14px', background: P.card, boxSizing: 'border-box' };
   const valid = f.name.trim().length > 0;
   const fields: [string, React.ReactNode][] = [
     ['Meal name', <input key="n" value={f.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Leftover Curry Rice" style={ss} />],
-    ['Cook time (min)', <select key="m" value={f.minutes} onChange={e => set('minutes', e.target.value)} style={ss}>{[10,15,20,25,30,35,40,45].map(n => <option key={n} value={n}>{n}</option>)}</select>],
+    ['Cook time (min)', <select key="m" value={f.minutes} onChange={e => set('minutes', e.target.value)} style={ss}>{[10,15,20,25,30,35,40,45,50,60,75,90].map(n => <option key={n} value={n}>{n}</option>)}</select>],
     ['Protein', <select key="p" value={f.protein} onChange={e => set('protein', e.target.value)} style={ss}>{['chicken','beef','fish','pork','lamb','seafood','eggs','veggie'].map(p => <option key={p}>{p}</option>)}</select>],
     ['Cuisine', <select key="c" value={f.cuisine} onChange={e => set('cuisine', e.target.value)} style={ss}>{['british','italian','asian','mexican','indian','american','middleeastern','other'].map(c => <option key={c}>{c}</option>)}</select>],
     ['Description (optional)', <textarea key="d" value={f.description} onChange={e => set('description', e.target.value)} placeholder="A short summary shown on the meal card" style={{ ...ss, resize: 'vertical', minHeight: '60px' }} />],
@@ -805,7 +829,7 @@ function AddMealForm({ onSave, onCancel }: { onSave: (m: Meal) => Promise<void>;
   ];
   return (
     <div>
-      <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', marginBottom: '20px' }}>Add a meal</div>
+      <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', marginBottom: '20px' }}>{initial ? 'Edit meal' : 'Add a meal'}</div>
       {fields.map(([label, child]) => (
         <div key={label as string} style={{ marginBottom: '14px' }}>
           <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '1px' }}>{label}</div>
@@ -814,11 +838,11 @@ function AddMealForm({ onSave, onCancel }: { onSave: (m: Meal) => Promise<void>;
       ))}
       <Primary disabled={!valid} onClick={async () => {
         await onSave({ name: f.name.trim(), time: `${f.minutes} min`, minutes: parseInt(f.minutes) || 20,
-          protein: f.protein as any, cuisine: f.cuisine as any, carb: f.carb as any, serves: 4,
+          protein: f.protein as any, cuisine: f.cuisine as any, carb: f.carb as any, serves: initial?.serves ?? 4,
           description: f.description.trim() || f.steps.split('\n')[0] || f.name,
           ingredients: f.ingredients.split('\n').map(s => s.trim()).filter(Boolean),
           steps: f.steps.split('\n').map(s => s.trim()).filter(Boolean), custom: true });
-      }}>Save meal</Primary>
+      }}>{initial ? 'Save changes' : 'Save meal'}</Primary>
       <Secondary muted onClick={onCancel}>Cancel</Secondary>
     </div>
   );

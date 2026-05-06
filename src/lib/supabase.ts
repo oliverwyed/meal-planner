@@ -86,6 +86,18 @@ export async function addCustomMeal(householdId: string, meal: Meal): Promise<Me
   return { ...data.meal_data, id: data.id, sourceUrl: data.source_url };
 }
 
+export async function updateCustomMeal(mealId: string, meal: Meal): Promise<Meal | null> {
+  const { sourceUrl, id: _id, ...mealData } = meal;
+  const { data, error } = await supabase
+    .from('custom_meals')
+    .update({ meal_data: { ...mealData, custom: true }, source_url: sourceUrl ?? null })
+    .eq('id', mealId)
+    .select('id, meal_data, source_url')
+    .single();
+  if (error) { console.error(error); return null; }
+  return { ...data.meal_data, id: data.id, sourceUrl: data.source_url };
+}
+
 export async function deleteCustomMeal(mealId: string): Promise<void> {
   await supabase.from('custom_meals').delete().eq('id', mealId);
 }
