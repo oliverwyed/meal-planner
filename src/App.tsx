@@ -9,6 +9,7 @@ import { DAYS, HOUSEHOLD_ID_KEY, P, DESKTOP_BREAKPOINT } from './lib/constants';
 import type { DayName, DayMode, KidsMode, Meal } from './lib/types';
 import { playBeep } from './lib/timers';
 import { CAT_EMOJI } from './lib/shopping';
+import { log, logFetch, getLogs, clearLogs } from './lib/logger';
 import RECIPES from './data/recipes.json';
 
 const ALL_RECIPES = RECIPES as Meal[];
@@ -123,16 +124,17 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-      const res = await fetch(`${supabaseUrl}/functions/v1/get-nutrition`, {
+      const res = await logFetch('get-nutrition', `${supabaseUrl}/functions/v1/get-nutrition`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
         body: JSON.stringify({ ingredients: meal.ingredients, serves: meal.serves, name: meal.name }),
       });
       if (!res.ok) { showToast('Could not estimate nutrition'); return; }
       const data = await res.json();
-      if (data.error) { showToast('Could not estimate nutrition'); return; }
+      if (data.error) { log.error('get-nutrition', 'API error', { error: data.error }); showToast('Could not estimate nutrition'); return; }
       setNutritionCache(prev => ({ ...prev, [meal.name]: data }));
-    } catch {
+    } catch (err) {
+      log.error('get-nutrition', 'Unexpected error', { err: String(err) });
       showToast('Could not estimate nutrition');
     } finally {
       setNutritionLoading(prev => { const n = new Set(prev); n.delete(meal.name); return n; });
@@ -168,7 +170,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-      const res = await fetch(`${supabaseUrl}/functions/v1/suggest-meals`, {
+      const res = await logFetch('suggest-meals', `${supabaseUrl}/functions/v1/suggest-meals`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
         body: JSON.stringify({
@@ -187,9 +189,13 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           setFridgeLoading(false);
           return;
         }
+        log.warn('suggest-meals', 'AI returned empty matches, falling back to keyword');
       }
-    } catch { /* fall through to keyword match */ }
+    } catch (err) {
+      log.error('suggest-meals', 'Fetch failed, falling back to keyword', { err: String(err) });
+    }
     // Fallback: client-side keyword matching
+    log.info('suggest-meals', 'Using keyword fallback');
     setFridgeMatches(keywordMatchFridge(query, allMeals));
     setFridgeLoading(false);
   }, [state.customMeals, keywordMatchFridge]);
@@ -197,14 +203,16 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const adaptRecipe = useCallback(async (meal: Meal, request: string): Promise<Meal> => {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    const res = await fetch(`${supabaseUrl}/functions/v1/adapt-recipe`, {
+    log.info('adapt-recipe', `Adapting "${meal.name}"`, { request });
+    const res = await logFetch('adapt-recipe', `${supabaseUrl}/functions/v1/adapt-recipe`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
       body: JSON.stringify({ recipe: meal, request }),
     });
-    if (!res.ok) throw new Error('Adaptation failed');
+    if (!res.ok) throw new Error(`Adaptation failed (${res.status})`);
     const adapted = await res.json();
-    if (adapted.error) throw new Error(adapted.error);
+    if (adapted.error) { log.error('adapt-recipe', adapted.error); throw new Error(adapted.error); }
+    log.info('adapt-recipe', `Success → "${adapted.name}"`);
     return adapted as Meal;
   }, []);
 
@@ -849,6 +857,10 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         </button>
       </Section>
 
+      <Section>
+        <LogsPanel />
+      </Section>
+
       <Secondary muted onClick={() => { if (window.confirm('Leave this household? You can rejoin with the invite code.')) onLeave(); }}>
         Leave household
       </Secondary>
@@ -1186,6 +1198,60 @@ function HelpModal({ onClose }: { onClose: () => void }) {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function LogsPanel() {
+  const [open, setOpen] = useState(false);
+  const [entries, setEntries] = useState(() => getLogs());
+
+  const refresh = () => setEntries(getLogs());
+
+  const copyAll = () => {
+    const text = entries.map(e =>
+      `[${new Date(e.ts).toISOString()}] [${e.level.toUpperCase()}] [${e.ctx}] ${e.msg}${e.data ? ' ' + JSON.stringify(e.data) : ''}`
+    ).join('\n');
+    navigator.clipboard?.writeText(text).then(() => {});
+  };
+
+  const LEVEL_COLOR: Record<string, string> = { error: '#c0392b', warn: '#d97706', info: P.muted };
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: open ? '10px' : 0 }}>
+        <button onClick={() => { setOpen(x => !x); refresh(); }}
+          style={{ background: 'none', border: 'none', fontWeight: 700, fontSize: '14px', color: P.text, cursor: 'pointer', padding: 0 }}>
+          {open ? '▲' : '▼'} Debug logs ({entries.length})
+        </button>
+        {open && (
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={copyAll}
+              style={{ background: 'none', border: 'none', color: P.accent, fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>
+              Copy all
+            </button>
+            <button onClick={() => { clearLogs(); refresh(); }}
+              style={{ background: 'none', border: 'none', color: P.muted, fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>
+              Clear
+            </button>
+          </div>
+        )}
+      </div>
+      {open && (
+        <div style={{ background: '#1a1a1a', borderRadius: '10px', padding: '10px 12px', maxHeight: '280px', overflowY: 'auto', fontFamily: 'monospace' }}>
+          {entries.length === 0
+            ? <div style={{ fontSize: '12px', color: '#666' }}>No logs yet.</div>
+            : [...entries].reverse().map((e, i) => (
+                <div key={i} style={{ fontSize: '11px', lineHeight: 1.6, color: LEVEL_COLOR[e.level] ?? P.muted, borderBottom: i < entries.length - 1 ? '1px solid #333' : 'none', paddingBottom: '3px', marginBottom: '3px' }}>
+                  <span style={{ color: '#666' }}>{new Date(e.ts).toLocaleTimeString()} </span>
+                  <span style={{ color: '#888' }}>[{e.ctx}] </span>
+                  {e.msg}
+                  {e.data && <span style={{ color: '#555' }}> {JSON.stringify(e.data)}</span>}
+                </div>
+              ))
+          }
+        </div>
+      )}
     </div>
   );
 }

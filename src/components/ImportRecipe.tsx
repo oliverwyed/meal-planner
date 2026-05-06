@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Meal } from '../lib/types';
 import { P } from '../lib/constants';
 import { Primary, Secondary } from './ui';
+import { log, logFetch } from '../lib/logger';
 
 interface Props {
   onImport: (meal: Meal) => Promise<void>;
@@ -24,14 +25,15 @@ export function ImportRecipe({ onImport, onCancel }: Props) {
 
   const callFn = async (body: { url?: string; text?: string }) => {
     const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/import-recipe`;
-    const res = await fetch(fnUrl, {
+    log.info('import-recipe', body.url ? `Importing URL: ${body.url}` : 'Importing pasted text');
+    const res = await logFetch('import-recipe', fnUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`, 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY },
       body: JSON.stringify(body),
     });
     let data: any;
     try { data = await res.json(); } catch { throw new Error(`Server error ${res.status}`); }
-    if (!res.ok) throw new Error(data?.error ?? `Server error ${res.status}`);
+    if (!res.ok) { log.error('import-recipe', data?.error ?? `Status ${res.status}`); throw new Error(data?.error ?? `Server error ${res.status}`); }
     return data as Meal;
   };
 
