@@ -30,7 +30,9 @@ Deno.serve(async (req: Request) => {
     const jsonMatch = text.match(/\{[\s\S]+\}/);
     if (!jsonMatch) throw new Error('No adapted recipe returned');
 
-    return new Response(jsonMatch[0], {
+    const adapted = JSON.parse(jsonMatch[0]);
+    adapted._usage = message.usage;
+    return new Response(JSON.stringify(adapted), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (err) {

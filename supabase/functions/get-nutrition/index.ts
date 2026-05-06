@@ -44,7 +44,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const nutrition = JSON.parse(jsonMatch[0]);
-
+    nutrition._usage = message.usage;
     return new Response(JSON.stringify(nutrition), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

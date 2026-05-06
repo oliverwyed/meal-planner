@@ -41,7 +41,7 @@ ${recipeList}`,
     const match = text.match(/\[[\s\S]*?\]/);
     const names: string[] = match ? JSON.parse(match[0]) : [];
 
-    return new Response(JSON.stringify({ matches: names }), {
+    return new Response(JSON.stringify({ matches: names, _usage: message.usage }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (err) {
