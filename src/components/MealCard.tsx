@@ -153,7 +153,7 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
                 <div style={{ fontSize: '12px', color: '#5B21B6', fontWeight: 700 }}>✨ Adapted: {adaptRequest}</div>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   {onSaveAdapted && (
-                    <button onClick={e => { e.stopPropagation(); onSaveAdapted(adaptedMeal); }}
+                    <button onClick={e => { e.stopPropagation(); onSaveAdapted(adaptedMeal); setAdaptedMeal(null); setAdaptRequest(''); }}
                       style={{ background: '#5B21B6', color: '#fff', border: 'none', borderRadius: '8px', padding: '4px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
                       Save
                     </button>

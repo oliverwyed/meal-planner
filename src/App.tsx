@@ -444,7 +444,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               nutrition={meal.nutrition ?? nutritionCache[meal.name]}
               onCookMode={() => setCookingMeal({ meal, familySize: daySize })}
               onAdapt={request => adaptRecipe(meal, request)}
-              onSaveAdapted={adapted => { actions.addMeal(adapted); showToast(`Saved: ${adapted.name}`); }}
+              onSaveAdapted={adapted => { actions.addMeal(adapted); actions.replaceMealInPlan(day, adapted); showToast(`Saved: ${adapted.name}`); }}
             />
           </div>
         );
