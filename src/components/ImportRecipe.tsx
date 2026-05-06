@@ -8,6 +8,12 @@ interface Props {
   onCancel: () => void;
 }
 
+const BLOCKED_DOMAINS = ['bbcgoodfood.com', 'allrecipes.com', 'seriouseats.com', 'delicious.com', 'taste.com'];
+
+function isLikelyBlocked(url: string) {
+  try { return BLOCKED_DOMAINS.some(d => new URL(url).hostname.includes(d)); } catch { return false; }
+}
+
 export function ImportRecipe({ onImport, onCancel }: Props) {
   const [url, setUrl] = useState('');
   const [pasteText, setPasteText] = useState('');
@@ -29,15 +35,16 @@ export function ImportRecipe({ onImport, onCancel }: Props) {
   };
 
   const handleFetch = async () => {
-    if (!url.trim()) return;
+    const trimmed = url.trim();
+    if (!trimmed) return;
+    if (isLikelyBlocked(trimmed)) { setMode('text'); return; }
     setLoading(true); setError(''); setPreview(null);
     try {
-      const meal = await callFn({ url: url.trim() });
+      const meal = await callFn({ url: trimmed });
       setPreview(meal);
     } catch (err: any) {
       if (err?.error === 'blocked' || err?.status === 403 || err?.status === 429) {
         setMode('text');
-        setError('That site blocks automated imports. Copy the recipe text from the page and paste it below.');
       } else {
         setError(err?.error ?? 'Import failed.');
       }
@@ -65,14 +72,14 @@ export function ImportRecipe({ onImport, onCancel }: Props) {
   };
 
   const inp = { width: '100%', padding: '11px 14px', border: `2px solid ${P.border}`, borderRadius: '10px', fontSize: '14px', background: P.card, boxSizing: 'border-box' as const };
+  const blocked = isLikelyBlocked(url);
 
   return (
     <div>
-      <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', marginBottom: '6px' }}>Import a recipe</div>
+      <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', marginBottom: '16px' }}>Import a recipe</div>
 
       {!preview && (
         <>
-          {/* Mode tabs */}
           <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
             {(['url', 'text'] as const).map(m => (
               <button key={m} onClick={() => { setMode(m); setError(''); }}
@@ -85,9 +92,6 @@ export function ImportRecipe({ onImport, onCancel }: Props) {
 
           {mode === 'url' && (
             <>
-              <div style={{ fontSize: '13px', color: P.muted, marginBottom: '14px' }}>
-                Paste a link from any recipe website.
-              </div>
               <div style={{ marginBottom: '14px' }}>
                 <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '6px' }}>Recipe URL</div>
                 <input value={url} onChange={e => setUrl(e.target.value)}
@@ -95,22 +99,38 @@ export function ImportRecipe({ onImport, onCancel }: Props) {
                   placeholder="https://www.bbcgoodfood.com/recipes/…"
                   style={inp} />
               </div>
-              {error && <div style={{ color: '#B45309', background: '#FEF3C7', borderRadius: '8px', padding: '10px 12px', fontSize: '13px', marginBottom: '12px' }}>{error}</div>}
-              <Primary onClick={handleFetch} disabled={loading || !url.trim()}>
-                {loading ? '⏳ Extracting recipe…' : '🔍 Extract recipe'}
-              </Primary>
+              {blocked && (
+                <div style={{ background: P.accentLight, borderRadius: '10px', padding: '12px 14px', marginBottom: '14px', fontSize: '13px', color: P.accentDark }}>
+                  <div style={{ fontWeight: 700, marginBottom: '6px' }}>This site blocks automated imports</div>
+                  <div style={{ lineHeight: 1.5, marginBottom: '10px' }}>
+                    On the recipe page: tap <strong>Share → Copy</strong> in iOS Safari, then switch to Paste text and paste it in.
+                    You only need the ingredients and method — not the whole page.
+                  </div>
+                  <button onClick={() => setMode('text')}
+                    style={{ background: P.accent, color: '#fff', border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
+                    Switch to Paste text →
+                  </button>
+                </div>
+              )}
+              {error && <div style={{ color: '#c0392b', fontSize: '13px', marginBottom: '12px' }}>{error}</div>}
+              {!blocked && (
+                <Primary onClick={handleFetch} disabled={loading || !url.trim()}>
+                  {loading ? '⏳ Extracting recipe…' : '🔍 Extract recipe'}
+                </Primary>
+              )}
             </>
           )}
 
           {mode === 'text' && (
             <>
-              <div style={{ fontSize: '13px', color: P.muted, marginBottom: '14px' }}>
-                Copy the recipe text from the website and paste it here — ingredients, steps, everything.
+              <div style={{ background: P.accentLight, borderRadius: '10px', padding: '12px 14px', marginBottom: '16px', fontSize: '13px', color: P.accentDark, lineHeight: 1.6 }}>
+                <strong>Tip:</strong> You don't need to copy the whole page — just the ingredients list and method is enough.
+                In iOS Safari tap <strong>Share → Copy</strong> to grab the page text.
               </div>
               <div style={{ marginBottom: '14px' }}>
                 <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '6px' }}>Recipe text</div>
                 <textarea value={pasteText} onChange={e => setPasteText(e.target.value)}
-                  placeholder="Paste the full recipe here…"
+                  placeholder="Paste the ingredients and method here…"
                   rows={10}
                   style={{ ...inp, resize: 'vertical', lineHeight: 1.5 }} />
               </div>
