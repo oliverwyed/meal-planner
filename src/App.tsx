@@ -10,6 +10,7 @@ import type { DayName, DayMode, KidsMode, Meal } from './lib/types';
 import { playBeep } from './lib/timers';
 import { CAT_EMOJI } from './lib/shopping';
 import { log, logFetch, getLogs, clearLogs, recordCost, getTotalCost } from './lib/logger';
+import { downloadICS } from './lib/ics';
 import RECIPES from './data/recipes.json';
 
 const ALL_RECIPES = RECIPES as Meal[];
@@ -356,6 +357,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               setChecked({});
               showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); setChecked({}); } : undefined);
             }} title="Regenerate plan">🔄</IconBtn>
+            <IconBtn onClick={() => downloadICS(state.plan!, state.familySize)} title="Export to calendar">📅</IconBtn>
             <IconBtn onClick={() => setShowHelp(true)} title="How it works">ℹ️</IconBtn>
           </div>
         </div>
