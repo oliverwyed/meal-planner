@@ -91,6 +91,17 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
       <div style={{ maxHeight: expanded ? '2600px' : '0', opacity: expanded ? 1 : 0, overflow: 'hidden', transition: 'max-height 0.35s ease, opacity 0.2s' }}>
         <div style={{ borderTop: `1px solid ${P.border}`, padding: '14px 16px 18px' }}>
 
+          {/* Cook this — prominent CTA at top */}
+          {onCookMode && meal.steps && meal.steps.length > 0 && (
+            <button onClick={e => { e.stopPropagation(); onCookMode(); }}
+              style={{ width: '100%', background: P.accent, border: 'none', borderRadius: '12px',
+                padding: '13px', fontSize: '15px', fontWeight: 700, color: '#fff',
+                cursor: 'pointer', marginBottom: '16px', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', gap: '8px' }}>
+              👨‍🍳 Cook this now
+            </button>
+          )}
+
           {/* Serving size + time override */}
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
             <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, letterSpacing: '1.2px', textTransform: 'uppercase' }}>Ingredients — serves {familySize}</div>
@@ -205,15 +216,8 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
             </div>
           )}
 
-          {/* Cook mode + day-mode actions */}
-          <div style={{ display: 'flex', gap: '6px', marginTop: '16px', paddingTop: '12px', borderTop: `1px solid ${P.border}`, flexWrap: 'wrap' }}>
-            {onCookMode && meal.steps && meal.steps.length > 0 && (
-              <button onClick={e => { e.stopPropagation(); onCookMode(); }}
-                style={{ background: P.accent, border: 'none', borderRadius: '8px', padding: '6px 14px',
-                  fontSize: '12px', fontWeight: 700, color: '#fff', cursor: 'pointer' }}>
-                👨‍🍳 Cook this
-              </button>
-            )}
+          {/* Day-mode actions */}
+          {(onMarkCooked || onMarkGousto || onMarkOff) && <div style={{ display: 'flex', gap: '6px', marginTop: '16px', paddingTop: '12px', borderTop: `1px solid ${P.border}`, flexWrap: 'wrap' }}>
             {onMarkCooked && (
               <button onClick={e => { e.stopPropagation(); onMarkCooked(); }}
                 style={{ background: P.border, border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, color: P.text, cursor: 'pointer' }}>
@@ -232,7 +236,7 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
                 — Day off
               </button>
             )}
-          </div>
+          </div>}
         </div>
       </div>
     </div>
