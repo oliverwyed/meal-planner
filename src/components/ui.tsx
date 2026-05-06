@@ -73,7 +73,7 @@ export function ActiveTimers({ timers, onDismiss }: {
 }) {
   if (timers.length === 0) return null;
   return (
-    <div style={{ position: 'fixed', bottom: '84px', left: '50%', transform: 'translateX(-50%)', zIndex: 300,
+    <div style={{ position: 'fixed', bottom: 'calc(68px + env(safe-area-inset-bottom, 0px))', left: '50%', transform: 'translateX(-50%)', zIndex: 300,
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', pointerEvents: 'none' }}>
       {timers.map(t => {
         const pct = t.total > 0 ? Math.max(0, t.remaining / t.total) : 0;
@@ -131,6 +131,38 @@ export function TimeSlider({ value, onChange, onCommit, label }: {
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: P.muted, marginTop: '2px' }}>
         <span>15 min</span><span>Any time</span>
       </div>
+    </div>
+  );
+}
+
+export const BOTTOM_NAV_HEIGHT = 56;
+
+export function BottomNav({ onShopping, onFindRecipe, onRegenerate, onSettings }: {
+  onShopping: () => void;
+  onFindRecipe: () => void;
+  onRegenerate: () => void;
+  onSettings: () => void;
+}) {
+  return (
+    <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
+      background: P.card, borderTop: `1px solid ${P.border}`,
+      paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+      display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}>
+      {[
+        { icon: '🛒', label: 'Shopping', onClick: onShopping },
+        { icon: '🍴', label: 'Find recipe', onClick: onFindRecipe, primary: true },
+        { icon: '🔄', label: 'Regenerate', onClick: onRegenerate },
+        { icon: '⚙️', label: 'Settings', onClick: onSettings },
+      ].map(({ icon, label, onClick, primary }) => (
+        <button key={label} onClick={onClick}
+          style={{ background: 'none', border: 'none', padding: '10px 4px 10px', cursor: 'pointer',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
+            color: primary ? P.accent : P.muted }}>
+          <span style={{ fontSize: '20px', lineHeight: 1 }}>{icon}</span>
+          <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.3px',
+            color: primary ? P.accent : P.muted }}>{label}</span>
+        </button>
+      ))}
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { HouseholdGate } from './components/HouseholdGate';
 import { MealCard } from './components/MealCard';
 import { CookingMode } from './components/CookingMode';
 import { ImportRecipe } from './components/ImportRecipe';
-import { Primary, Secondary, Toast, Spinner, Section, TimeSlider, ActiveTimers } from './components/ui';
+import { Primary, Secondary, Toast, Spinner, Section, TimeSlider, ActiveTimers, BottomNav } from './components/ui';
 import { useHousehold } from './hooks/useHousehold';
 import { DAYS, HOUSEHOLD_ID_KEY, P, DESKTOP_BREAKPOINT } from './lib/constants';
 import type { DayName, DayMode, KidsMode, Meal } from './lib/types';
@@ -214,9 +214,29 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
             style={{ background: 'none', border: 'none', borderRadius: '10px', margin: '2px 12px', padding: '9px 12px', fontSize: '14px', fontWeight: 700, color: P.muted, cursor: 'pointer', textAlign: 'left' }}>
             👤 Preferences
           </button>
+          <div style={{ borderTop: `1px solid ${P.border}`, margin: '12px 0', padding: '12px 12px 0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <button onClick={() => {
+              const opts = { kids: 'either', size: state.familySize, time: state.preferences.timeFilter, dietary: state.preferences.dietaryMode };
+              setCookNowOpts(opts);
+              const meal = actions.pickCookNow(opts.time, opts.kids as any, opts.dietary);
+              if (meal) { setCookNow(meal); setCookNowExp(true); setCookNowAddToPlan(false); }
+              else showToast('No meals match — try relaxing your filters');
+            }} style={{ background: P.accentLight, border: 'none', borderRadius: '10px', padding: '9px 12px', fontSize: '14px', fontWeight: 700, color: P.accentDark, cursor: 'pointer', textAlign: 'left' }}>
+              🍴 Find a recipe
+            </button>
+            <button onClick={() => {
+              const prevPlan = state.plan;
+              const prevOverrides = state.dayOverrides;
+              actions.generate();
+              setChecked({});
+              showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); setChecked({}); } : undefined);
+            }} style={{ background: 'none', border: 'none', borderRadius: '10px', padding: '9px 12px', fontSize: '14px', fontWeight: 700, color: P.muted, cursor: 'pointer', textAlign: 'left' }}>
+              🔄 Regenerate
+            </button>
+          </div>
         </div>
       )}
-      <div style={{ flex: 1, maxWidth: isDesktop ? 'none' : '480px', margin: isDesktop ? '0' : '0 auto', padding: '0 16px', paddingBottom: '100px', overflowX: 'hidden' }}>
+      <div style={{ flex: 1, maxWidth: isDesktop ? 'none' : '480px', margin: isDesktop ? '0' : '0 auto', padding: '0 16px', paddingBottom: isDesktop ? '40px' : '80px', overflowX: 'hidden' }}>
       <div style={{ padding: '24px 0 16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
@@ -233,8 +253,6 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           </div>
           <div style={{ display: 'flex', gap: '8px', paddingTop: '4px' }}>
             <IconBtn onClick={() => setShowHelp(true)} title="How it works">ℹ️</IconBtn>
-            <IconBtn onClick={() => setStep('setup')} title="Settings">⚙️</IconBtn>
-            <IconBtn onClick={() => setStep('prefs')} title="Preferences">👤</IconBtn>
           </div>
         </div>
         {!hintDismissed && (
@@ -342,39 +360,30 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
 
       <ActiveTimers timers={timers} onDismiss={dismissTimer} />
 
-      <div style={{ marginTop: '6px' }}>
-        <Primary onClick={() => setStep('shopping')}>View shopping list</Primary>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-          <Secondary onClick={() => {
+      {!isDesktop && (
+        <BottomNav
+          onShopping={() => setStep('shopping')}
+          onFindRecipe={() => {
+            const opts = { kids: 'either', size: state.familySize, time: state.preferences.timeFilter, dietary: state.preferences.dietaryMode };
+            setCookNowOpts(opts);
+            const meal = actions.pickCookNow(opts.time, opts.kids as any, opts.dietary);
+            if (meal) { setCookNow(meal); setCookNowExp(true); setCookNowAddToPlan(false); }
+            else showToast('No meals match — try relaxing your filters');
+          }}
+          onRegenerate={() => {
             const prevPlan = state.plan;
             const prevOverrides = state.dayOverrides;
             actions.generate();
             setChecked({});
             showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); setChecked({}); } : undefined);
-          }}>🔄 Regenerate</Secondary>
-          <Secondary onClick={() => setStep('setup')}>⚙️ Edit days</Secondary>
-        </div>
-      </div>
-
-      {/* Floating Cook Tonight button */}
-      <button onClick={() => {
-        const opts = { kids: 'either', size: state.familySize, time: state.preferences.timeFilter, dietary: state.preferences.dietaryMode };
-        setCookNowOpts(opts);
-        const meal = actions.pickCookNow(opts.time, opts.kids as any, opts.dietary);
-        if (meal) { setCookNow(meal); setCookNowExp(true); setCookNowAddToPlan(false); }
-        else showToast('No meals match — try relaxing your filters');
-      }} style={{ position: 'fixed', bottom: 'calc(24px + env(safe-area-inset-bottom, 0px))', right: '20px', zIndex: 200,
-        background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`,
-        color: '#fff', border: 'none', borderRadius: '28px',
-        padding: '14px 20px', fontSize: '15px', fontWeight: 700,
-        cursor: 'pointer', boxShadow: '0 4px 20px rgba(79,70,229,0.30)',
-        display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}>
-        🍴 Cook tonight
-      </button>
+          }}
+          onSettings={() => setStep('setup')}
+        />
+      )}
 
       {toast && <Toast message={toast} onUndo={toastUndoRef.current ?? undefined} bottom="80px" />}
 
-      {/* Cook Tonight modal */}
+      {/* Find a recipe modal */}
       {cookNow && (() => {
         const rePick = (opts = cookNowOpts) => {
           const meal = actions.pickCookNow(opts.time, opts.kids as any, opts.dietary);
@@ -398,7 +407,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                   {/* Header */}
                   <div style={{ background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`, padding: '20px 20px 16px', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontSize: '11px', opacity: 0.85, fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase' }}>Cook tonight</div>
+                      <div style={{ fontSize: '11px', opacity: 0.85, fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase' }}>Find a recipe</div>
                       <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '22px', marginTop: '3px' }}>What shall we make?</div>
                     </div>
                     <button onClick={() => setCookNow(null)}
@@ -983,8 +992,8 @@ function HelpModal({ onClose }: { onClose: () => void }) {
       '👎 to skip a meal forever. It disappears from suggestions.',
       '📋 to hand-pick any meal from the full library for that day.',
     ]},
-    { icon: '🍴', title: 'Cook tonight', items: [
-      'Tap the orange button at the bottom-right to get a meal suggestion for tonight — independent of your weekly plan.',
+    { icon: '🍴', title: 'Find a recipe', items: [
+      'Tap "Find a recipe" in the bottom bar to get a meal suggestion independent of your weekly plan.',
       'Filter by kids/adults, max cook time, and dietary preference before picking.',
       '🔀 Suggest something else to get a different recommendation. 📋 Browse all meals to hand-pick from the full library.',
       '📅 Add to this week\'s plan to slot tonight\'s suggestion into any day.',
