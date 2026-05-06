@@ -137,27 +137,28 @@ export function TimeSlider({ value, onChange, onCommit, label }: {
 
 export const BOTTOM_NAV_HEIGHT = 56;
 
-export function BottomNav({ onShopping, onFindRecipe, onRegenerate, onSettings }: {
+export function BottomNav({ onShopping, onFindRecipe, onRegenerate, onSettings, onProfile }: {
   onShopping: () => void;
   onFindRecipe: () => void;
   onRegenerate: () => void;
   onSettings: () => void;
+  onProfile: () => void;
 }) {
   return (
     <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
       background: P.card, borderTop: `1px solid ${P.border}`,
       paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-      display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}>
+      display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)' }}>
       {[
         { icon: '🛒', label: 'Shopping', onClick: onShopping },
         { icon: '🍴', label: 'Find recipe', onClick: onFindRecipe, primary: true },
         { icon: '🔄', label: 'Regenerate', onClick: onRegenerate },
         { icon: '⚙️', label: 'Settings', onClick: onSettings },
+        { icon: '👤', label: 'Profile', onClick: onProfile },
       ].map(({ icon, label, onClick, primary }) => (
         <button key={label} onClick={onClick}
           style={{ background: 'none', border: 'none', padding: '10px 4px 10px', cursor: 'pointer',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
-            color: primary ? P.accent : P.muted }}>
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
           <span style={{ fontSize: '20px', lineHeight: 1 }}>{icon}</span>
           <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.3px',
             color: primary ? P.accent : P.muted }}>{label}</span>

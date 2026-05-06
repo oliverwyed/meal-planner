@@ -378,6 +378,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
             showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); setChecked({}); } : undefined);
           }}
           onSettings={() => setStep('setup')}
+          onProfile={() => setStep('prefs')}
         />
       )}
 
