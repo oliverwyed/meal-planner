@@ -268,7 +268,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
 
       <div style={isDesktop ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '12px' } : {}}>
       {DAYS.map(day => {
-        const mode = (state.dayConfig[day] as DayMode) ?? 'home';
+        const rawMode = state.dayConfig[day] as string;
+        const mode: DayMode = (rawMode === 'gousto' || rawMode === 'off') ? 'off' : 'home';
 
         if (mode === 'off') return (
           <div key={day} style={{ background: P.card, borderRadius: '16px', padding: '15px 16px', marginBottom: '10px', boxShadow: P.shadow, border: `1px solid ${P.border}`, opacity: 0.5 }}>
@@ -815,7 +816,8 @@ function ActionBtn({ children, bg, color, onClick }: { children: React.ReactNode
   );
 }
 
-function DayToggle({ day, mode, onChange }: { day: DayName; mode: DayMode; onChange: (m: DayMode) => void }) {
+function DayToggle({ day, mode: rawMode, onChange }: { day: DayName; mode: string; onChange: (m: DayMode) => void }) {
+  const mode: DayMode = rawMode === 'gousto' ? 'off' : (rawMode as DayMode) ?? 'home';
   const cycle: Record<DayMode, DayMode> = { home: 'off', off: 'home' };
   const labels: Record<DayMode, string> = { home: '🍽️ Home', off: '— Off' };
   const colors: Record<DayMode, [string, string]> = { home: [P.accentLight, P.accentDark], off: ['#F0F0F0', P.muted] };
