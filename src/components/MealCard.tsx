@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import type { Meal, KidsMode } from '../lib/types';
 import { P } from '../lib/constants';
 import { Tag, TimeSlider } from './ui';
@@ -54,6 +54,9 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
   const [adaptInput, setAdaptInput] = useState('');
   const [adaptLoading, setAdaptLoading] = useState(false);
   const [adaptError, setAdaptError] = useState('');
+  const [cardTab, setCardTab] = useState<'overview' | 'ingredients' | 'recipe'>('overview');
+
+  useEffect(() => { if (!expanded) setCardTab('overview'); }, [expanded]);
 
   const displayMeal = adaptedMeal ?? meal;
   const scale = familySize / (displayMeal.serves ?? 4);
@@ -120,193 +123,218 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
       <div style={{ maxHeight: expanded ? '2600px' : '0', opacity: expanded ? 1 : 0, overflow: 'hidden', transition: 'max-height 0.35s ease, opacity 0.2s' }}>
         <div style={{ borderTop: `1px solid ${P.border}`, padding: '14px 16px 18px' }}>
 
-          {/* Cook this — prominent CTA at top */}
-          {onCookMode && displayMeal.steps && displayMeal.steps.length > 0 && (
-            <button onClick={e => { e.stopPropagation(); onCookMode(); }}
-              style={{ width: '100%', background: P.accent, border: 'none', borderRadius: '12px',
-                padding: '13px', fontSize: '15px', fontWeight: 700, color: '#fff',
-                cursor: 'pointer', marginBottom: '16px', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', gap: '8px' }}>
-              👨‍🍳 Cook this now
-            </button>
-          )}
-
-          {/* Adapted recipe banner */}
-          {adaptedMeal && (
-            <div style={{ background: '#EDE9FE', borderRadius: '10px', padding: '10px 14px', marginBottom: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontSize: '12px', color: '#5B21B6', fontWeight: 700 }}>✨ Adapted: {adaptRequest}</div>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                {onSaveAdapted && (
-                  <button onClick={e => { e.stopPropagation(); onSaveAdapted(adaptedMeal); }}
-                    style={{ background: '#5B21B6', color: '#fff', border: 'none', borderRadius: '8px', padding: '4px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
-                    Save
-                  </button>
-                )}
-                <button onClick={e => { e.stopPropagation(); setAdaptedMeal(null); setAdaptRequest(''); }}
-                  style={{ background: 'none', border: 'none', color: '#5B21B6', fontSize: '11px', fontWeight: 700, cursor: 'pointer', padding: '4px 6px' }}>
-                  Undo
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Serving size + time override */}
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, letterSpacing: '1.2px', textTransform: 'uppercase' }}>Ingredients — serves {familySize}</div>
-            <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              {onCycleKids && (
-                <button onClick={e => { e.stopPropagation(); onCycleKids(); }}
-                  style={{ background: P.border, border: 'none', borderRadius: '20px', padding: '3px 8px', fontSize: '11px', fontWeight: 700, color: P.muted, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px', flexShrink: 0 }}>
-                  {kidsMode === 'kids' ? '👶 Kids' : kidsMode === 'adults' ? '🍷 Adults' : '✌️ Either'}
-                </button>
-              )}
-              {onChangeMealSize && <SmallBtn onClick={() => onChangeMealSize(-1)}>−</SmallBtn>}
-              {onChangeMealSize && <SmallBtn onClick={() => onChangeMealSize(1)}>+</SmallBtn>}
-            </div>
+          {/* Tab bar */}
+          <div style={{ display: 'flex', gap: '4px', marginBottom: '16px' }}>
+            {(['overview', 'ingredients', 'recipe'] as const).map(tab => (
+              <button key={tab} onClick={e => { e.stopPropagation(); setCardTab(tab); }}
+                style={{ flex: 1, background: cardTab === tab ? P.accentLight : 'transparent',
+                  border: `1.5px solid ${cardTab === tab ? P.accent : P.border}`,
+                  borderRadius: '20px', padding: '5px 4px', fontSize: '11px', fontWeight: 700,
+                  cursor: 'pointer', color: cardTab === tab ? P.accentDark : P.muted }}>
+                {tab === 'overview' ? '📋 Overview' : tab === 'ingredients' ? '🥕 Ingredients' : '👨‍🍳 Recipe'}
+              </button>
+            ))}
           </div>
 
-          {onSetDayTime && dayTimeFilter !== undefined && (
-            <div style={{ marginBottom: '12px' }}>
-              <TimeSlider value={dayTimeFilter} label="Swap max time" onChange={onSetDayTime} />
-            </div>
-          )}
+          {/* Overview tab */}
+          {cardTab === 'overview' && <>
+            {onCookMode && displayMeal.steps && displayMeal.steps.length > 0 && (
+              <button onClick={e => { e.stopPropagation(); onCookMode(); }}
+                style={{ width: '100%', background: P.accent, border: 'none', borderRadius: '12px',
+                  padding: '13px', fontSize: '15px', fontWeight: 700, color: '#fff',
+                  cursor: 'pointer', marginBottom: '16px', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', gap: '8px' }}>
+                👨‍🍳 Cook this now
+              </button>
+            )}
 
-          {/* Categorised ingredients */}
-          {Object.keys(shopByCategory).length > 0
-            ? <div style={{ marginBottom: '16px' }}>
-                {Object.entries(shopByCategory).map(([cat, items]) => (
-                  <div key={cat} style={{ marginBottom: '10px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>
-                      {CAT_EMOJI[cat] ?? '•'} {cat}
-                    </div>
-                    {items.map((x, i) => {
-                      const cn = getCookedNote(x.label, x.qty);
-                      return <div key={i} style={{ fontSize: '14px', lineHeight: 1.6, paddingLeft: '6px' }}>
-                        {x.display}{cn && <span style={{ fontSize: '12px', color: P.muted, marginLeft: '4px' }}>({cn})</span>}
-                      </div>;
-                    })}
-                  </div>
+            {adaptedMeal && (
+              <div style={{ background: '#EDE9FE', borderRadius: '10px', padding: '10px 14px', marginBottom: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontSize: '12px', color: '#5B21B6', fontWeight: 700 }}>✨ Adapted: {adaptRequest}</div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {onSaveAdapted && (
+                    <button onClick={e => { e.stopPropagation(); onSaveAdapted(adaptedMeal); }}
+                      style={{ background: '#5B21B6', color: '#fff', border: 'none', borderRadius: '8px', padding: '4px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
+                      Save
+                    </button>
+                  )}
+                  <button onClick={e => { e.stopPropagation(); setAdaptedMeal(null); setAdaptRequest(''); }}
+                    style={{ background: 'none', border: 'none', color: '#5B21B6', fontSize: '11px', fontWeight: 700, cursor: 'pointer', padding: '4px 6px' }}>
+                    Undo
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {(adaptedMeal?.nutrition ?? nutrition) ? (
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '14px' }}>
+                {[
+                  ['🔥', `${(adaptedMeal?.nutrition ?? nutrition)!.calories} cal`],
+                  ['🥩', `${(adaptedMeal?.nutrition ?? nutrition)!.protein}g protein`],
+                  ['🍞', `${(adaptedMeal?.nutrition ?? nutrition)!.carbs}g carbs`],
+                  ['🫙', `${(adaptedMeal?.nutrition ?? nutrition)!.fat}g fat`],
+                ].map(([icon, label]) => (
+                  <span key={label} style={{ background: P.accentLight, color: P.accentDark, borderRadius: '8px', padding: '3px 8px', fontSize: '11px', fontWeight: 700 }}>{icon} {label}</span>
                 ))}
-                <button onClick={e => {
-                  e.stopPropagation();
-                  const lines = Object.entries(shopByCategory).map(([cat, items]) =>
-                    `${CAT_EMOJI[cat] ?? '•'} ${cat}\n${items.map(x => `  • ${x.display}`).join('\n')}`
-                  ).join('\n\n');
-                  const body = `🛒 ${displayMeal.name} — serves ${familySize}\n\n${lines}`;
-                  if (navigator.share) navigator.share({ title: displayMeal.name, text: body }).catch(() => {});
-                  else navigator.clipboard?.writeText(body);
-                }} style={{ background: 'none', border: `1px solid ${P.border}`, borderRadius: '8px',
-                  padding: '5px 12px', fontSize: '12px', color: P.muted, cursor: 'pointer', marginTop: '4px' }}>
-                  🔗 Share ingredients
+              </div>
+            ) : onEstimateNutrition ? (
+              <div style={{ marginBottom: '14px' }}>
+                <button onClick={e => { e.stopPropagation(); onEstimateNutrition(); }}
+                  disabled={nutritionLoading}
+                  style={{ background: P.border, border: 'none', borderRadius: '8px',
+                    padding: '6px 12px', fontSize: '12px', fontWeight: 700,
+                    color: nutritionLoading ? P.muted : P.text, cursor: nutritionLoading ? 'default' : 'pointer' }}>
+                  {nutritionLoading ? '⏳ Estimating…' : '📊 Estimate nutrition'}
                 </button>
               </div>
-            : <div style={{ fontSize: '14px', color: P.muted, marginBottom: '16px' }}>No ingredients listed</div>
-          }
+            ) : null}
 
-          {/* Nutrition row */}
-          {(adaptedMeal?.nutrition ?? nutrition) ? (
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '14px' }}>
-              {[
-                ['🔥', `${(adaptedMeal?.nutrition ?? nutrition)!.calories} cal`],
-                ['🥩', `${(adaptedMeal?.nutrition ?? nutrition)!.protein}g protein`],
-                ['🍞', `${(adaptedMeal?.nutrition ?? nutrition)!.carbs}g carbs`],
-                ['🫙', `${(adaptedMeal?.nutrition ?? nutrition)!.fat}g fat`],
-              ].map(([icon, label]) => (
-                <span key={label} style={{ background: P.accentLight, color: P.accentDark, borderRadius: '8px', padding: '3px 8px', fontSize: '11px', fontWeight: 700 }}>{icon} {label}</span>
-              ))}
-            </div>
-          ) : onEstimateNutrition ? (
-            <div style={{ marginBottom: '14px' }}>
-              <button onClick={e => { e.stopPropagation(); onEstimateNutrition(); }}
-                disabled={nutritionLoading}
-                style={{ background: P.border, border: 'none', borderRadius: '8px',
-                  padding: '6px 12px', fontSize: '12px', fontWeight: 700,
-                  color: nutritionLoading ? P.muted : P.text, cursor: nutritionLoading ? 'default' : 'pointer' }}>
-                {nutritionLoading ? '⏳ Estimating…' : '📊 Estimate nutrition'}
-              </button>
-            </div>
-          ) : null}
+            {displayMeal.kidNote && (
+              <div style={{ marginBottom: '14px', background: P.greenLight, borderRadius: '10px', padding: '11px 14px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                <span style={{ fontSize: '16px', flexShrink: 0 }}>👶</span>
+                <div>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: P.greenDark, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '3px' }}>For kids</div>
+                  <div style={{ fontSize: '13px', lineHeight: 1.5, color: P.greenDark }}>{displayMeal.kidNote}</div>
+                </div>
+              </div>
+            )}
 
-          {/* Steps */}
-          {displayMeal.steps && displayMeal.steps.length > 0 && <>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, letterSpacing: '1.2px', marginBottom: '8px', textTransform: 'uppercase' }}>Recipe</div>
-            <ol style={{ paddingLeft: '18px' }}>
-              {displayMeal.steps.map((s, i) => (
-                <li key={i} style={{ fontSize: '14px', lineHeight: 1.6, marginBottom: '6px' }}>
-                  {parseTimerParts(s).map((part, j) =>
-                    part.seconds ? (
-                      <button key={j} onClick={e => { e.stopPropagation(); onStartTimer?.(part.text, part.seconds!); }}
-                        style={{ background: P.accentLight, color: P.accentDark, border: 'none', borderRadius: '6px',
-                          padding: '1px 6px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', margin: '0 1px' }}>
-                        ⏱ {part.text}
+            {displayMeal.tip && (
+              <div style={{ marginBottom: '14px', background: P.goldLight, borderRadius: '10px', padding: '11px 14px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                <span style={{ fontSize: '16px', flexShrink: 0 }}>👨‍🍳</span>
+                <div>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: P.gold, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '3px' }}>Chef's tip</div>
+                  <div style={{ fontSize: '13px', lineHeight: 1.5, color: '#78350F' }}>{displayMeal.tip}</div>
+                </div>
+              </div>
+            )}
+
+            {onAdapt && (
+              <div style={{ paddingTop: '4px' }}>
+                {!showAdaptInput ? (
+                  <button onClick={e => { e.stopPropagation(); setShowAdaptInput(true); setAdaptError(''); }}
+                    style={{ background: '#EDE9FE', border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '13px', fontWeight: 700, color: '#5B21B6', cursor: 'pointer' }}>
+                    ✨ Adapt this recipe
+                  </button>
+                ) : (
+                  <div onClick={e => e.stopPropagation()}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: P.muted, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>How would you like to adapt it?</div>
+                    <input
+                      value={adaptInput}
+                      onChange={e => setAdaptInput(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleAdapt()}
+                      placeholder="e.g. make it dairy-free, scale to 2, make it veggie"
+                      autoFocus
+                      style={{ width: '100%', padding: '10px 12px', border: `2px solid #C4B5FD`, borderRadius: '10px', fontSize: '14px', background: P.card, boxSizing: 'border-box', marginBottom: '8px', outline: 'none' }}
+                    />
+                    {adaptError && <div style={{ color: '#c0392b', fontSize: '12px', marginBottom: '8px' }}>{adaptError}</div>}
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button onClick={handleAdapt} disabled={adaptLoading || !adaptInput.trim()}
+                        style={{ flex: 1, background: '#5B21B6', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px', fontSize: '13px', fontWeight: 700, cursor: adaptLoading || !adaptInput.trim() ? 'default' : 'pointer', opacity: adaptLoading || !adaptInput.trim() ? 0.6 : 1 }}>
+                        {adaptLoading ? '⏳ Adapting…' : '✨ Adapt'}
                       </button>
-                    ) : (
-                      <span key={j}>{part.text}</span>
-                    )
-                  )}
-                </li>
-              ))}
-            </ol>
+                      <button onClick={() => { setShowAdaptInput(false); setAdaptInput(''); setAdaptError(''); }}
+                        style={{ background: P.border, border: 'none', borderRadius: '8px', padding: '9px 14px', fontSize: '13px', fontWeight: 700, color: P.muted, cursor: 'pointer' }}>
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </>}
 
-          {/* Kid note */}
-          {displayMeal.kidNote && (
-            <div style={{ marginTop: '14px', background: P.greenLight, borderRadius: '10px', padding: '11px 14px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: '16px', flexShrink: 0 }}>👶</span>
-              <div>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: P.greenDark, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '3px' }}>For kids</div>
-                <div style={{ fontSize: '13px', lineHeight: 1.5, color: P.greenDark }}>{displayMeal.kidNote}</div>
+          {/* Ingredients tab */}
+          {cardTab === 'ingredients' && <>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, letterSpacing: '1.2px', textTransform: 'uppercase' }}>Serves {familySize}</div>
+              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                {onCycleKids && (
+                  <button onClick={e => { e.stopPropagation(); onCycleKids(); }}
+                    style={{ background: P.border, border: 'none', borderRadius: '20px', padding: '3px 8px', fontSize: '11px', fontWeight: 700, color: P.muted, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px', flexShrink: 0 }}>
+                    {kidsMode === 'kids' ? '👶 Kids' : kidsMode === 'adults' ? '🍷 Adults' : '✌️ Either'}
+                  </button>
+                )}
+                {onChangeMealSize && <SmallBtn onClick={() => onChangeMealSize(-1)}>−</SmallBtn>}
+                {onChangeMealSize && <SmallBtn onClick={() => onChangeMealSize(1)}>+</SmallBtn>}
               </div>
             </div>
-          )}
 
-          {/* Chef tip */}
-          {displayMeal.tip && (
-            <div style={{ marginTop: '14px', background: P.goldLight, borderRadius: '10px', padding: '11px 14px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: '16px', flexShrink: 0 }}>👨‍🍳</span>
-              <div>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: P.gold, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '3px' }}>Chef's tip</div>
-                <div style={{ fontSize: '13px', lineHeight: 1.5, color: '#78350F' }}>{displayMeal.tip}</div>
+            {onSetDayTime && dayTimeFilter !== undefined && (
+              <div style={{ marginBottom: '12px' }}>
+                <TimeSlider value={dayTimeFilter} label="Swap max time" onChange={onSetDayTime} />
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Adapt recipe */}
-          {onAdapt && (
-            <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: `1px solid ${P.border}` }}>
-              {!showAdaptInput ? (
-                <button onClick={e => { e.stopPropagation(); setShowAdaptInput(true); setAdaptError(''); }}
-                  style={{ background: '#EDE9FE', border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '13px', fontWeight: 700, color: '#5B21B6', cursor: 'pointer' }}>
-                  ✨ Adapt this recipe
-                </button>
-              ) : (
-                <div onClick={e => e.stopPropagation()}>
-                  <div style={{ fontSize: '12px', fontWeight: 700, color: P.muted, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>How would you like to adapt it?</div>
-                  <input
-                    value={adaptInput}
-                    onChange={e => setAdaptInput(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && handleAdapt()}
-                    placeholder="e.g. make it dairy-free, scale to 2, make it veggie"
-                    autoFocus
-                    style={{ width: '100%', padding: '10px 12px', border: `2px solid #C4B5FD`, borderRadius: '10px', fontSize: '14px', background: P.card, boxSizing: 'border-box', marginBottom: '8px', outline: 'none' }}
-                  />
-                  {adaptError && <div style={{ color: '#c0392b', fontSize: '12px', marginBottom: '8px' }}>{adaptError}</div>}
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button onClick={handleAdapt} disabled={adaptLoading || !adaptInput.trim()}
-                      style={{ flex: 1, background: '#5B21B6', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px', fontSize: '13px', fontWeight: 700, cursor: adaptLoading || !adaptInput.trim() ? 'default' : 'pointer', opacity: adaptLoading || !adaptInput.trim() ? 0.6 : 1 }}>
-                      {adaptLoading ? '⏳ Adapting…' : '✨ Adapt'}
-                    </button>
-                    <button onClick={() => { setShowAdaptInput(false); setAdaptInput(''); setAdaptError(''); }}
-                      style={{ background: P.border, border: 'none', borderRadius: '8px', padding: '9px 14px', fontSize: '13px', fontWeight: 700, color: P.muted, cursor: 'pointer' }}>
-                      Cancel
-                    </button>
-                  </div>
+            {Object.keys(shopByCategory).length > 0
+              ? <div style={{ marginBottom: '8px' }}>
+                  {Object.entries(shopByCategory).map(([cat, items]) => (
+                    <div key={cat} style={{ marginBottom: '10px' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>
+                        {CAT_EMOJI[cat] ?? '•'} {cat}
+                      </div>
+                      {items.map((x, i) => {
+                        const cn = getCookedNote(x.label, x.qty);
+                        return <div key={i} style={{ fontSize: '14px', lineHeight: 1.6, paddingLeft: '6px' }}>
+                          {x.display}{cn && <span style={{ fontSize: '12px', color: P.muted, marginLeft: '4px' }}>({cn})</span>}
+                        </div>;
+                      })}
+                    </div>
+                  ))}
+                  <button onClick={e => {
+                    e.stopPropagation();
+                    const lines = Object.entries(shopByCategory).map(([cat, items]) =>
+                      `${CAT_EMOJI[cat] ?? '•'} ${cat}\n${items.map(x => `  • ${x.display}`).join('\n')}`
+                    ).join('\n\n');
+                    const body = `🛒 ${displayMeal.name} — serves ${familySize}\n\n${lines}`;
+                    if (navigator.share) navigator.share({ title: displayMeal.name, text: body }).catch(() => {});
+                    else navigator.clipboard?.writeText(body);
+                  }} style={{ background: 'none', border: `1px solid ${P.border}`, borderRadius: '8px',
+                    padding: '5px 12px', fontSize: '12px', color: P.muted, cursor: 'pointer', marginTop: '4px' }}>
+                    🔗 Share ingredients
+                  </button>
                 </div>
-              )}
-            </div>
-          )}
+              : <div style={{ fontSize: '14px', color: P.muted, marginBottom: '16px' }}>No ingredients listed</div>
+            }
+          </>}
 
-          {/* Day-mode actions */}
+          {/* Recipe tab */}
+          {cardTab === 'recipe' && <>
+            {onCookMode && displayMeal.steps && displayMeal.steps.length > 0 && (
+              <button onClick={e => { e.stopPropagation(); onCookMode(); }}
+                style={{ width: '100%', background: P.accent, border: 'none', borderRadius: '12px',
+                  padding: '13px', fontSize: '15px', fontWeight: 700, color: '#fff',
+                  cursor: 'pointer', marginBottom: '16px', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', gap: '8px' }}>
+                👨‍🍳 Cook this now
+              </button>
+            )}
+            {displayMeal.steps && displayMeal.steps.length > 0
+              ? <>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, letterSpacing: '1.2px', marginBottom: '8px', textTransform: 'uppercase' }}>Steps</div>
+                  <ol style={{ paddingLeft: '18px' }}>
+                    {displayMeal.steps.map((s, i) => (
+                      <li key={i} style={{ fontSize: '14px', lineHeight: 1.6, marginBottom: '6px' }}>
+                        {parseTimerParts(s).map((part, j) =>
+                          part.seconds ? (
+                            <button key={j} onClick={e => { e.stopPropagation(); onStartTimer?.(part.text, part.seconds!); }}
+                              style={{ background: P.accentLight, color: P.accentDark, border: 'none', borderRadius: '6px',
+                                padding: '1px 6px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', margin: '0 1px' }}>
+                              ⏱ {part.text}
+                            </button>
+                          ) : (
+                            <span key={j}>{part.text}</span>
+                          )
+                        )}
+                      </li>
+                    ))}
+                  </ol>
+                </>
+              : <div style={{ fontSize: '14px', color: P.muted }}>No recipe steps listed.</div>
+            }
+          </>}
+
+          {/* Day-mode actions — always visible */}
           {(onMarkCooked || onMarkOff) && <div style={{ display: 'flex', gap: '6px', marginTop: '16px', paddingTop: '12px', borderTop: `1px solid ${P.border}`, flexWrap: 'wrap' }}>
             {onMarkCooked && (
               <button onClick={e => { e.stopPropagation(); onMarkCooked(); }}

@@ -46,7 +46,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [expandedDay, setExpandedDay] = useState<DayName | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [checked, setChecked] = useState<Record<string, boolean>>(() => {
-    try { return JSON.parse(sessionStorage.getItem('shopChecked') ?? '{}'); } catch { return {}; }
+    try { return JSON.parse(localStorage.getItem('shopChecked') ?? '{}'); } catch { return {}; }
   });
   const [pickerFor, setPickerFor] = useState<DayName | 'cookNow' | null>(null);
   const [showImport, setShowImport] = useState(false);
@@ -56,6 +56,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [inviteLoading, setInviteLoading] = useState(false);
   const [hintDismissed, setHintDismissed] = useState(() => localStorage.getItem('hintDismissed') === '1');
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAskAI, setShowAskAI] = useState(false);
   const [pantryDraft, setPantryDraft] = useState(state.preferences.pantry);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const toastUndoRef = useRef<(() => void) | null>(null);
@@ -236,7 +238,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   }, [step, state.plan, state.shopList, loading]);
 
   useEffect(() => {
-    sessionStorage.setItem('shopChecked', JSON.stringify(checked));
+    localStorage.setItem('shopChecked', JSON.stringify(checked));
   }, [checked]);
 
   useEffect(() => { setPantryDraft(state.preferences.pantry); }, [state.preferences.pantry]);
@@ -347,6 +349,13 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
             })()}
           </div>
           <div style={{ display: 'flex', gap: '8px', paddingTop: '4px' }}>
+            <IconBtn onClick={() => {
+              const prevPlan = state.plan;
+              const prevOverrides = state.dayOverrides;
+              actions.generate();
+              setChecked({});
+              showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); setChecked({}); } : undefined);
+            }} title="Regenerate plan">🔄</IconBtn>
             <IconBtn onClick={() => setShowHelp(true)} title="How it works">ℹ️</IconBtn>
           </div>
         </div>
@@ -454,13 +463,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
             if (meal) { setCookNow(meal); setCookNowExp(true); setCookNowAddToPlan(false); }
             else showToast('No meals match — try relaxing your filters');
           }}
-          onRegenerate={() => {
-            const prevPlan = state.plan;
-            const prevOverrides = state.dayOverrides;
-            actions.generate();
-            setChecked({});
-            showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); setChecked({}); } : undefined);
-          }}
+          onAskAI={() => { setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
           onSettings={() => setStep('setup')}
           onProfile={() => setStep('prefs')}
         />
@@ -690,6 +693,85 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       )}
 
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+
+      {/* Ask AI modal */}
+      {showAskAI && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 500 }}>
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '24px 0 40px' } as React.CSSProperties}
+            onClick={() => setShowAskAI(false)}>
+            <div style={{ maxWidth: '480px', margin: '0 auto', padding: '0 16px' }} onClick={e => e.stopPropagation()}>
+              <div style={{ background: P.bg, borderRadius: '20px', boxShadow: '0 8px 40px rgba(0,0,0,0.22)', overflow: 'hidden' }}>
+                <div style={{ background: 'linear-gradient(135deg, #7C3AED, #5B21B6)', padding: '20px 20px 20px', color: '#fff' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontSize: '11px', opacity: 0.85, fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase' }}>AI Assistant</div>
+                      <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '22px', marginTop: '3px' }}>✨ What shall we cook?</div>
+                    </div>
+                    <button onClick={() => setShowAskAI(false)}
+                      style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: '10px', padding: '8px 12px', cursor: 'pointer', fontSize: '18px', fontWeight: 700 }}>✕</button>
+                  </div>
+                </div>
+                <div style={{ padding: '16px' }}>
+                  <div style={{ fontSize: '13px', color: P.muted, marginBottom: '14px', lineHeight: 1.5 }}>
+                    Tell me what ingredients you have and I'll find the best matches.
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '14px' }}>
+                    {['chicken & veg', 'pasta & tomatoes', 'fish', 'eggs & cheese'].map(q => (
+                      <button key={q} onClick={() => { setFridgeQuery(q); searchFridge(q); }}
+                        style={{ background: '#EDE9FE', border: 'none', borderRadius: '20px', padding: '5px 12px', fontSize: '12px', fontWeight: 700, color: '#5B21B6', cursor: 'pointer' }}>
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                    <textarea
+                      value={fridgeQuery}
+                      onChange={e => setFridgeQuery(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (fridgeQuery.trim()) searchFridge(fridgeQuery); } }}
+                      placeholder="e.g. chicken thighs, broccoli, garlic, olive oil…"
+                      rows={2}
+                      style={{ flex: 1, padding: '11px 14px', border: `2px solid #C4B5FD`, borderRadius: '10px', fontSize: '14px', background: P.card, resize: 'none', lineHeight: 1.5, outline: 'none', boxSizing: 'border-box' } as React.CSSProperties}
+                    />
+                    <button onClick={() => { if (fridgeQuery.trim()) searchFridge(fridgeQuery); }}
+                      disabled={fridgeLoading || !fridgeQuery.trim()}
+                      style={{ background: '#7C3AED', color: '#fff', border: 'none', borderRadius: '10px', padding: '0 18px', fontSize: '20px', fontWeight: 700, cursor: fridgeLoading || !fridgeQuery.trim() ? 'default' : 'pointer', opacity: fridgeLoading || !fridgeQuery.trim() ? 0.5 : 1, alignSelf: 'stretch', flexShrink: 0 }}>
+                      {fridgeLoading ? '…' : '→'}
+                    </button>
+                  </div>
+
+                  {fridgeMatches !== null && fridgeMatches.length === 0 && !fridgeLoading && (
+                    <div style={{ textAlign: 'center', color: P.muted, fontSize: '14px', padding: '12px 0' }}>
+                      No close matches — try different ingredients.
+                    </div>
+                  )}
+
+                  {fridgeMatches && fridgeMatches.length > 0 && (
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                        <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                          {fridgeMatches.length} match{fridgeMatches.length !== 1 ? 'es' : ''}
+                        </div>
+                        {fridgeAI && <span style={{ background: '#EDE9FE', color: '#5B21B6', borderRadius: '6px', padding: '2px 7px', fontSize: '10px', fontWeight: 700 }}>✨ AI</span>}
+                      </div>
+                      {fridgeMatches.map(match => (
+                        <div key={match.name}
+                          style={{ background: P.card, border: `1.5px solid ${P.border}`, borderRadius: '12px', padding: '12px 14px', marginBottom: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                          onClick={() => { setCookNow(match); setCookNowExp(false); setCookNowAddToPlan(false); setShowAskAI(false); setFridgeMatches(null); setFridgeQuery(''); }}>
+                          <div>
+                            <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>{match.name}</div>
+                            <div style={{ fontSize: '12px', color: P.muted }}>{match.time} · {match.cuisine}</div>
+                          </div>
+                          <span style={{ fontSize: '18px', color: P.muted, marginLeft: '10px' }}>→</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );
@@ -724,6 +806,9 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           })}
         </Section>
       ))}
+      {Object.values(checked).some(Boolean) && (
+        <Secondary muted onClick={() => setChecked({})}>Clear checks</Secondary>
+      )}
       <Primary onClick={() => {
         const mealLines = state.plan!.meals.map(m => `${m.day}: ${m.name}`).join('\n');
         const lines = Object.entries(state.shopList!).map(([cat, items]) => {
@@ -862,9 +947,13 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         </button>
       </Section>
 
-      <Section>
-        <LogsPanel />
-      </Section>
+      <div style={{ marginBottom: '10px' }}>
+        <button onClick={() => setShowAdvanced(x => !x)}
+          style={{ background: 'none', border: 'none', fontWeight: 700, fontSize: '14px', color: P.muted, cursor: 'pointer', padding: '8px 0', width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span>{showAdvanced ? '▲' : '▼'}</span> Advanced
+        </button>
+        {showAdvanced && <Section><LogsPanel /></Section>}
+      </div>
 
       <Secondary muted onClick={() => { if (window.confirm('Leave this household? You can rejoin with the invite code.')) onLeave(); }}>
         Leave household

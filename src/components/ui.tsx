@@ -137,10 +137,10 @@ export function TimeSlider({ value, onChange, onCommit, label }: {
 
 export const BOTTOM_NAV_HEIGHT = 56;
 
-export function BottomNav({ onShopping, onFindRecipe, onRegenerate, onSettings, onProfile }: {
+export function BottomNav({ onShopping, onFindRecipe, onAskAI, onSettings, onProfile }: {
   onShopping: () => void;
   onFindRecipe: () => void;
-  onRegenerate: () => void;
+  onAskAI: () => void;
   onSettings: () => void;
   onProfile: () => void;
 }) {
@@ -152,16 +152,16 @@ export function BottomNav({ onShopping, onFindRecipe, onRegenerate, onSettings, 
       {[
         { icon: '🛒', label: 'Shopping', onClick: onShopping },
         { icon: '🍴', label: 'Find recipe', onClick: onFindRecipe, primary: true },
-        { icon: '🔄', label: 'Regenerate', onClick: onRegenerate },
+        { icon: '✨', label: 'Ask AI', onClick: onAskAI, ai: true },
         { icon: '⚙️', label: 'Settings', onClick: onSettings },
         { icon: '👤', label: 'Profile', onClick: onProfile },
-      ].map(({ icon, label, onClick, primary }) => (
+      ].map(({ icon, label, onClick, primary, ai }) => (
         <button key={label} onClick={onClick}
           style={{ background: 'none', border: 'none', padding: '10px 4px 10px', cursor: 'pointer',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
           <span style={{ fontSize: '20px', lineHeight: 1 }}>{icon}</span>
           <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.3px',
-            color: primary ? P.accent : P.muted }}>{label}</span>
+            color: ai ? '#7C3AED' : primary ? P.accent : P.muted }}>{label}</span>
         </button>
       ))}
     </div>
