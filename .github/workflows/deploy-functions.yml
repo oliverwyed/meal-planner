@@ -23,3 +23,6 @@ jobs:
           supabase functions deploy import-recipe \
             --project-ref ejinmxvbeaolypwmkuhh \
             --no-verify-jwt
+          supabase functions deploy get-nutrition \
+            --project-ref ejinmxvbeaolypwmkuhh \
+            --no-verify-jwt
