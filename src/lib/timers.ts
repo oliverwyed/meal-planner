@@ -2,7 +2,7 @@
 // e.g. "cook for 8 mins" → [{ text: "cook for " }, { text: "8 mins", seconds: 480 }]
 export function parseTimerParts(text: string): { text: string; seconds?: number }[] {
   // Match patterns like "8 mins", "30 seconds", "1 hour 20 minutes", "45 sec", "2 hrs"
-  const timerPattern = /(\d+(?:\.\d+)?)\s*(hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s)(?:\s+(\d+(?:\.\d+)?)\s*(minutes?|mins?|m|seconds?|secs?|s))?/gi;
+  const timerPattern = /(\d+(?:\.\d+)?)\s*(hours?|hrs?|h(?!\w)|minutes?|mins?|m(?!\w)|seconds?|secs?|s(?!\w))(?:\s+(\d+(?:\.\d+)?)\s*(minutes?|mins?|m(?!\w)|seconds?|secs?|s(?!\w)))?/gi;
 
   const parts: { text: string; seconds?: number }[] = [];
   let lastIndex = 0;
