@@ -60,6 +60,7 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
   });
 
   const isRemoteUpdate = useRef(false);
+  const pendingShopSave = useRef(false);
 
   // Derived
   const allMeals = [...ALL_RECIPES, ...hs.customMeals];
@@ -85,6 +86,7 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
         ...patch,
         plan: patch.plan ?? prev.plan,
         preferences: patch.preferences ?? prev.preferences,
+        shopChecked: pendingShopSave.current ? prev.shopChecked : (patch.shopChecked ?? prev.shopChecked),
       }));
     });
     return () => { sub.unsubscribe(); };
@@ -108,7 +110,9 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
       if (hs.preferences !== p.preferences) patch.preferences  = hs.preferences;
       if (hs.cookHistory !== p.cookHistory) patch.cookHistory  = hs.cookHistory;
       prevHs.current = hs;
-      if (Object.keys(patch).length) saveState(householdId, patch);
+      if (Object.keys(patch).length) {
+        saveState(householdId, patch).then(() => { pendingShopSave.current = false; });
+      }
     }, 400);
     return () => clearTimeout(saveTimer.current);
   }, [householdId, hs]);
@@ -272,6 +276,7 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
   }, []);
 
   const setShopChecked = useCallback((checked: Record<string, boolean>) => {
+    pendingShopSave.current = true;
     setHs(prev => ({ ...prev, shopChecked: checked }));
   }, []);
 
