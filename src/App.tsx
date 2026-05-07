@@ -120,7 +120,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [nutritionLoading, setNutritionLoading] = useState<Set<string>>(new Set());
 
   const estimateNutrition = useCallback(async (meal: Meal) => {
-    if (nutritionCache[meal.name] || nutritionLoading.has(meal.name)) return;
+    if (meal.nutrition || nutritionCache[meal.name] || nutritionLoading.has(meal.name)) return;
     setNutritionLoading(prev => new Set(prev).add(meal.name));
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -136,13 +136,18 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       if (data._usage) recordCost('get-nutrition', data._usage.input_tokens, data._usage.output_tokens);
       const { _usage: _u1, ...nutrition } = data;
       setNutritionCache(prev => ({ ...prev, [meal.name]: nutrition }));
+      // Persist into plan meal so it survives page reload
+      const planMeal = state.plan?.meals.find(m => m.name === meal.name);
+      if (planMeal) actions.replaceMealInPlan(planMeal.day, { ...planMeal, nutrition });
+      // Persist into custom meal record
+      if (meal.id && meal.custom) actions.editMeal({ ...meal, nutrition });
     } catch (err) {
       log.error('get-nutrition', 'Unexpected error', { err: String(err) });
       showToast('Could not estimate nutrition');
     } finally {
       setNutritionLoading(prev => { const n = new Set(prev); n.delete(meal.name); return n; });
     }
-  }, [nutritionCache, nutritionLoading, showToast]);
+  }, [nutritionCache, nutritionLoading, showToast, state.plan, actions.replaceMealInPlan, actions.editMeal]);
 
   const keywordMatchFridge = useCallback((query: string, allMeals: Meal[]): Meal[] => {
     const STOPWORDS = new Set(['a', 'an', 'the', 'of', 'with', 'and', 'or', 'some', 'fresh', 'dried',
