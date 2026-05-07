@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import type { HouseholdState, DayName, DayMode, KidsMode, Meal, Plan, PlanMeal, DayConfig, DayOverrides, Preferences } from '../lib/types';
+import type { HouseholdState, DayName, DayMode, KidsMode, Meal, Plan, PlanMeal, DayConfig, DayOverrides, Preferences, PlanHistoryEntry } from '../lib/types';
 import { DEFAULT_DAY_CONFIG, DAYS } from '../lib/constants';
 import { loadState, saveState, saveFamilySize, addCustomMeal, updateCustomMeal, deleteCustomMeal, subscribeToState } from '../lib/supabase';
 import { getPool, smartPick } from '../lib/scoring';
@@ -43,12 +43,14 @@ export type AppActions = {
   addToHistory: (meals: { name: string }[]) => void;
   pickCookNow: (time: string, kidsMode: KidsMode, dietary: string) => Meal | null;
   setShopChecked: (checked: Record<string, boolean>) => void;
+  clearPlanHistory: () => void;
 };
 
 export function useHousehold(householdId: string): { state: AppState; actions: AppActions; loading: boolean } {
   const [loading, setLoading] = useState(true);
   const [hs, setHs] = useState<HouseholdState>({
     plan: null,
+    planHistory: [],
     dayConfig: { ...DEFAULT_DAY_CONFIG },
     kidsConfig: {},
     dayOverrides: {},
@@ -109,6 +111,7 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
       if (hs.dayOverrides !== p.dayOverrides) patch.dayOverrides = hs.dayOverrides;
       if (hs.preferences !== p.preferences) patch.preferences  = hs.preferences;
       if (hs.cookHistory !== p.cookHistory) patch.cookHistory  = hs.cookHistory;
+      if (hs.planHistory !== p.planHistory) patch.planHistory  = hs.planHistory;
       prevHs.current = hs;
       if (Object.keys(patch).length) {
         saveState(householdId, patch).then(() => { pendingShopSave.current = false; });
@@ -146,8 +149,20 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
     const now = Date.now();
     const newHistory = [...hs.cookHistory, ...selected.map(m => ({ name: m.name, date: now }))]
       .filter(h => now - h.date < 60 * 24 * 60 * 60 * 1000);
-    setHs(prev => ({ ...prev, plan: newPlan, dayOverrides: {}, cookHistory: newHistory, shopChecked: {} }));
-  }, [hs.dayConfig, hs.cookHistory, pool, smartOpts]);
+    const historyEntry: PlanHistoryEntry | null = hs.plan
+      ? { plan: { meals: hs.plan.meals, generatedAt: hs.plan.generatedAt }, dayOverrides: hs.dayOverrides, savedAt: now }
+      : null;
+    setHs(prev => ({
+      ...prev,
+      plan: newPlan,
+      dayOverrides: {},
+      cookHistory: newHistory,
+      shopChecked: {},
+      planHistory: historyEntry
+        ? [historyEntry, ...prev.planHistory].slice(0, 8)
+        : prev.planHistory,
+    }));
+  }, [hs.dayConfig, hs.cookHistory, hs.plan, hs.dayOverrides, pool, smartOpts]);
 
   const swap = useCallback((day: DayName, extraDislikes: string[] = []) => {
     if (!hs.plan) return;
@@ -259,6 +274,10 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
     setHs(prev => ({ ...prev, cookHistory: [] }));
   }, []);
 
+  const clearPlanHistory = useCallback(() => {
+    setHs(prev => ({ ...prev, planHistory: [] }));
+  }, []);
+
   const addToHistory = useCallback((meals: { name: string }[]) => {
     const now = Date.now();
     const oneDayAgo = now - 24 * 60 * 60 * 1000;
@@ -293,7 +312,7 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
 
   return {
     state: { ...hs, householdId, shopList, season },
-    actions: { generate, swap, setDayMode, setKidsMode, cycleKids, setFamilySize, setDaySize, setDayTime, setPreferences, toggleFav, addDislike, addMeal, editMeal, removeMeal, replaceMealInPlan, restorePlan, clearHistory, addToHistory, pickCookNow, setShopChecked },
+    actions: { generate, swap, setDayMode, setKidsMode, cycleKids, setFamilySize, setDaySize, setDayTime, setPreferences, toggleFav, addDislike, addMeal, editMeal, removeMeal, replaceMealInPlan, restorePlan, clearHistory, addToHistory, pickCookNow, setShopChecked, clearPlanHistory },
     loading,
   };
 }

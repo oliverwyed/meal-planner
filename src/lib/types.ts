@@ -39,6 +39,12 @@ export interface Plan {
   shopChecked?: Record<string, boolean>; // persisted alongside plan in DB
 }
 
+export interface PlanHistoryEntry {
+  plan: Plan;
+  dayOverrides: DayOverrides;
+  savedAt: number;
+}
+
 export interface DayConfig {
   [day: string]: DayMode;
 }
@@ -69,6 +75,7 @@ export interface CookHistoryEntry {
 
 export interface HouseholdState {
   plan: Plan | null;
+  planHistory: PlanHistoryEntry[];
   dayConfig: DayConfig;
   kidsConfig: KidsConfig;
   dayOverrides: DayOverrides;

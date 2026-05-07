@@ -43,6 +43,7 @@ export async function loadState(householdId: string): Promise<HouseholdState | n
   const { shopChecked: loadedChecked, ...cleanPlan } = rawPlan ?? {};
   return {
     plan: rawPlan ? (cleanPlan as import('./types').Plan) : null,
+    planHistory: s.plan_history ?? [],
     dayConfig: s.day_config ?? {},
     kidsConfig: s.kids_config ?? {},
     dayOverrides: s.day_overrides ?? {},
@@ -60,6 +61,7 @@ export async function saveState(
 ): Promise<void> {
   const update: Record<string, any> = {};
   if ('plan' in patch)        update.plan          = patch.plan;
+  if ('planHistory' in patch) update.plan_history  = patch.planHistory;
   if ('dayConfig' in patch)   update.day_config    = patch.dayConfig;
   if ('kidsConfig' in patch)  update.kids_config   = patch.kidsConfig;
   if ('dayOverrides' in patch) update.day_overrides = patch.dayOverrides;
@@ -116,6 +118,7 @@ export function subscribeToState(householdId: string, onUpdate: (state: Partial<
       const { shopChecked: remoteChecked, ...cleanPlan } = rawPlan ?? {};
       onUpdate({
         plan: rawPlan ? cleanPlan : null,
+        planHistory: s.plan_history ?? [],
         dayConfig: s.day_config ?? {},
         kidsConfig: s.kids_config ?? {},
         dayOverrides: s.day_overrides ?? {},

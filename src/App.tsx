@@ -56,6 +56,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [hintDismissed, setHintDismissed] = useState(() => localStorage.getItem('hintDismissed') === '1');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showAskAI, setShowAskAI] = useState(false);
+  const [showPlanHistory, setShowPlanHistory] = useState(false);
   const [pantryDraft, setPantryDraft] = useState(state.preferences.pantry);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const toastUndoRef = useRef<(() => void) | null>(null);
@@ -324,6 +325,12 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
             }} style={{ background: 'none', border: 'none', borderRadius: '10px', padding: '9px 12px', fontSize: '14px', fontWeight: 700, color: P.muted, cursor: 'pointer', textAlign: 'left' }}>
               🔄 Regenerate
             </button>
+            {state.planHistory.length > 0 && (
+              <button onClick={() => setShowPlanHistory(true)}
+                style={{ background: 'none', border: 'none', borderRadius: '10px', padding: '9px 12px', fontSize: '14px', fontWeight: 700, color: P.muted, cursor: 'pointer', textAlign: 'left' }}>
+                🕐 History
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -351,6 +358,9 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); actions.setShopChecked({}); } : undefined);
             }} title="Regenerate plan">🔄</IconBtn>
             <IconBtn onClick={() => downloadICS(state.plan!, state.familySize)} title="Export to calendar">📅</IconBtn>
+            {state.planHistory.length > 0 && (
+              <IconBtn onClick={() => setShowPlanHistory(true)} title="Previous plans">🕐</IconBtn>
+            )}
             <IconBtn onClick={() => setShowHelp(true)} title="How it works">ℹ️</IconBtn>
           </div>
         </div>
@@ -688,6 +698,69 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       )}
 
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+
+      {/* Plan history modal */}
+      {showPlanHistory && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 500 }}>
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '24px 0 40px' } as React.CSSProperties}
+            onClick={() => setShowPlanHistory(false)}>
+            <div style={{ maxWidth: '480px', margin: '0 auto', padding: '0 16px' }} onClick={e => e.stopPropagation()}>
+              <div style={{ background: P.bg, borderRadius: '20px', boxShadow: '0 8px 40px rgba(0,0,0,0.22)', overflow: 'hidden' }}>
+                <div style={{ background: P.accent, padding: '18px 20px', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontSize: '11px', opacity: 0.85, fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase' }}>Plan history</div>
+                    <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', marginTop: '2px' }}>🕐 Previous plans</div>
+                  </div>
+                  <button onClick={() => setShowPlanHistory(false)}
+                    style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: '10px', padding: '8px 12px', cursor: 'pointer', fontSize: '18px', fontWeight: 700 }}>✕</button>
+                </div>
+                <div style={{ padding: '16px 20px 24px' }}>
+                  {state.planHistory.length === 0 ? (
+                    <div style={{ color: P.muted, fontSize: '14px', textAlign: 'center', padding: '20px 0' }}>No previous plans yet. Generate a new plan to start building history.</div>
+                  ) : (
+                    state.planHistory.map((entry, idx) => {
+                      const d = new Date(entry.savedAt);
+                      const weekLabel = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                      return (
+                        <div key={idx} style={{ borderBottom: idx < state.planHistory.length - 1 ? `1px solid ${P.border}` : 'none', paddingBottom: '16px', marginBottom: '16px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 700, color: P.text }}>Week of {weekLabel}</div>
+                            <button onClick={() => {
+                              actions.restorePlan(entry.plan, entry.dayOverrides);
+                              actions.setShopChecked({});
+                              setShowPlanHistory(false);
+                              showToast('Plan restored!', () => {
+                                actions.restorePlan(state.plan!, state.dayOverrides);
+                                actions.setShopChecked({});
+                              });
+                            }} style={{ background: P.accentLight, border: 'none', borderRadius: '8px', padding: '5px 12px', fontSize: '12px', fontWeight: 700, color: P.accentDark, cursor: 'pointer' }}>
+                              Restore
+                            </button>
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            {entry.plan.meals.map(m => (
+                              <div key={m.day} style={{ display: 'flex', gap: '8px', fontSize: '13px' }}>
+                                <span style={{ color: P.muted, minWidth: '36px', flexShrink: 0 }}>{m.day.slice(0, 3)}</span>
+                                <span style={{ color: P.text }}>{m.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                  {state.planHistory.length > 0 && (
+                    <button onClick={() => { actions.clearPlanHistory(); setShowPlanHistory(false); }}
+                      style={{ background: 'none', border: `1px solid ${P.border}`, borderRadius: '8px', padding: '6px 14px', fontSize: '12px', color: P.muted, cursor: 'pointer', marginTop: '4px' }}>
+                      Clear history
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Ask AI modal */}
       {showAskAI && (
