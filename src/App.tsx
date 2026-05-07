@@ -1271,6 +1271,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
             isFav={state.preferences.favourites.includes(browseDetailMeal.name)}
             onFav={() => actions.toggleFav(browseDetailMeal.name)}
             onAdd={() => { setBrowseAddDay(browseDetailMeal); setBrowseDetailMeal(null); }}
+            onCook={() => { setCookingMeal({ meal: browseDetailMeal, familySize: state.familySize }); setBrowseDetailMeal(null); }}
             onClose={() => setBrowseDetailMeal(null)}
             familySize={state.familySize}
           />
