@@ -87,6 +87,20 @@ export interface HouseholdState {
   updatedAt?: number;
 }
 
+export interface CommunityMeal extends Meal {
+  communityId: string;
+  sourceHouseholdId?: string;
+  publishedAt: number;
+}
+
+export interface RecipeReview {
+  id: string;
+  recipeName: string;
+  stars: number;
+  comment?: string;
+  createdAt: number;
+}
+
 export interface ScaledIngredient {
   qty: string;
   label: string;

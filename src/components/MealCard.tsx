@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import type { Meal, KidsMode } from '../lib/types';
+import type { Meal, KidsMode, RecipeReview } from '../lib/types';
 import { P } from '../lib/constants';
 import { Tag, TimeSlider } from './ui';
 import { buildMealShop, getCookedNote, CAT_EMOJI } from '../lib/shopping';
@@ -36,6 +36,11 @@ interface Props {
   onCookMode?: () => void;
   onAdapt?: (request: string) => Promise<Meal>;
   onSaveAdapted?: (adapted: Meal) => void;
+  reviews?: RecipeReview[];
+  reviewsLoading?: boolean;
+  onAddReview?: (stars: number, comment: string) => Promise<void>;
+  householdReviewId?: string;
+  onDeleteReview?: (id: string) => void;
 }
 
 function getMealEmoji(meal: Meal): string {
@@ -46,7 +51,8 @@ function getMealEmoji(meal: Meal): string {
 
 export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOpen, expanded, familySize, onOverview, onFullExpand, onFav,
   onSwap, onDislike, onChoose, onMarkOff, onMarkCooked, onChangeMealSize, kidsMode, onCycleKids, dayTimeFilter, onSetDayTime,
-  readOnly, lastUsedStr, onStartTimer, onEstimateNutrition, nutritionLoading, nutrition, onCookMode, onAdapt, onSaveAdapted }: Props) {
+  readOnly, lastUsedStr, onStartTimer, onEstimateNutrition, nutritionLoading, nutrition, onCookMode, onAdapt, onSaveAdapted,
+  reviews, reviewsLoading, onAddReview, householdReviewId, onDeleteReview }: Props) {
 
   const [adaptedMeal, setAdaptedMeal] = useState<Meal | null>(null);
   const [adaptRequest, setAdaptRequest] = useState('');
@@ -55,6 +61,11 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
   const [adaptLoading, setAdaptLoading] = useState(false);
   const [adaptError, setAdaptError] = useState('');
   const [cardTab, setCardTab] = useState<'overview' | 'ingredients' | 'recipe'>('overview');
+
+  const [reviewStars, setReviewStars] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewDone, setReviewDone] = useState(false);
 
   useEffect(() => { if (!expanded) setCardTab('overview'); }, [expanded]);
 
@@ -357,6 +368,78 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
               : <div style={{ fontSize: '14px', color: P.muted }}>No recipe steps listed.</div>
             }
           </>}
+
+          {/* Reviews section */}
+          {onAddReview && (
+            <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: `1px solid ${P.border}` }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '10px' }}>★ Reviews</div>
+
+              {reviewsLoading && <div style={{ fontSize: '13px', color: P.muted, marginBottom: '10px' }}>Loading…</div>}
+
+              {/* Existing reviews */}
+              {reviews && reviews.length > 0 && (
+                <div style={{ marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {reviews.slice(0, 5).map(r => (
+                    <div key={r.id} style={{ background: P.bg, borderRadius: '10px', padding: '9px 12px', border: `1px solid ${P.border}` }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: r.comment ? '4px' : 0 }}>
+                        <span style={{ fontSize: '14px', letterSpacing: '1px' }}>{'★'.repeat(r.stars)}{'☆'.repeat(5 - r.stars)}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontSize: '11px', color: P.muted }}>{new Date(r.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
+                          {householdReviewId === r.id && onDeleteReview && (
+                            <button onClick={e => { e.stopPropagation(); onDeleteReview(r.id); }}
+                              style={{ background: 'none', border: 'none', color: P.muted, cursor: 'pointer', fontSize: '14px', padding: '0 2px', lineHeight: 1 }}>×</button>
+                          )}
+                        </div>
+                      </div>
+                      {r.comment && <div style={{ fontSize: '13px', color: P.text, lineHeight: 1.45 }}>{r.comment}</div>}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {reviews && reviews.length === 0 && !reviewDone && (
+                <div style={{ fontSize: '13px', color: P.muted, marginBottom: '10px' }}>No reviews yet — be the first!</div>
+              )}
+
+              {/* Add review form */}
+              {!reviewDone && !householdReviewId && (
+                <div>
+                  <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
+                    {[1, 2, 3, 4, 5].map(s => (
+                      <button key={s} onClick={e => { e.stopPropagation(); setReviewStars(s); }}
+                        style={{ background: 'none', border: 'none', fontSize: '22px', cursor: 'pointer', padding: '2px', color: s <= reviewStars ? '#F59E0B' : P.border }}>
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                  {reviewStars > 0 && (
+                    <>
+                      <textarea
+                        value={reviewComment}
+                        onChange={e => setReviewComment(e.target.value)}
+                        placeholder="Add a comment (optional)…"
+                        rows={2}
+                        onClick={e => e.stopPropagation()}
+                        style={{ width: '100%', padding: '8px 12px', border: `1px solid ${P.border}`, borderRadius: '8px', fontSize: '13px', background: P.bg, boxSizing: 'border-box', resize: 'none', marginBottom: '8px', lineHeight: 1.5 }}
+                      />
+                      <button onClick={async e => {
+                        e.stopPropagation();
+                        if (!reviewStars) return;
+                        setReviewSubmitting(true);
+                        await onAddReview(reviewStars, reviewComment);
+                        setReviewDone(true);
+                        setReviewSubmitting(false);
+                      }} disabled={reviewSubmitting}
+                        style={{ background: P.accent, border: 'none', borderRadius: '8px', padding: '8px 18px', fontSize: '13px', fontWeight: 700, color: '#fff', cursor: reviewSubmitting ? 'default' : 'pointer', opacity: reviewSubmitting ? 0.7 : 1 }}>
+                        {reviewSubmitting ? 'Saving…' : 'Submit review'}
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+              {reviewDone && <div style={{ fontSize: '13px', color: P.accent, fontWeight: 700 }}>✓ Thanks for your review!</div>}
+              {householdReviewId && !reviewDone && <div style={{ fontSize: '13px', color: P.muted }}>You've already reviewed this recipe.</div>}
+            </div>
+          )}
 
           {/* Day-mode actions — always visible */}
           {(onMarkCooked || onMarkOff) && <div style={{ display: 'flex', gap: '6px', marginTop: '16px', paddingTop: '12px', borderTop: `1px solid ${P.border}`, flexWrap: 'wrap' }}>

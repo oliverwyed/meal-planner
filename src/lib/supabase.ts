@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import type { HouseholdState, Meal } from './types';
+import type { HouseholdState, Meal, CommunityMeal, RecipeReview } from './types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
@@ -133,4 +133,106 @@ export function subscribeToState(householdId: string, onUpdate: (state: Partial<
       onUpdate({ customMeals });
     })
     .subscribe();
+}
+
+// ── Community meals ───────────────────────────────────────────────────────────
+
+export async function loadCommunityMeals(): Promise<CommunityMeal[]> {
+  const { data, error } = await supabase
+    .from('community_meals')
+    .select('*')
+    .order('published_at', { ascending: false });
+  if (error) { console.error(error); return []; }
+  return (data ?? []).map((r: any) => ({
+    ...r.meal_data,
+    communityId: r.id,
+    sourceHouseholdId: r.source_household_id,
+    publishedAt: new Date(r.published_at).getTime(),
+    sourceUrl: r.source_url,
+    photo: r.photo_url ?? r.meal_data?.photo,
+    custom: true,
+  }));
+}
+
+export async function publishMeal(
+  householdId: string,
+  meal: Meal,
+): Promise<CommunityMeal | null> {
+  const { sourceUrl, id: _id, communityId: _cid, ...mealData } = meal as any;
+  const { data, error } = await supabase
+    .from('community_meals')
+    .insert({
+      meal_data: { ...mealData, custom: true },
+      source_url: sourceUrl ?? null,
+      photo_url: meal.photo ?? null,
+      source_household_id: householdId,
+    })
+    .select('*')
+    .single();
+  if (error) { console.error(error); return null; }
+  return {
+    ...data.meal_data,
+    communityId: data.id,
+    sourceHouseholdId: data.source_household_id,
+    publishedAt: new Date(data.published_at).getTime(),
+    sourceUrl: data.source_url,
+    photo: data.photo_url ?? data.meal_data?.photo,
+    custom: true,
+  };
+}
+
+export async function unpublishMeal(communityId: string): Promise<void> {
+  await supabase.from('community_meals').delete().eq('id', communityId);
+}
+
+export async function uploadRecipePhoto(file: File): Promise<string | null> {
+  const ext = file.name.split('.').pop() ?? 'jpg';
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  const { error } = await supabase.storage.from('recipe-photos').upload(path, file, { upsert: false });
+  if (error) { console.error(error); return null; }
+  const { data } = supabase.storage.from('recipe-photos').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+// ── Reviews ───────────────────────────────────────────────────────────────────
+
+export async function loadReviews(recipeName: string): Promise<RecipeReview[]> {
+  const { data, error } = await supabase
+    .from('recipe_reviews')
+    .select('*')
+    .eq('recipe_name', recipeName)
+    .order('created_at', { ascending: false });
+  if (error) { console.error(error); return []; }
+  return (data ?? []).map((r: any) => ({
+    id: r.id,
+    recipeName: r.recipe_name,
+    stars: r.stars,
+    comment: r.comment ?? undefined,
+    createdAt: new Date(r.created_at).getTime(),
+  }));
+}
+
+export async function addReview(
+  householdId: string,
+  recipeName: string,
+  stars: number,
+  comment: string,
+): Promise<RecipeReview | null> {
+  const { data, error } = await supabase
+    .from('recipe_reviews')
+    .insert({ household_id: householdId, recipe_name: recipeName, stars, comment: comment.trim() || null })
+    .select('*')
+    .single();
+  if (error) { console.error(error); return null; }
+  return {
+    id: data.id,
+    recipeName: data.recipe_name,
+    stars: data.stars,
+    comment: data.comment ?? undefined,
+    createdAt: new Date(data.created_at).getTime(),
+  };
+}
+
+export async function deleteReview(reviewId: string): Promise<void> {
+  await supabase.from('recipe_reviews').delete().eq('id', reviewId);
 }
