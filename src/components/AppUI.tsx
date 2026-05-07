@@ -316,14 +316,14 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-export function BrowseMealCard({ meal, isFav, onFav, onAdd, compact, communityLabel }: {
-  meal: Meal; isFav: boolean; onFav: () => void; onAdd: () => void; compact?: boolean; communityLabel?: boolean;
+export function BrowseMealCard({ meal, isFav, onFav, onAdd, onView, compact, communityLabel }: {
+  meal: Meal; isFav: boolean; onFav: () => void; onAdd: () => void; onView?: () => void; compact?: boolean; communityLabel?: boolean;
 }) {
   const cardStyle: React.CSSProperties = compact
     ? { width: '140px', flexShrink: 0, background: P.card, borderRadius: '14px', overflow: 'hidden', boxShadow: P.shadow, border: `1px solid ${P.border}`, cursor: 'pointer' }
-    : { background: P.card, borderRadius: '14px', overflow: 'hidden', boxShadow: P.shadow, border: `1px solid ${P.border}` };
+    : { background: P.card, borderRadius: '14px', overflow: 'hidden', boxShadow: P.shadow, border: `1px solid ${P.border}`, cursor: onView ? 'pointer' : 'default' };
   return (
-    <div style={cardStyle}>
+    <div style={cardStyle} onClick={onView}>
       {meal.photo && (
         <div style={{ position: 'relative' }}>
           <img src={meal.photo} alt={meal.name} loading="lazy"
@@ -342,13 +342,13 @@ export function BrowseMealCard({ meal, isFav, onFav, onAdd, compact, communityLa
           ⏱ {meal.time}{communityLabel ? ' · 👥' : ''}
         </div>
         {!compact && (
-          <button onClick={onAdd}
+          <button onClick={e => { e.stopPropagation(); onAdd(); }}
             style={{ width: '100%', background: P.accentLight, border: 'none', borderRadius: '8px', padding: '7px', fontSize: '12px', fontWeight: 700, color: P.accentDark, cursor: 'pointer' }}>
             + Add to plan
           </button>
         )}
         {compact && (
-          <button onClick={onAdd}
+          <button onClick={e => { e.stopPropagation(); onAdd(); }}
             style={{ width: '100%', background: P.accentLight, border: 'none', borderRadius: '6px', padding: '5px', fontSize: '11px', fontWeight: 700, color: P.accentDark, cursor: 'pointer' }}>
             + Add
           </button>
@@ -356,6 +356,93 @@ export function BrowseMealCard({ meal, isFav, onFav, onAdd, compact, communityLa
       </div>
     </div>
   );
+}
+
+export function RecipeDetailSheet({ meal, isFav, onFav, onAdd, onClose, familySize }: {
+  meal: Meal; isFav: boolean; onFav: () => void; onAdd: () => void; onClose: () => void; familySize: number;
+}) {
+  const scale = familySize / (meal.serves ?? 4);
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 600, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
+      onClick={onClose}>
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }} />
+      <div style={{ position: 'relative', background: P.bg, borderRadius: '20px 20px 0 0', maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 -4px 32px rgba(0,0,0,0.18)' }}
+        onClick={e => e.stopPropagation()}>
+        {/* Drag handle */}
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 0' }}>
+          <div style={{ width: '36px', height: '4px', borderRadius: '2px', background: P.border }} />
+        </div>
+        {/* Photo or gradient header */}
+        {meal.photo ? (
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <img src={meal.photo} alt={meal.name} style={{ width: '100%', height: '200px', objectFit: 'cover', display: 'block' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)' }} />
+            <button onClick={onClose} style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(0,0,0,0.4)', border: 'none', color: '#fff', borderRadius: '20px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 16px 4px' }}>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', color: P.muted, fontSize: '22px', cursor: 'pointer', padding: '4px 8px' }}>✕</button>
+          </div>
+        )}
+        {/* Scrollable content */}
+        <div style={{ overflowY: 'auto', padding: '16px 20px 32px', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
+          {/* Title + meta */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+            <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '22px', lineHeight: 1.25, flex: 1, marginRight: '12px' }}>{meal.name}</div>
+            <button onClick={onFav} style={{ background: 'none', border: 'none', fontSize: '22px', cursor: 'pointer', color: isFav ? P.gold : P.muted, flexShrink: 0, padding: '2px' }}>
+              {isFav ? '★' : '☆'}
+            </button>
+          </div>
+          <div style={{ fontSize: '13px', color: P.muted, marginBottom: '14px' }}>
+            ⏱ {meal.time} · {meal.cuisine} · {meal.protein} · serves {meal.serves ?? 4}
+          </div>
+          {meal.description && (
+            <div style={{ fontSize: '14px', color: P.text, lineHeight: 1.6, marginBottom: '18px' }}>{meal.description}</div>
+          )}
+          {/* Ingredients */}
+          {(meal.ingredients ?? []).length > 0 && (
+            <div style={{ marginBottom: '18px' }}>
+              <div style={{ fontWeight: 700, fontSize: '13px', textTransform: 'uppercase', letterSpacing: '1px', color: P.muted, marginBottom: '8px' }}>
+                Ingredients {familySize !== (meal.serves ?? 4) && <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>· scaled for {familySize}</span>}
+              </div>
+              <div style={{ background: P.card, borderRadius: '12px', border: `1px solid ${P.border}`, padding: '4px 14px' }}>
+                {(meal.ingredients ?? []).map((ing, i) => (
+                  <div key={i} style={{ padding: '8px 0', borderBottom: i < (meal.ingredients ?? []).length - 1 ? `1px solid ${P.border}` : 'none', fontSize: '14px', lineHeight: 1.5 }}>
+                    {scale !== 1 ? scaleIngredient(ing, scale) : ing}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {/* Steps */}
+          {(meal.steps ?? []).length > 0 && (
+            <div style={{ marginBottom: '20px' }}>
+              <div style={{ fontWeight: 700, fontSize: '13px', textTransform: 'uppercase', letterSpacing: '1px', color: P.muted, marginBottom: '8px' }}>Method</div>
+              {(meal.steps ?? []).map((step, i) => (
+                <div key={i} style={{ display: 'flex', gap: '12px', marginBottom: '10px' }}>
+                  <div style={{ flexShrink: 0, width: '24px', height: '24px', borderRadius: '50%', background: P.accentLight, color: P.accentDark, fontSize: '12px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{i + 1}</div>
+                  <div style={{ fontSize: '14px', lineHeight: 1.6, color: P.text, paddingTop: '2px' }}>{step}</div>
+                </div>
+              ))}
+            </div>
+          )}
+          {/* Add to plan */}
+          <button onClick={onAdd}
+            style={{ width: '100%', background: P.accent, color: '#fff', border: 'none', borderRadius: '12px', padding: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
+            + Add to plan
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function scaleIngredient(ingredient: string, scale: number): string {
+  if (Math.abs(scale - 1) < 0.05) return ingredient;
+  return ingredient.replace(/(\d+\.?\d*)/g, (_, n) => {
+    const scaled = parseFloat(n) * scale;
+    return scaled % 1 === 0 ? String(scaled) : scaled.toFixed(1).replace(/\.0$/, '');
+  });
 }
 
 export function LogsPanel() {

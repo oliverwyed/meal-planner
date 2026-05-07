@@ -5,7 +5,7 @@ import { CookingMode } from './components/CookingMode';
 import { ImportRecipe } from './components/ImportRecipe';
 import { PhotoImport } from './components/PhotoImport';
 import { Primary, Secondary, Toast, Spinner, Section, TimeSlider, ActiveTimers, BottomNav } from './components/ui';
-import { Screen, Header, IconBtn, Row, Stepper, Chip, DayActions, DayToggle, Modal, MealPicker, AddMealForm, HelpModal, BrowseMealCard, LogsPanel, formatLastUsed, SEASON_INFO } from './components/AppUI';
+import { Screen, Header, IconBtn, Row, Stepper, Chip, DayActions, DayToggle, Modal, MealPicker, AddMealForm, HelpModal, BrowseMealCard, RecipeDetailSheet, LogsPanel, formatLastUsed, SEASON_INFO } from './components/AppUI';
 import { useHousehold } from './hooks/useHousehold';
 import { DAYS, HOUSEHOLD_ID_KEY, P, DESKTOP_BREAKPOINT } from './lib/constants';
 import type { DayName, DayMode, KidsMode, Meal, CommunityMeal, RecipeReview } from './lib/types';
@@ -116,6 +116,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [browseCuisine, setBrowseCuisine] = useState('');
   const [browseTime, setBrowseTime] = useState('');
   const [browseAddDay, setBrowseAddDay] = useState<Meal | null>(null);
+  const [browseDetailMeal, setBrowseDetailMeal] = useState<Meal | null>(null);
   const [browseTab, setBrowseTab] = useState<'all' | 'community'>('all');
 
   // Community meals
@@ -1186,6 +1187,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                       isFav={state.preferences.favourites.includes(m.name)}
                       onFav={() => actions.toggleFav(m.name)}
                       onAdd={() => setBrowseAddDay(m)}
+                      onView={() => setBrowseDetailMeal(m)}
                       compact
                     />
                   ))}
@@ -1201,6 +1203,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                   isFav={state.preferences.favourites.includes(m.name)}
                   onFav={() => actions.toggleFav(m.name)}
                   onAdd={() => setBrowseAddDay(m)}
+                  onView={() => setBrowseDetailMeal(m)}
                 />
               ))}
             </div>
@@ -1236,6 +1239,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                     isFav={state.preferences.favourites.includes(m.name)}
                     onFav={() => actions.toggleFav(m.name)}
                     onAdd={() => setBrowseAddDay(m)}
+                    onView={() => setBrowseDetailMeal(m)}
                     communityLabel
                   />
                 ))}
@@ -1245,6 +1249,16 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         </div>
 
         {addDayModal}
+        {browseDetailMeal && (
+          <RecipeDetailSheet
+            meal={browseDetailMeal}
+            isFav={state.preferences.favourites.includes(browseDetailMeal.name)}
+            onFav={() => actions.toggleFav(browseDetailMeal.name)}
+            onAdd={() => { setBrowseAddDay(browseDetailMeal); setBrowseDetailMeal(null); }}
+            onClose={() => setBrowseDetailMeal(null)}
+            familySize={state.familySize}
+          />
+        )}
         {toast && <Toast message={toast} onUndo={toastUndoRef.current ?? undefined} bottom="80px" />}
         <BottomNav
           onShopping={() => setStep('shopping')}
