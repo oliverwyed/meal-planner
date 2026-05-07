@@ -44,7 +44,6 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [inviteLoading, setInviteLoading] = useState(false);
   const [hintDismissed, setHintDismissed] = useState(() => localStorage.getItem('hintDismissed') === '1');
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [showAskAI, setShowAskAI] = useState(false);
   const [showPlanHistory, setShowPlanHistory] = useState(false);
   const [isFirstRun, setIsFirstRun] = useState(() => !localStorage.getItem('onboardingDone'));
   const [onboardStep, setOnboardStep] = useState<1 | 2 | 3>(1);
@@ -117,6 +116,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [browseTime, setBrowseTime] = useState('');
   const [browseAddDay, setBrowseAddDay] = useState<Meal | null>(null);
   const [browseDetailMeal, setBrowseDetailMeal] = useState<Meal | null>(null);
+  const [browseAIOpen, setBrowseAIOpen] = useState(false);
   const [planDetailMeal, setPlanDetailMeal] = useState<{ meal: Meal; daySize: number } | null>(null);
   const [browseTab, setBrowseTab] = useState<'all' | 'community'>('all');
 
@@ -243,6 +243,13 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     log.info('adapt-recipe', `Success → "${adaptedMeal.name}"`);
     return adaptedMeal as Meal;
   }, []);
+
+  const rePick = useCallback((opts?: { time: string; kids: string; dietary: string }) => {
+    const o = opts ?? cookNowOpts;
+    const meal = actions.pickCookNow(o.time, o.kids as any, o.dietary);
+    if (meal) { setCookNow(meal); setCookNowExp(true); }
+    else showToast('No meals match — try relaxing your filters');
+  }, [cookNowOpts, actions, showToast]);
 
   const didAutoNav = useRef(false);
 
@@ -421,7 +428,6 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           onPlan={() => setStep('plan')}
           onShopping={() => setStep('shopping')}
           onBrowse={() => setStep('browse')}
-          onAskAI={() => { setStep('plan'); setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
           onSettings={() => setStep('setup')}
           onProfile={() => setStep('prefs')}
           active="settings"
@@ -632,7 +638,6 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           onPlan={() => setStep('plan')}
           onShopping={() => setStep('shopping')}
           onBrowse={() => setStep('browse')}
-          onAskAI={() => { setStep('plan'); setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
           onSettings={() => setStep('setup')}
           onProfile={() => setStep('prefs')}
           active="plan"
@@ -640,208 +645,6 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       )}
 
       {toast && <Toast message={toast} onUndo={toastUndoRef.current ?? undefined} bottom="80px" />}
-
-      {/* Find a recipe modal */}
-      {cookNow && (() => {
-        const rePick = (opts = cookNowOpts) => {
-          const meal = actions.pickCookNow(opts.time, opts.kids as any, opts.dietary);
-          if (meal) { setCookNow(meal); setCookNowExp(true); }
-          else showToast('No meals match — try relaxing your filters');
-        };
-        const updateOpts = (patch: Partial<typeof cookNowOpts>) => {
-          const next = { ...cookNowOpts, ...patch };
-          setCookNowOpts(next);
-          if (!('size' in patch)) rePick(next);
-        };
-        const lu = state.cookHistory.filter(h => h.name === cookNow.name);
-        const lastUsedStr = formatLastUsed(lu.length ? Math.max(...lu.map(h => h.date)) : null);
-        const homeDays = DAYS.filter(d => !state.dayConfig[d] || state.dayConfig[d] === 'home');
-        return (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 500 }}>
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '24px 0 40px' } as React.CSSProperties}
-              onClick={() => setCookNow(null)}>
-              <div style={{ maxWidth: '480px', margin: '0 auto', padding: '0 16px' }} onClick={e => e.stopPropagation()}>
-                <div style={{ background: P.bg, borderRadius: '20px', boxShadow: '0 8px 40px rgba(0,0,0,0.22)', overflow: 'hidden' }}>
-                  {/* Header */}
-                  <div style={{ background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`, padding: '20px 20px 12px', color: '#fff' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                      <div>
-                        <div style={{ fontSize: '11px', opacity: 0.85, fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase' }}>Find a recipe</div>
-                        <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '22px', marginTop: '3px' }}>What shall we make?</div>
-                      </div>
-                      <button onClick={() => setCookNow(null)}
-                        style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: '10px', padding: '8px 12px', cursor: 'pointer', fontSize: '18px', fontWeight: 700 }}>✕</button>
-                    </div>
-                    {/* Tab bar */}
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                      {([['🎲 Suggested', 'suggest'], ['🧊 From my fridge', 'fridge']] as [string, 'suggest' | 'fridge'][]).map(([label, tab]) => (
-                        <button key={tab} onClick={() => { setFindRecipeTab(tab); setFridgeMatches(null); setFridgeQuery(''); }}
-                          style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', fontSize: '13px', fontWeight: 700, cursor: 'pointer',
-                            background: findRecipeTab === tab ? '#fff' : 'rgba(255,255,255,0.2)',
-                            color: findRecipeTab === tab ? P.accent : '#fff' }}>
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Fridge search tab */}
-                  {findRecipeTab === 'fridge' && (
-                    <div style={{ padding: '16px' }}>
-                      <div style={{ fontSize: '13px', color: P.muted, marginBottom: '12px', lineHeight: 1.5 }}>
-                        Tell us what you have and we'll find the best matches from your recipe library.
-                      </div>
-                      <textarea
-                        value={fridgeQuery}
-                        onChange={e => setFridgeQuery(e.target.value)}
-                        placeholder="e.g. chicken thighs, broccoli, canned tomatoes, pasta, garlic"
-                        rows={3}
-                        style={{ width: '100%', padding: '11px 14px', border: `2px solid ${P.border}`, borderRadius: '10px', fontSize: '14px', background: P.card, boxSizing: 'border-box', resize: 'none', lineHeight: 1.5, marginBottom: '10px' }}
-                      />
-                      <button onClick={() => searchFridge(fridgeQuery)} disabled={fridgeLoading || !fridgeQuery.trim()}
-                        style={{ width: '100%', background: P.accent, color: '#fff', border: 'none', borderRadius: '10px', padding: '12px', fontSize: '14px', fontWeight: 700, cursor: fridgeLoading || !fridgeQuery.trim() ? 'default' : 'pointer', opacity: fridgeLoading || !fridgeQuery.trim() ? 0.6 : 1, marginBottom: '16px' }}>
-                        {fridgeLoading ? '✨ Asking AI…' : '🔍 Find meals'}
-                      </button>
-
-                      {fridgeMatches !== null && fridgeMatches.length === 0 && (
-                        <div style={{ textAlign: 'center', color: P.muted, fontSize: '14px', marginBottom: '12px' }}>
-                          No close matches found.
-                          <button onClick={() => { setFindRecipeTab('suggest'); setShowImport(true); setCookNow(null); }}
-                            style={{ display: 'block', margin: '10px auto 0', background: P.accentLight, color: P.accentDark, border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
-                            Generate a custom recipe →
-                          </button>
-                        </div>
-                      )}
-
-                      {fridgeMatches && fridgeMatches.length > 0 && (
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-                            <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '1px' }}>
-                              {fridgeMatches.length} match{fridgeMatches.length !== 1 ? 'es' : ''} found
-                            </div>
-                            {fridgeAI && <span style={{ background: '#EDE9FE', color: '#5B21B6', borderRadius: '6px', padding: '2px 7px', fontSize: '10px', fontWeight: 700 }}>✨ AI</span>}
-                          </div>
-                          {fridgeMatches.map(match => (
-                            <div key={match.name}
-                              onClick={() => { setCookNow(match); setCookNowExp(false); setFindRecipeTab('suggest'); setFridgeMatches(null); }}
-                              style={{ background: P.card, border: `1.5px solid ${P.border}`, borderRadius: '12px', padding: '12px 14px', marginBottom: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <div>
-                                <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>{match.name}</div>
-                                <div style={{ fontSize: '12px', color: P.muted }}>{match.time} · {match.cuisine}</div>
-                              </div>
-                              <div style={{ fontSize: '20px', marginLeft: '10px', flexShrink: 0 }}>→</div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Filters + meal card + actions (suggested tab only) */}
-                  {findRecipeTab === 'suggest' && <>
-                  <div style={{ padding: '12px 16px', borderBottom: `1px solid ${P.border}`, background: P.card }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                      <div style={{ display: 'flex', gap: '5px' }}>
-                        {([['👶 Kids', 'kids'], ['✌️ Either', 'either'], ['🍷 Adults', 'adults']] as [string, string][]).map(([label, val]) => (
-                          <button key={val} onClick={() => updateOpts({ kids: val })}
-                            style={{ background: cookNowOpts.kids === val ? P.accentLight : 'transparent', border: `1.5px solid ${cookNowOpts.kids === val ? P.accent : P.border}`, borderRadius: '20px', padding: '4px 10px', fontSize: '12px', fontWeight: 700, color: cookNowOpts.kids === val ? P.accentDark : P.muted, cursor: 'pointer' }}>
-                            {label}
-                          </button>
-                        ))}
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <button onClick={() => setCookNowOpts(p => ({ ...p, size: Math.max(1, p.size - 1) }))}
-                          style={{ background: P.border, border: 'none', borderRadius: '6px', width: '22px', height: '22px', fontSize: '15px', cursor: 'pointer', color: P.muted, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
-                        <span style={{ fontSize: '12px', fontWeight: 600, color: P.muted, minWidth: '52px', textAlign: 'center' }}>{cookNowOpts.size} people</span>
-                        <button onClick={() => setCookNowOpts(p => ({ ...p, size: Math.min(20, p.size + 1) }))}
-                          style={{ background: P.border, border: 'none', borderRadius: '6px', width: '22px', height: '22px', fontSize: '15px', cursor: 'pointer', color: P.muted, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
-                      </div>
-                    </div>
-                    <div style={{ marginBottom: '8px' }}>
-                      <TimeSlider value={cookNowOpts.time} label="Max cook time" onChange={v => updateOpts({ time: v })} />
-                    </div>
-                    <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-                      {([['none', 'All'], ['noFish', 'No fish'], ['noPork', 'No pork'], ['noRed', 'No red meat'], ['veggie', '🌱 Veggie']] as [string, string][]).map(([v, l]) => (
-                        <button key={v} onClick={() => updateOpts({ dietary: v })}
-                          style={{ background: cookNowOpts.dietary === v ? P.greenLight : 'transparent', border: `1.5px solid ${cookNowOpts.dietary === v ? P.greenDark : P.border}`, borderRadius: '20px', padding: '3px 9px', fontSize: '11px', fontWeight: 700, color: cookNowOpts.dietary === v ? P.greenDark : P.muted, cursor: 'pointer' }}>
-                          {l}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Suggested meal card */}
-                  <div style={{ padding: '16px' }}>
-                    <MealCard meal={cookNow} day="Tonight"
-                      isFav={state.preferences.favourites.includes(cookNow.name)}
-                      isSeasonal={!!(cookNow.seasons?.includes(state.season as any))}
-                      seasonLabel={si.label}
-                      overviewOpen={true}
-                      expanded={cookNowExp}
-                      familySize={cookNowOpts.size}
-                      onOverview={() => setCookNowExp(x => !x)}
-                      onFullExpand={() => setCookNowExp(x => !x)}
-                      onFav={() => actions.toggleFav(cookNow.name)}
-                      onSwap={() => rePick()}
-                      onDislike={() => {
-                        const prev = cookNow;
-                        actions.addDislike(prev.name);
-                        rePick();
-                        showToast("Won't suggest again", () => {
-                          actions.setPreferences({ dislikes: state.preferences.dislikes.filter(d => d !== prev.name) });
-                          setCookNow(prev); setCookNowExp(true);
-                        });
-                      }}
-                      lastUsedStr={lastUsedStr}
-                      onStartTimer={addTimer}
-                      onEstimateNutrition={() => estimateNutrition(cookNow)}
-                      nutritionLoading={nutritionLoading.has(cookNow.name)}
-                      nutrition={cookNow.nutrition ?? nutritionCache[cookNow.name]}
-                      onCookMode={() => { setCookNow(null); setCookingMeal({ meal: cookNow, familySize: cookNowOpts.size }); }}
-                      onAdapt={request => adaptRecipe(cookNow, request)}
-                      onSaveAdapted={adapted => { actions.addMeal(adapted); showToast(`Saved: ${adapted.name}`); }}
-                    />
-                  </div>
-
-                  {/* Actions */}
-                  <div style={{ padding: '0 16px 20px' }}>
-                    <Primary onClick={() => rePick()}>🔀 Suggest something else</Primary>
-                    <Secondary muted onClick={() => { actions.addToHistory([{ name: cookNow.name }]); setCookNow(null); showToast('Logged as cooked!'); }}>✓ Cooked it</Secondary>
-                    <button onClick={() => setPickerFor('cookNow')}
-                      style={{ width: '100%', background: 'none', border: 'none', color: P.muted, fontSize: '14px', fontWeight: 600, cursor: 'pointer', marginTop: '4px', padding: '4px' }}>
-                      📋 Browse all meals
-                    </button>
-                    {state.plan && homeDays.length > 0 && (
-                      <>
-                        <button onClick={() => setCookNowAddToPlan(x => !x)}
-                          style={{ width: '100%', background: 'none', border: 'none', color: P.muted, fontSize: '14px', fontWeight: 600, cursor: 'pointer', marginTop: '4px', padding: '4px' }}>
-                          📅 Add to this week's plan
-                        </button>
-                        {cookNowAddToPlan && (
-                          <div style={{ marginTop: '12px', background: P.card, borderRadius: '14px', padding: '10px 14px', border: `1px solid ${P.border}` }}>
-                            <div style={{ fontSize: '11px', color: P.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Replace which day?</div>
-                            {homeDays.map((d, idx) => {
-                              const existing = state.plan!.meals.find(m => m.day === d);
-                              return (
-                                <div key={d} onClick={() => { actions.replaceMealInPlan(d, cookNow); setCookNow(null); showToast(`${d}: ${cookNow.name}`); }}
-                                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 4px', cursor: 'pointer', borderBottom: idx < homeDays.length - 1 ? `1px solid ${P.border}` : 'none' }}>
-                                  <div style={{ fontWeight: 700, fontSize: '13px', minWidth: '72px' }}>{d}</div>
-                                  <div style={{ fontSize: '12px', color: P.muted, textAlign: 'right', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{existing ? existing.name : '—'}</div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                  </>}
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
 
       {pickerFor && (
         <Modal onClose={() => setPickerFor(null)}>
@@ -927,84 +730,6 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         </div>
       )}
 
-      {/* Ask AI modal */}
-      {showAskAI && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 500 }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '24px 0 40px' } as React.CSSProperties}
-            onClick={() => setShowAskAI(false)}>
-            <div style={{ maxWidth: '480px', margin: '0 auto', padding: '0 16px' }} onClick={e => e.stopPropagation()}>
-              <div style={{ background: P.bg, borderRadius: '20px', boxShadow: '0 8px 40px rgba(0,0,0,0.22)', overflow: 'hidden' }}>
-                <div style={{ background: 'linear-gradient(135deg, #7C3AED, #5B21B6)', padding: '20px 20px 20px', color: '#fff' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontSize: '11px', opacity: 0.85, fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase' }}>AI Assistant</div>
-                      <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '22px', marginTop: '3px' }}>✨ What shall we cook?</div>
-                    </div>
-                    <button onClick={() => setShowAskAI(false)}
-                      style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: '10px', padding: '8px 12px', cursor: 'pointer', fontSize: '18px', fontWeight: 700 }}>✕</button>
-                  </div>
-                </div>
-                <div style={{ padding: '16px' }}>
-                  <div style={{ fontSize: '13px', color: P.muted, marginBottom: '14px', lineHeight: 1.5 }}>
-                    Tell me what ingredients you have and I'll find the best matches.
-                  </div>
-                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '14px' }}>
-                    {['chicken & veg', 'pasta & tomatoes', 'fish', 'eggs & cheese'].map(q => (
-                      <button key={q} onClick={() => { setFridgeQuery(q); searchFridge(q); }}
-                        style={{ background: '#EDE9FE', border: 'none', borderRadius: '20px', padding: '5px 12px', fontSize: '12px', fontWeight: 700, color: '#5B21B6', cursor: 'pointer' }}>
-                        {q}
-                      </button>
-                    ))}
-                  </div>
-                  <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-                    <textarea
-                      value={fridgeQuery}
-                      onChange={e => setFridgeQuery(e.target.value)}
-                      onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (fridgeQuery.trim()) searchFridge(fridgeQuery); } }}
-                      placeholder="e.g. chicken thighs, broccoli, garlic, olive oil…"
-                      rows={2}
-                      style={{ flex: 1, padding: '11px 14px', border: `2px solid #C4B5FD`, borderRadius: '10px', fontSize: '14px', background: P.card, resize: 'none', lineHeight: 1.5, outline: 'none', boxSizing: 'border-box' } as React.CSSProperties}
-                    />
-                    <button onClick={() => { if (fridgeQuery.trim()) searchFridge(fridgeQuery); }}
-                      disabled={fridgeLoading || !fridgeQuery.trim()}
-                      style={{ background: '#7C3AED', color: '#fff', border: 'none', borderRadius: '10px', padding: '0 18px', fontSize: '20px', fontWeight: 700, cursor: fridgeLoading || !fridgeQuery.trim() ? 'default' : 'pointer', opacity: fridgeLoading || !fridgeQuery.trim() ? 0.5 : 1, alignSelf: 'stretch', flexShrink: 0 }}>
-                      {fridgeLoading ? '…' : '→'}
-                    </button>
-                  </div>
-
-                  {fridgeMatches !== null && fridgeMatches.length === 0 && !fridgeLoading && (
-                    <div style={{ textAlign: 'center', color: P.muted, fontSize: '14px', padding: '12px 0' }}>
-                      No close matches — try different ingredients.
-                    </div>
-                  )}
-
-                  {fridgeMatches && fridgeMatches.length > 0 && (
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-                        <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '1px' }}>
-                          {fridgeMatches.length} match{fridgeMatches.length !== 1 ? 'es' : ''}
-                        </div>
-                        {fridgeAI && <span style={{ background: '#EDE9FE', color: '#5B21B6', borderRadius: '6px', padding: '2px 7px', fontSize: '10px', fontWeight: 700 }}>✨ AI</span>}
-                      </div>
-                      {fridgeMatches.map(match => (
-                        <div key={match.name}
-                          style={{ background: P.card, border: `1.5px solid ${P.border}`, borderRadius: '12px', padding: '12px 14px', marginBottom: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                          onClick={() => { setCookNow(match); setCookNowExp(false); setCookNowAddToPlan(false); setShowAskAI(false); setFridgeMatches(null); setFridgeQuery(''); }}>
-                          <div>
-                            <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>{match.name}</div>
-                            <div style={{ fontSize: '12px', color: P.muted }}>{match.time} · {match.cuisine}</div>
-                          </div>
-                          <span style={{ fontSize: '18px', color: P.muted, marginLeft: '10px' }}>→</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
       </div>
     </div>
   );
@@ -1059,7 +784,6 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         onPlan={() => setStep('plan')}
         onShopping={() => setStep('shopping')}
         onBrowse={() => setStep('browse')}
-        onAskAI={() => { setStep('plan'); setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
         onSettings={() => setStep('setup')}
         onProfile={() => setStep('prefs')}
         active="shopping"
@@ -1069,6 +793,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
 
   // ── Browse screen ─────────────────────────────────────────────────────────
   if (step === 'browse') {
+    const si = SEASON_INFO[state.season] ?? { label: '' };
     const allMeals = ALL_RECIPES.concat(state.customMeals);
     const q = browseQuery.trim().toLowerCase();
     const filterMeals = (meals: Meal[]) => meals.filter(m => {
@@ -1128,7 +853,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         <div style={{ position: 'sticky', top: 0, zIndex: 100, background: P.card, borderBottom: `1px solid ${P.border}`, padding: '12px 16px 0' }}>
           <div style={{ maxWidth: '480px', margin: '0 auto' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-              <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', flex: 1 }}>Browse recipes</div>
+              <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', flex: 1 }}>Recipes</div>
               {hasFilters && (
                 <button onClick={() => { setBrowseQuery(''); setBrowseProtein(''); setBrowseCuisine(''); setBrowseTime(''); }}
                   style={{ background: 'none', border: 'none', color: P.accent, fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
@@ -1186,6 +911,153 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                 ))}
               </div>
             </>}
+          </div>
+        </div>
+
+        {/* AI panel */}
+        <div style={{ maxWidth: '480px', margin: '0 auto', padding: '12px 16px 0' }}>
+          <div style={{ background: P.card, borderRadius: '16px', border: `1px solid ${P.border}`, overflow: 'hidden', boxShadow: P.shadow }}>
+            <div onClick={() => { if (!browseAIOpen) { setBrowseAIOpen(true); if (!cookNow) rePick(); } else setBrowseAIOpen(false); }}
+              style={{ background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`, padding: '14px 16px', color: '#fff', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <div style={{ fontSize: '11px', opacity: 0.85, fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase' }}>AI Suggestions</div>
+                <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '18px', marginTop: '2px' }}>✨ Find something for tonight</div>
+              </div>
+              <div style={{ fontSize: '18px', opacity: 0.8 }}>{browseAIOpen ? '▲' : '▼'}</div>
+            </div>
+            {browseAIOpen && (() => {
+              const updateOpts = (patch: Partial<typeof cookNowOpts>) => {
+                const next = { ...cookNowOpts, ...patch };
+                setCookNowOpts(next);
+                if (!('size' in patch)) rePick(next);
+              };
+              const lu = cookNow ? state.cookHistory.filter(h => h.name === cookNow.name) : [];
+              const lastUsedStr = cookNow ? formatLastUsed(lu.length ? Math.max(...lu.map(h => h.date)) : null) : null;
+              const homeDays = DAYS.filter(d => !state.dayConfig[d] || state.dayConfig[d] === 'home');
+              return (
+                <>
+                  <div style={{ display: 'flex', gap: '6px', padding: '10px 16px', borderBottom: `1px solid ${P.border}`, background: P.bg }}>
+                    {([['🎲 Suggested', 'suggest'], ['🧊 From my fridge', 'fridge']] as [string, 'suggest' | 'fridge'][]).map(([label, tab]) => (
+                      <button key={tab} onClick={() => { setFindRecipeTab(tab); if (tab === 'suggest' && !cookNow) rePick(); }}
+                        style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', fontSize: '13px', fontWeight: 700, cursor: 'pointer',
+                          background: findRecipeTab === tab ? P.accent : P.accentLight, color: findRecipeTab === tab ? '#fff' : P.accentDark }}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  {findRecipeTab === 'fridge' && (
+                    <div style={{ padding: '16px' }}>
+                      <div style={{ fontSize: '13px', color: P.muted, marginBottom: '12px', lineHeight: 1.5 }}>Tell us what you have and we'll find the best matches.</div>
+                      <textarea value={fridgeQuery} onChange={e => setFridgeQuery(e.target.value)}
+                        placeholder="e.g. chicken thighs, broccoli, pasta, garlic" rows={3}
+                        style={{ width: '100%', padding: '11px 14px', border: `2px solid ${P.border}`, borderRadius: '10px', fontSize: '14px', background: P.card, boxSizing: 'border-box', resize: 'none', lineHeight: 1.5, marginBottom: '10px' } as React.CSSProperties} />
+                      <button onClick={() => searchFridge(fridgeQuery)} disabled={fridgeLoading || !fridgeQuery.trim()}
+                        style={{ width: '100%', background: P.accent, color: '#fff', border: 'none', borderRadius: '10px', padding: '12px', fontSize: '14px', fontWeight: 700, cursor: fridgeLoading || !fridgeQuery.trim() ? 'default' : 'pointer', opacity: fridgeLoading || !fridgeQuery.trim() ? 0.6 : 1, marginBottom: '12px' }}>
+                        {fridgeLoading ? '✨ Asking AI…' : '🔍 Find meals'}
+                      </button>
+                      {fridgeMatches !== null && fridgeMatches.length === 0 && <div style={{ textAlign: 'center', color: P.muted, fontSize: '14px' }}>No close matches found.</div>}
+                      {fridgeMatches && fridgeMatches.length > 0 && (
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                            <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '1px' }}>{fridgeMatches.length} match{fridgeMatches.length !== 1 ? 'es' : ''} found</div>
+                            {fridgeAI && <span style={{ background: '#EDE9FE', color: '#5B21B6', borderRadius: '6px', padding: '2px 7px', fontSize: '10px', fontWeight: 700 }}>✨ AI</span>}
+                          </div>
+                          {fridgeMatches.map(match => (
+                            <div key={match.name} onClick={() => { setCookNow(match); setCookNowExp(false); setFindRecipeTab('suggest'); setFridgeMatches(null); setFridgeQuery(''); }}
+                              style={{ background: P.bg, border: `1.5px solid ${P.border}`, borderRadius: '12px', padding: '12px 14px', marginBottom: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <div><div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>{match.name}</div><div style={{ fontSize: '12px', color: P.muted }}>{match.time} · {match.cuisine}</div></div>
+                              <div style={{ fontSize: '20px', marginLeft: '10px', flexShrink: 0 }}>→</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {findRecipeTab === 'suggest' && (
+                    <>
+                      <div style={{ padding: '12px 16px', borderBottom: `1px solid ${P.border}`, background: P.card }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                          <div style={{ display: 'flex', gap: '5px' }}>
+                            {([['👶 Kids', 'kids'], ['✌️ Either', 'either'], ['🍷 Adults', 'adults']] as [string, string][]).map(([label, val]) => (
+                              <button key={val} onClick={() => updateOpts({ kids: val })}
+                                style={{ background: cookNowOpts.kids === val ? P.accentLight : 'transparent', border: `1.5px solid ${cookNowOpts.kids === val ? P.accent : P.border}`, borderRadius: '20px', padding: '4px 10px', fontSize: '12px', fontWeight: 700, color: cookNowOpts.kids === val ? P.accentDark : P.muted, cursor: 'pointer' }}>
+                                {label}
+                              </button>
+                            ))}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <button onClick={() => setCookNowOpts(p => ({ ...p, size: Math.max(1, p.size - 1) }))} style={{ background: P.border, border: 'none', borderRadius: '6px', width: '22px', height: '22px', fontSize: '15px', cursor: 'pointer', color: P.muted, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
+                            <span style={{ fontSize: '12px', fontWeight: 600, color: P.muted, minWidth: '52px', textAlign: 'center' }}>{cookNowOpts.size} people</span>
+                            <button onClick={() => setCookNowOpts(p => ({ ...p, size: Math.min(20, p.size + 1) }))} style={{ background: P.border, border: 'none', borderRadius: '6px', width: '22px', height: '22px', fontSize: '15px', cursor: 'pointer', color: P.muted, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                          </div>
+                        </div>
+                        <div style={{ marginBottom: '8px' }}><TimeSlider value={cookNowOpts.time} label="Max cook time" onChange={v => updateOpts({ time: v })} /></div>
+                        <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                          {([['none', 'All'], ['noFish', 'No fish'], ['noPork', 'No pork'], ['noRed', 'No red meat'], ['veggie', '🌱 Veggie']] as [string, string][]).map(([v, l]) => (
+                            <button key={v} onClick={() => updateOpts({ dietary: v })}
+                              style={{ background: cookNowOpts.dietary === v ? P.greenLight : 'transparent', border: `1.5px solid ${cookNowOpts.dietary === v ? P.greenDark : P.border}`, borderRadius: '20px', padding: '3px 9px', fontSize: '11px', fontWeight: 700, color: cookNowOpts.dietary === v ? P.greenDark : P.muted, cursor: 'pointer' }}>
+                              {l}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      {cookNow ? (
+                        <div style={{ padding: '16px' }}>
+                          <MealCard meal={cookNow} day="Tonight"
+                            isFav={state.preferences.favourites.includes(cookNow.name)}
+                            isSeasonal={!!(cookNow.seasons?.includes(state.season as any))}
+                            seasonLabel={si.label} overviewOpen={true} expanded={cookNowExp}
+                            familySize={cookNowOpts.size}
+                            onView={() => setBrowseDetailMeal(cookNow)}
+                            onOverview={() => setCookNowExp(x => !x)} onFullExpand={() => setCookNowExp(x => !x)}
+                            onFav={() => actions.toggleFav(cookNow.name)} onSwap={() => rePick()}
+                            onDislike={() => { const prev = cookNow; actions.addDislike(prev.name); rePick(); showToast("Won't suggest again", () => { actions.setPreferences({ dislikes: state.preferences.dislikes.filter(d => d !== prev.name) }); setCookNow(prev); setCookNowExp(true); }); }}
+                            lastUsedStr={lastUsedStr} onStartTimer={addTimer}
+                            onEstimateNutrition={() => estimateNutrition(cookNow)}
+                            nutritionLoading={nutritionLoading.has(cookNow.name)}
+                            nutrition={cookNow.nutrition ?? nutritionCache[cookNow.name]}
+                            onCookMode={() => setCookingMeal({ meal: cookNow, familySize: cookNowOpts.size })}
+                            onAdapt={request => adaptRecipe(cookNow, request)}
+                            onSaveAdapted={adapted => { actions.addMeal(adapted); showToast(`Saved: ${adapted.name}`); }}
+                          />
+                        </div>
+                      ) : (
+                        <div style={{ padding: '24px 16px', textAlign: 'center' }}>
+                          <button onClick={() => rePick()} style={{ background: P.accent, color: '#fff', border: 'none', borderRadius: '12px', padding: '13px 28px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>🎲 Get a suggestion</button>
+                        </div>
+                      )}
+                      {cookNow && (
+                        <div style={{ padding: '0 16px 16px' }}>
+                          <Primary onClick={() => rePick()}>🔀 Suggest something else</Primary>
+                          <Secondary muted onClick={() => { actions.addToHistory([{ name: cookNow.name }]); setCookNow(null); showToast('Logged as cooked!'); }}>✓ Cooked it</Secondary>
+                          <button onClick={() => setPickerFor('cookNow')} style={{ width: '100%', background: 'none', border: 'none', color: P.muted, fontSize: '14px', fontWeight: 600, cursor: 'pointer', marginTop: '4px', padding: '4px' }}>📋 Browse all meals</button>
+                          {state.plan && homeDays.length > 0 && (
+                            <>
+                              <button onClick={() => setCookNowAddToPlan(x => !x)} style={{ width: '100%', background: 'none', border: 'none', color: P.muted, fontSize: '14px', fontWeight: 600, cursor: 'pointer', marginTop: '4px', padding: '4px' }}>📅 Add to this week's plan</button>
+                              {cookNowAddToPlan && (
+                                <div style={{ marginTop: '12px', background: P.card, borderRadius: '14px', padding: '10px 14px', border: `1px solid ${P.border}` }}>
+                                  <div style={{ fontSize: '11px', color: P.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Replace which day?</div>
+                                  {homeDays.map((d, idx) => {
+                                    const existing = state.plan!.meals.find(m => m.day === d);
+                                    return (
+                                      <div key={d} onClick={() => { actions.replaceMealInPlan(d, cookNow); setCookNow(null); setBrowseAIOpen(false); setCookNowAddToPlan(false); showToast(`${d}: ${cookNow.name}`); setStep('plan'); }}
+                                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 4px', cursor: 'pointer', borderBottom: idx < homeDays.length - 1 ? `1px solid ${P.border}` : 'none' }}>
+                                        <div style={{ fontWeight: 700, fontSize: '13px', minWidth: '72px' }}>{d}</div>
+                                        <div style={{ fontSize: '12px', color: P.muted, flex: 1, textAlign: 'right', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '200px' }}>{existing ? existing.name : '+ Add'}</div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </>
+              );
+            })()}
           </div>
         </div>
 
@@ -1281,8 +1153,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           onPlan={() => setStep('plan')}
           onShopping={() => setStep('shopping')}
           onBrowse={() => setStep('browse')}
-          onAskAI={() => { setStep('plan'); setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
-          onSettings={() => setStep('setup')}
+            onSettings={() => setStep('setup')}
           onProfile={() => setStep('prefs')}
           active="browse"
         />
@@ -1495,7 +1366,6 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         onPlan={() => setStep('plan')}
         onShopping={() => setStep('shopping')}
         onBrowse={() => setStep('browse')}
-        onAskAI={() => { setStep('plan'); setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
         onSettings={() => setStep('setup')}
         onProfile={() => setStep('prefs')}
         active="profile"

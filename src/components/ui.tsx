@@ -137,11 +137,10 @@ export function TimeSlider({ value, onChange, onCommit, label }: {
 
 export const BOTTOM_NAV_HEIGHT = 56;
 
-export function BottomNav({ onPlan, onShopping, onBrowse, onAskAI, onSettings, onProfile, active }: {
+export function BottomNav({ onPlan, onShopping, onBrowse, onSettings, onProfile, active }: {
   onPlan: () => void;
   onShopping: () => void;
   onBrowse: () => void;
-  onAskAI: () => void;
   onSettings: () => void;
   onProfile: () => void;
   active?: 'shopping' | 'browse' | 'plan' | 'settings' | 'profile';
@@ -149,8 +148,7 @@ export function BottomNav({ onPlan, onShopping, onBrowse, onAskAI, onSettings, o
   const tabs = [
     { id: 'plan', icon: '📅', label: 'Week', onClick: onPlan },
     { id: 'shopping', icon: '🛒', label: 'Shopping', onClick: onShopping },
-    { id: 'browse', icon: '🍴', label: 'Browse', onClick: onBrowse, primary: true },
-    { id: 'ai', icon: '✨', label: 'Ask AI', onClick: onAskAI, ai: true },
+    { id: 'browse', icon: '🍴', label: 'Recipes', onClick: onBrowse, primary: true },
     { id: 'settings', icon: '⚙️', label: 'Settings', onClick: onSettings },
     { id: 'profile', icon: '👤', label: 'Profile', onClick: onProfile },
   ];
@@ -158,17 +156,17 @@ export function BottomNav({ onPlan, onShopping, onBrowse, onAskAI, onSettings, o
     <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
       background: P.card, borderTop: `1px solid ${P.border}`,
       paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-      display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)' }}>
-      {tabs.map(({ id, icon, label, onClick, primary, ai }) => {
+      display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)' }}>
+      {tabs.map(({ id, icon, label, onClick, primary }) => {
         const isActive = active === id;
         return (
           <button key={id} onClick={onClick}
             style={{ background: 'none', border: 'none', padding: '10px 4px 10px', cursor: 'pointer',
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
-              borderTop: isActive ? `2px solid ${ai ? '#7C3AED' : P.accent}` : '2px solid transparent' }}>
+              borderTop: isActive ? `2px solid ${P.accent}` : '2px solid transparent' }}>
             <span style={{ fontSize: '20px', lineHeight: 1 }}>{icon}</span>
             <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.3px',
-              color: isActive ? (ai ? '#7C3AED' : P.accent) : ai ? '#7C3AED' : primary ? P.accent : P.muted }}>{label}</span>
+              color: isActive ? P.accent : primary ? P.accent : P.muted }}>{label}</span>
           </button>
         );
       })}
