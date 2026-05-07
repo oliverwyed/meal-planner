@@ -181,8 +181,10 @@ export async function publishMeal(
   };
 }
 
-export async function unpublishMeal(communityId: string): Promise<void> {
-  await supabase.from('community_meals').delete().eq('id', communityId);
+export async function unpublishMeal(communityId: string, householdId: string): Promise<void> {
+  await supabase.from('community_meals').delete()
+    .eq('id', communityId)
+    .eq('source_household_id', householdId);
 }
 
 export async function uploadRecipePhoto(file: File): Promise<string | null> {
@@ -233,6 +235,8 @@ export async function addReview(
   };
 }
 
-export async function deleteReview(reviewId: string): Promise<void> {
-  await supabase.from('recipe_reviews').delete().eq('id', reviewId);
+export async function deleteReview(reviewId: string, householdId: string): Promise<void> {
+  await supabase.from('recipe_reviews').delete()
+    .eq('id', reviewId)
+    .eq('household_id', householdId);
 }
