@@ -4,7 +4,7 @@ import { MealCard } from './components/MealCard';
 import { CookingMode } from './components/CookingMode';
 import { ImportRecipe } from './components/ImportRecipe';
 import { PhotoImport } from './components/PhotoImport';
-import { Primary, Secondary, Toast, Spinner, Section, TimeSlider, ActiveTimers, BottomNav, BackBar } from './components/ui';
+import { Primary, Secondary, Toast, Spinner, Section, TimeSlider, ActiveTimers, BottomNav } from './components/ui';
 import { Screen, Header, IconBtn, Row, Stepper, Chip, DayActions, DayToggle, Modal, MealPicker, AddMealForm, HelpModal, BrowseMealCard, LogsPanel, formatLastUsed, SEASON_INFO } from './components/AppUI';
 import { useHousehold } from './hooks/useHousehold';
 import { DAYS, HOUSEHOLD_ID_KEY, P, DESKTOP_BREAKPOINT } from './lib/constants';
