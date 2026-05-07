@@ -358,8 +358,8 @@ export function BrowseMealCard({ meal, isFav, onFav, onAdd, onView, compact, com
   );
 }
 
-export function RecipeDetailSheet({ meal, isFav, onFav, onAdd, onClose, familySize }: {
-  meal: Meal; isFav: boolean; onFav: () => void; onAdd: () => void; onClose: () => void; familySize: number;
+export function RecipeDetailSheet({ meal, isFav, onFav, onAdd, onCook, onClose, familySize }: {
+  meal: Meal; isFav: boolean; onFav: () => void; onAdd?: () => void; onCook?: () => void; onClose: () => void; familySize: number;
 }) {
   const scale = familySize / (meal.serves ?? 4);
   return (
@@ -426,11 +426,19 @@ export function RecipeDetailSheet({ meal, isFav, onFav, onAdd, onClose, familySi
               ))}
             </div>
           )}
-          {/* Add to plan */}
-          <button onClick={onAdd}
-            style={{ width: '100%', background: P.accent, color: '#fff', border: 'none', borderRadius: '12px', padding: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
-            + Add to plan
-          </button>
+          {/* Actions */}
+          {onCook && (
+            <button onClick={onCook}
+              style={{ width: '100%', background: P.accent, color: '#fff', border: 'none', borderRadius: '12px', padding: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', marginBottom: onAdd ? '10px' : 0 }}>
+              👨‍🍳 Cook this now
+            </button>
+          )}
+          {onAdd && (
+            <button onClick={onAdd}
+              style={{ width: '100%', background: onCook ? P.accentLight : P.accent, color: onCook ? P.accentDark : '#fff', border: 'none', borderRadius: '12px', padding: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
+              + Add to plan
+            </button>
+          )}
         </div>
       </div>
     </div>

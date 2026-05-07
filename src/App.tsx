@@ -117,6 +117,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [browseTime, setBrowseTime] = useState('');
   const [browseAddDay, setBrowseAddDay] = useState<Meal | null>(null);
   const [browseDetailMeal, setBrowseDetailMeal] = useState<Meal | null>(null);
+  const [planDetailMeal, setPlanDetailMeal] = useState<{ meal: Meal; daySize: number } | null>(null);
   const [browseTab, setBrowseTab] = useState<'all' | 'community'>('all');
 
   // Community meals
@@ -417,6 +418,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           <Primary onClick={() => { actions.generate(); setStep('plan'); }}>Generate this week's meals</Primary>
         </div>
         <BottomNav
+          onPlan={() => setStep('plan')}
           onShopping={() => setStep('shopping')}
           onBrowse={() => setStep('browse')}
           onAskAI={() => { setStep('plan'); setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
@@ -561,6 +563,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               overviewOpen={previewDay === day || expandedDay === day}
               expanded={expandedDay === day}
               familySize={daySize}
+              onView={() => setPlanDetailMeal({ meal, daySize })}
               onOverview={() => {
                 if (previewDay === day || expandedDay === day) {
                   setPreviewDay(null); setExpandedDay(null);
@@ -613,8 +616,20 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
 
       <ActiveTimers timers={timers} onDismiss={dismissTimer} />
 
+      {planDetailMeal && (
+        <RecipeDetailSheet
+          meal={planDetailMeal.meal}
+          isFav={state.preferences.favourites.includes(planDetailMeal.meal.name)}
+          onFav={() => actions.toggleFav(planDetailMeal.meal.name)}
+          onCook={() => { setCookingMeal({ meal: planDetailMeal.meal, familySize: planDetailMeal.daySize }); setPlanDetailMeal(null); }}
+          onClose={() => setPlanDetailMeal(null)}
+          familySize={planDetailMeal.daySize}
+        />
+      )}
+
       {!isDesktop && (
         <BottomNav
+          onPlan={() => setStep('plan')}
           onShopping={() => setStep('shopping')}
           onBrowse={() => setStep('browse')}
           onAskAI={() => { setStep('plan'); setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
@@ -1041,6 +1056,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       }}>🔗 Share list</Primary>
       {toast && <Toast message={toast} onUndo={toastUndoRef.current ?? undefined} />}
       <BottomNav
+        onPlan={() => setStep('plan')}
         onShopping={() => setStep('shopping')}
         onBrowse={() => setStep('browse')}
         onAskAI={() => { setStep('plan'); setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
@@ -1261,6 +1277,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         )}
         {toast && <Toast message={toast} onUndo={toastUndoRef.current ?? undefined} bottom="80px" />}
         <BottomNav
+          onPlan={() => setStep('plan')}
           onShopping={() => setStep('shopping')}
           onBrowse={() => setStep('browse')}
           onAskAI={() => { setStep('plan'); setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
@@ -1474,6 +1491,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         </Modal>
       )}
       <BottomNav
+        onPlan={() => setStep('plan')}
         onShopping={() => setStep('shopping')}
         onBrowse={() => setStep('browse')}
         onAskAI={() => { setStep('plan'); setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}

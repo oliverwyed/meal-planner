@@ -14,6 +14,7 @@ interface Props {
   overviewOpen: boolean;
   expanded: boolean;
   familySize: number;
+  onView?: () => void;
   onOverview: () => void;
   onFullExpand: () => void;
   onFav: () => void;
@@ -49,7 +50,7 @@ function getMealEmoji(meal: Meal): string {
   return p[meal.protein] ?? c[meal.cuisine] ?? '🍽️';
 }
 
-export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOpen, expanded, familySize, onOverview, onFullExpand, onFav,
+export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOpen, expanded, familySize, onView, onOverview, onFullExpand, onFav,
   onSwap, onDislike, onChoose, onMarkOff, onMarkCooked, onChangeMealSize, kidsMode, onCycleKids, dayTimeFilter, onSetDayTime,
   readOnly, lastUsedStr, onStartTimer, onEstimateNutrition, nutritionLoading, nutrition, onCookMode, onAdapt, onSaveAdapted,
   reviews, reviewsLoading, onAddReview, householdReviewId, onDeleteReview }: Props) {
@@ -96,7 +97,7 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
 
       {/* Hero photo */}
       {displayMeal.photo && (
-        <div style={{ position: 'relative', height: '160px', overflow: 'hidden', cursor: 'pointer' }} onClick={onOverview}>
+        <div style={{ position: 'relative', height: '160px', overflow: 'hidden', cursor: 'pointer' }} onClick={onView ?? onOverview}>
           <img src={displayMeal.photo} alt={displayMeal.name} loading="lazy"
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 100%)' }} />
@@ -117,7 +118,7 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
       )}
 
       {/* Header */}
-      <div style={{ padding: '13px 16px', cursor: 'pointer' }} onClick={onOverview}>
+      <div style={{ padding: '13px 16px', cursor: 'pointer' }} onClick={onView ?? onOverview}>
         <div style={{ display: 'flex', gap: '12px' }}>
           {!displayMeal.photo && <div style={{ fontSize: '26px', flexShrink: 0, paddingTop: '2px' }}>{getMealEmoji(displayMeal)}</div>}
           <div style={{ flex: 1, minWidth: 0 }}>
