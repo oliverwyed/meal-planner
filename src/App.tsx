@@ -415,7 +415,14 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         <div style={{ marginTop: '16px' }}>
           <Primary onClick={() => { actions.generate(); setStep('plan'); }}>Generate this week's meals</Primary>
         </div>
-        {state.plan && <BackBar onClick={() => setStep('plan')} />}
+        <BottomNav
+          onShopping={() => setStep('shopping')}
+          onBrowse={() => setStep('browse')}
+          onAskAI={() => { setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
+          onSettings={() => setStep('setup')}
+          onProfile={() => setStep('prefs')}
+          active="settings"
+        />
       </Screen>
     );
   }
@@ -1032,7 +1039,14 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         else navigator.clipboard?.writeText(body).then(() => showToast('Copied!'));
       }}>🔗 Share list</Primary>
       {toast && <Toast message={toast} onUndo={toastUndoRef.current ?? undefined} />}
-      <BackBar onClick={() => setStep('plan')} />
+      <BottomNav
+        onShopping={() => setStep('shopping')}
+        onBrowse={() => setStep('browse')}
+        onAskAI={() => { setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
+        onSettings={() => setStep('setup')}
+        onProfile={() => setStep('prefs')}
+        active="shopping"
+      />
     </Screen>
   );
 
@@ -1445,7 +1459,14 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           />
         </Modal>
       )}
-      <BackBar onClick={() => setStep('plan')} />
+      <BottomNav
+        onShopping={() => setStep('shopping')}
+        onBrowse={() => setStep('browse')}
+        onAskAI={() => { setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
+        onSettings={() => setStep('setup')}
+        onProfile={() => setStep('prefs')}
+        active="profile"
+      />
     </Screen>
   );
 
