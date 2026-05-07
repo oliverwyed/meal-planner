@@ -418,7 +418,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         <BottomNav
           onShopping={() => setStep('shopping')}
           onBrowse={() => setStep('browse')}
-          onAskAI={() => { setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
+          onAskAI={() => { setStep('plan'); setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
           onSettings={() => setStep('setup')}
           onProfile={() => setStep('prefs')}
           active="settings"
@@ -616,7 +616,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         <BottomNav
           onShopping={() => setStep('shopping')}
           onBrowse={() => setStep('browse')}
-          onAskAI={() => { setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
+          onAskAI={() => { setStep('plan'); setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
           onSettings={() => setStep('setup')}
           onProfile={() => setStep('prefs')}
           active="plan"
@@ -1042,7 +1042,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       <BottomNav
         onShopping={() => setStep('shopping')}
         onBrowse={() => setStep('browse')}
-        onAskAI={() => { setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
+        onAskAI={() => { setStep('plan'); setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
         onSettings={() => setStep('setup')}
         onProfile={() => setStep('prefs')}
         active="shopping"
@@ -1249,7 +1249,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         <BottomNav
           onShopping={() => setStep('shopping')}
           onBrowse={() => setStep('browse')}
-          onAskAI={() => { setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
+          onAskAI={() => { setStep('plan'); setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
           onSettings={() => setStep('setup')}
           onProfile={() => setStep('prefs')}
           active="browse"
@@ -1462,7 +1462,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       <BottomNav
         onShopping={() => setStep('shopping')}
         onBrowse={() => setStep('browse')}
-        onAskAI={() => { setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
+        onAskAI={() => { setStep('plan'); setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
         onSettings={() => setStep('setup')}
         onProfile={() => setStep('prefs')}
         active="profile"
