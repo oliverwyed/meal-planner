@@ -57,6 +57,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showAskAI, setShowAskAI] = useState(false);
   const [showPlanHistory, setShowPlanHistory] = useState(false);
+  const [isFirstRun, setIsFirstRun] = useState(() => !localStorage.getItem('onboardingDone'));
+  const [onboardStep, setOnboardStep] = useState<1 | 2 | 3>(1);
   const [pantryDraft, setPantryDraft] = useState(state.preferences.pantry);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const toastUndoRef = useRef<(() => void) | null>(null);
@@ -247,36 +249,113 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
 
   if (loading) return <Spinner />;
 
-  // ── Setup screen ──────────────────────────────────────────────────────────
-  if (step === 'setup') return (
-    <Screen>
-      <Header eyebrow="Meal Planner" title="Set up your week" subtitle="Choose your days and preferences" />
-      <Section>
-        <Row label="People eating">
-          <Stepper value={state.familySize} min={1} max={12} onChange={actions.setFamilySize} />
-        </Row>
-      </Section>
-      <Section>
-        <Row label="Max cook time"><span /></Row>
-        <TimeSlider value={state.preferences.timeFilter} onChange={v => actions.setPreferences({ timeFilter: v })} />
-      </Section>
-      <Section>
-        <Row label="Dietary"><span /></Row>
-        <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-          {([['none','All'],['noFish','No fish'],['noPork','No pork'],['noRed','No red meat'],['veggie','🌱 Veggie']] as [string,string][]).map(([v,l]) => (
-            <Chip key={v} active={state.preferences.dietaryMode === v} onClick={() => actions.setPreferences({ dietaryMode: v as any })}>{l}</Chip>
-          ))}
+  // ── Setup / Onboarding screen ─────────────────────────────────────────────
+  if (step === 'setup') {
+    // First-run: 3-step onboarding wizard
+    if (isFirstRun) {
+      const steps: Record<number, string> = { 1: 'Your household', 2: 'Preferences', 3: 'Your week' };
+      return (
+        <Screen padBottom="32px">
+          {/* Progress indicator */}
+          <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', padding: '20px 0 8px' }}>
+            {[1, 2, 3].map(s => (
+              <div key={s} style={{ height: '6px', borderRadius: '3px', background: s <= onboardStep ? P.accent : P.border,
+                width: s === onboardStep ? '28px' : '10px', transition: 'width 0.25s ease, background 0.25s ease' }} />
+            ))}
+          </div>
+          <div style={{ textAlign: 'center', fontSize: '11px', color: P.muted, fontWeight: 700, letterSpacing: '1px',
+            textTransform: 'uppercase', marginBottom: '20px' }}>Step {onboardStep} of 3 — {steps[onboardStep]}</div>
+
+          {onboardStep === 1 && <>
+            <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+              <div style={{ fontSize: '40px', marginBottom: '10px' }}>🍽️</div>
+              <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '26px', lineHeight: 1.25, marginBottom: '6px' }}>
+                Welcome to Meal Planner
+              </div>
+              <div style={{ fontSize: '14px', color: P.muted, lineHeight: 1.5 }}>
+                We'll build a personalised weekly dinner plan for your household — then generate a shopping list automatically.
+              </div>
+            </div>
+            <Section>
+              <Row label="How many people are eating?">
+                <Stepper value={state.familySize} min={1} max={12} onChange={actions.setFamilySize} />
+              </Row>
+            </Section>
+            <div style={{ marginTop: '20px' }}>
+              <Primary onClick={() => setOnboardStep(2)}>Next →</Primary>
+            </div>
+          </>}
+
+          {onboardStep === 2 && <>
+            <Header eyebrow="Preferences" title="How do you like to cook?" />
+            <Section>
+              <Row label="Max cook time per evening"><span /></Row>
+              <TimeSlider value={state.preferences.timeFilter} onChange={v => actions.setPreferences({ timeFilter: v })} />
+            </Section>
+            <Section>
+              <Row label="Dietary needs"><span /></Row>
+              <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                {([['none', 'No restrictions'], ['noFish', 'No fish'], ['noPork', 'No pork'], ['noRed', 'No red meat'], ['veggie', '🌱 Vegetarian']] as [string, string][]).map(([v, l]) => (
+                  <Chip key={v} active={state.preferences.dietaryMode === v} onClick={() => actions.setPreferences({ dietaryMode: v as any })}>{l}</Chip>
+                ))}
+              </div>
+            </Section>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '20px' }}>
+              <Secondary muted onClick={() => setOnboardStep(1)}>← Back</Secondary>
+              <Primary onClick={() => setOnboardStep(3)}>Next →</Primary>
+            </div>
+          </>}
+
+          {onboardStep === 3 && <>
+            <Header eyebrow="Your week" title="Which days do you cook?" subtitle="Tap a day to toggle it on or off" />
+            {DAYS.map(day => (
+              <DayToggle key={day} day={day} mode={(state.dayConfig[day] as DayMode) ?? 'home'} onChange={mode => actions.setDayMode(day, mode)} />
+            ))}
+            <div style={{ display: 'flex', gap: '8px', marginTop: '20px' }}>
+              <Secondary muted onClick={() => setOnboardStep(2)}>← Back</Secondary>
+              <Primary onClick={() => {
+                actions.generate();
+                localStorage.setItem('onboardingDone', '1');
+                setIsFirstRun(false);
+                setStep('plan');
+              }}>✨ Build my first plan</Primary>
+            </div>
+          </>}
+        </Screen>
+      );
+    }
+
+    // Returning users: settings screen
+    return (
+      <Screen>
+        <Header eyebrow="Meal Planner" title="Set up your week" subtitle="Choose your days and preferences" />
+        <Section>
+          <Row label="People eating">
+            <Stepper value={state.familySize} min={1} max={12} onChange={actions.setFamilySize} />
+          </Row>
+        </Section>
+        <Section>
+          <Row label="Max cook time"><span /></Row>
+          <TimeSlider value={state.preferences.timeFilter} onChange={v => actions.setPreferences({ timeFilter: v })} />
+        </Section>
+        <Section>
+          <Row label="Dietary"><span /></Row>
+          <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+            {([['none', 'All'], ['noFish', 'No fish'], ['noPork', 'No pork'], ['noRed', 'No red meat'], ['veggie', '🌱 Veggie']] as [string, string][]).map(([v, l]) => (
+              <Chip key={v} active={state.preferences.dietaryMode === v} onClick={() => actions.setPreferences({ dietaryMode: v as any })}>{l}</Chip>
+            ))}
+          </div>
+        </Section>
+        {DAYS.map(day => (
+          <DayToggle key={day} day={day} mode={(state.dayConfig[day] as DayMode) ?? 'home'} onChange={mode => actions.setDayMode(day, mode)} />
+        ))}
+        <div style={{ marginTop: '16px' }}>
+          <Primary onClick={() => { actions.generate(); setStep('plan'); }}>Generate this week's meals</Primary>
         </div>
-      </Section>
-      {DAYS.map(day => (
-        <DayToggle key={day} day={day} mode={(state.dayConfig[day] as DayMode) ?? 'home'} onChange={mode => actions.setDayMode(day, mode)} />
-      ))}
-      <div style={{ marginTop: '16px' }}>
-        <Primary onClick={() => { actions.generate(); setStep('plan'); }}>Generate this week's meals</Primary>
-      </div>
-      {state.plan && <BackBar onClick={() => setStep('plan')} />}
-    </Screen>
-  );
+        {state.plan && <BackBar onClick={() => setStep('plan')} />}
+      </Screen>
+    );
+  }
 
   // ── Cooking mode overlay ─────────────────────────────────────────────────
   if (cookingMeal) return (
