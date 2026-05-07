@@ -15,7 +15,7 @@ import RECIPES from './data/recipes.json';
 
 const ALL_RECIPES = RECIPES as Meal[];
 
-type Step = 'setup' | 'plan' | 'shopping' | 'prefs';
+type Step = 'setup' | 'plan' | 'shopping' | 'prefs' | 'browse';
 
 const SEASON_INFO: Record<string, { label: string }> = {
   spring: { label: '🌸 Spring' }, summer: { label: '☀️ Summer' },
@@ -120,6 +120,13 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   }, []);
 
   const [nutritionLoading, setNutritionLoading] = useState<Set<string>>(new Set());
+
+  // Browse screen state
+  const [browseQuery, setBrowseQuery] = useState('');
+  const [browseProtein, setBrowseProtein] = useState('');
+  const [browseCuisine, setBrowseCuisine] = useState('');
+  const [browseTime, setBrowseTime] = useState('');
+  const [browseAddDay, setBrowseAddDay] = useState<Meal | null>(null);
 
   const estimateNutrition = useCallback(async (meal: Meal) => {
     if (meal.nutrition || nutritionCache[meal.name] || nutritionLoading.has(meal.name)) return;
@@ -391,14 +398,9 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
             👤 Preferences
           </button>
           <div style={{ borderTop: `1px solid ${P.border}`, margin: '12px 0', padding: '12px 12px 0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <button onClick={() => {
-              const opts = { kids: 'either', size: state.familySize, time: state.preferences.timeFilter, dietary: state.preferences.dietaryMode };
-              setCookNowOpts(opts);
-              const meal = actions.pickCookNow(opts.time, opts.kids as any, opts.dietary);
-              if (meal) { setCookNow(meal); setCookNowExp(true); setCookNowAddToPlan(false); }
-              else showToast('No meals match — try relaxing your filters');
-            }} style={{ background: P.accentLight, border: 'none', borderRadius: '10px', padding: '9px 12px', fontSize: '14px', fontWeight: 700, color: P.accentDark, cursor: 'pointer', textAlign: 'left' }}>
-              🍴 Find a recipe
+            <button onClick={() => setStep('browse')}
+              style={{ background: P.accentLight, border: 'none', borderRadius: '10px', padding: '9px 12px', fontSize: '14px', fontWeight: 700, color: P.accentDark, cursor: 'pointer', textAlign: 'left' }}>
+              🍴 Browse recipes
             </button>
             <button onClick={() => {
               const prevPlan = state.plan;
@@ -545,16 +547,11 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       {!isDesktop && (
         <BottomNav
           onShopping={() => setStep('shopping')}
-          onFindRecipe={() => {
-            const opts = { kids: 'either', size: state.familySize, time: state.preferences.timeFilter, dietary: state.preferences.dietaryMode };
-            setCookNowOpts(opts);
-            const meal = actions.pickCookNow(opts.time, opts.kids as any, opts.dietary);
-            if (meal) { setCookNow(meal); setCookNowExp(true); setCookNowAddToPlan(false); }
-            else showToast('No meals match — try relaxing your filters');
-          }}
+          onBrowse={() => setStep('browse')}
           onAskAI={() => { setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
           onSettings={() => setStep('setup')}
           onProfile={() => setStep('prefs')}
+          active="plan"
         />
       )}
 
@@ -977,6 +974,174 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       <BackBar onClick={() => setStep('plan')} />
     </Screen>
   );
+
+  // ── Browse screen ─────────────────────────────────────────────────────────
+  if (step === 'browse') {
+    const allMeals = ALL_RECIPES.concat(state.customMeals);
+    const q = browseQuery.trim().toLowerCase();
+    const browsed = allMeals.filter(m => {
+      if (browseProtein && m.protein !== browseProtein) return false;
+      if (browseCuisine && m.cuisine !== browseCuisine) return false;
+      if (browseTime) {
+        if (browseTime === '30') { if (m.minutes > 30) return false; }
+        else if (browseTime === '45') { if (m.minutes > 45) return false; }
+      }
+      if (q) {
+        const hay = `${m.name} ${m.cuisine} ${m.protein} ${m.description}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    const seasonal = allMeals.filter(m => m.seasons?.includes(state.season as any));
+    const hasFilters = !!(browseQuery || browseProtein || browseCuisine || browseTime);
+
+    return (
+      <div style={{ background: P.bg, minHeight: '100vh', paddingBottom: '80px' }}>
+        {/* Sticky header */}
+        <div style={{ position: 'sticky', top: 0, zIndex: 100, background: P.card, borderBottom: `1px solid ${P.border}`, padding: '12px 16px 0' }}>
+          <div style={{ maxWidth: '480px', margin: '0 auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+              <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', flex: 1 }}>Browse recipes</div>
+              {hasFilters && (
+                <button onClick={() => { setBrowseQuery(''); setBrowseProtein(''); setBrowseCuisine(''); setBrowseTime(''); }}
+                  style={{ background: 'none', border: 'none', color: P.accent, fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
+                  Clear
+                </button>
+              )}
+            </div>
+            {/* Search */}
+            <input
+              type="search"
+              placeholder="Search meals…"
+              value={browseQuery}
+              onChange={e => setBrowseQuery(e.target.value)}
+              style={{ width: '100%', padding: '9px 14px', border: `2px solid ${P.border}`, borderRadius: '10px', fontSize: '14px', background: P.bg, boxSizing: 'border-box', outline: 'none', marginBottom: '10px' }}
+            />
+            {/* Filter chips — horizontal scroll rows */}
+            <div style={{ overflowX: 'auto', whiteSpace: 'nowrap', marginBottom: '6px', scrollbarWidth: 'none' }}>
+              {([['', 'Any time'], ['30', '≤ 30 min'], ['45', '≤ 45 min']] as [string, string][]).map(([v, l]) => (
+                <button key={v} onClick={() => setBrowseTime(browseTime === v ? '' : v)}
+                  style={{ display: 'inline-block', marginRight: '6px', padding: '5px 12px', borderRadius: '20px', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
+                    background: browseTime === v ? P.accent : P.accentLight, color: browseTime === v ? '#fff' : P.accentDark }}>
+                  {l}
+                </button>
+              ))}
+            </div>
+            <div style={{ overflowX: 'auto', whiteSpace: 'nowrap', marginBottom: '6px', scrollbarWidth: 'none' }}>
+              {([['', 'All proteins'], ['chicken', '🍗 Chicken'], ['beef', '🥩 Beef'], ['fish', '🐟 Fish'], ['pork', '🥓 Pork'], ['lamb', '🍖 Lamb'], ['seafood', '🦐 Seafood'], ['eggs', '🥚 Eggs'], ['veggie', '🌱 Veggie']] as [string, string][]).map(([v, l]) => (
+                <button key={v} onClick={() => setBrowseProtein(browseProtein === v ? '' : v)}
+                  style={{ display: 'inline-block', marginRight: '6px', padding: '5px 12px', borderRadius: '20px', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
+                    background: browseProtein === v ? P.accent : P.accentLight, color: browseProtein === v ? '#fff' : P.accentDark }}>
+                  {l}
+                </button>
+              ))}
+            </div>
+            <div style={{ overflowX: 'auto', whiteSpace: 'nowrap', marginBottom: '10px', scrollbarWidth: 'none' }}>
+              {([['', 'All cuisines'], ['british', '🇬🇧 British'], ['italian', '🇮🇹 Italian'], ['asian', '🥢 Asian'], ['mexican', '🌮 Mexican'], ['indian', '🍛 Indian'], ['american', '🍔 American'], ['middleeastern', '🧆 Middle Eastern'], ['other', '🌍 Other']] as [string, string][]).map(([v, l]) => (
+                <button key={v} onClick={() => setBrowseCuisine(browseCuisine === v ? '' : v)}
+                  style={{ display: 'inline-block', marginRight: '6px', padding: '5px 12px', borderRadius: '20px', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
+                    background: browseCuisine === v ? P.accent : P.accentLight, color: browseCuisine === v ? '#fff' : P.accentDark }}>
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ maxWidth: '480px', margin: '0 auto', padding: '16px 16px 0' }}>
+          {/* Seasonal strip — only when no filters active */}
+          {!hasFilters && seasonal.length > 0 && (
+            <div style={{ marginBottom: '20px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', color: P.accent, marginBottom: '10px' }}>
+                {SEASON_INFO[state.season]?.label ?? '🍽️'} In season now
+              </div>
+              <div style={{ overflowX: 'auto', display: 'flex', gap: '10px', scrollbarWidth: 'none', paddingBottom: '4px' }}>
+                {seasonal.slice(0, 8).map(m => (
+                  <BrowseMealCard key={m.name} meal={m}
+                    isFav={state.preferences.favourites.includes(m.name)}
+                    onFav={() => actions.toggleFav(m.name)}
+                    onAdd={() => setBrowseAddDay(m)}
+                    compact
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Result count */}
+          <div style={{ fontSize: '12px', color: P.muted, marginBottom: '12px', fontWeight: 600 }}>
+            {browsed.length} {browsed.length === 1 ? 'recipe' : 'recipes'}{hasFilters ? ' matching' : ''}
+          </div>
+
+          {/* 2-column grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            {browsed.map(m => (
+              <BrowseMealCard key={m.name} meal={m}
+                isFav={state.preferences.favourites.includes(m.name)}
+                onFav={() => actions.toggleFav(m.name)}
+                onAdd={() => setBrowseAddDay(m)}
+              />
+            ))}
+          </div>
+          {browsed.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '40px 16px', color: P.muted }}>
+              <div style={{ fontSize: '36px', marginBottom: '10px' }}>🍽️</div>
+              <div style={{ fontWeight: 700, marginBottom: '6px' }}>No recipes found</div>
+              <div style={{ fontSize: '13px' }}>Try clearing some filters</div>
+            </div>
+          )}
+        </div>
+
+        {/* Add-to-plan day picker modal */}
+        {browseAddDay && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 600, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+            onClick={() => setBrowseAddDay(null)}>
+            <div style={{ background: P.card, borderRadius: '20px 20px 0 0', padding: '20px 20px 32px', width: '100%', maxWidth: '480px' }}
+              onClick={e => e.stopPropagation()}>
+              <div style={{ textAlign: 'center', marginBottom: '4px', fontSize: '16px', fontWeight: 700 }}>Add to plan</div>
+              <div style={{ textAlign: 'center', color: P.muted, fontSize: '13px', marginBottom: '16px' }}>{browseAddDay.name}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {!state.plan ? (
+                  <div style={{ textAlign: 'center', color: P.muted, fontSize: '13px', padding: '10px 0' }}>
+                    Generate a plan first to add meals to it
+                  </div>
+                ) : DAYS.filter(d => !state.dayConfig[d] || state.dayConfig[d] === 'home').map(day => {
+                  const current = state.plan!.meals.find(m => m.day === day);
+                  return (
+                    <button key={day} onClick={() => {
+                      actions.replaceMealInPlan(day, browseAddDay!);
+                      setBrowseAddDay(null);
+                      showToast(`Added to ${day}!`);
+                    }}
+                      style={{ background: P.bg, border: `2px solid ${P.border}`, borderRadius: '10px', padding: '10px 14px', fontSize: '14px', cursor: 'pointer', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontWeight: 700 }}>{day}</span>
+                      <span style={{ fontSize: '12px', color: P.muted, maxWidth: '55%', textAlign: 'right', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {current ? `Replace: ${current.name}` : '+ Add'}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              <button onClick={() => setBrowseAddDay(null)}
+                style={{ width: '100%', marginTop: '12px', background: 'none', border: 'none', color: P.muted, fontSize: '14px', cursor: 'pointer', padding: '8px' }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {toast && <Toast message={toast} onUndo={toastUndoRef.current ?? undefined} bottom="80px" />}
+        <BottomNav
+          onShopping={() => setStep('shopping')}
+          onBrowse={() => setStep('browse')}
+          onAskAI={() => { setFridgeMatches(null); setFridgeQuery(''); setShowAskAI(true); }}
+          onSettings={() => setStep('setup')}
+          onProfile={() => setStep('prefs')}
+          active="browse"
+        />
+      </div>
+    );
+  }
 
   // ── Prefs screen ──────────────────────────────────────────────────────────
   if (step === 'prefs') return (
@@ -1443,6 +1608,46 @@ function HelpModal({ onClose }: { onClose: () => void }) {
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function BrowseMealCard({ meal, isFav, onFav, onAdd, compact }: {
+  meal: Meal; isFav: boolean; onFav: () => void; onAdd: () => void; compact?: boolean;
+}) {
+  const cardStyle: React.CSSProperties = compact
+    ? { width: '140px', flexShrink: 0, background: P.card, borderRadius: '14px', overflow: 'hidden', boxShadow: P.shadow, border: `1px solid ${P.border}`, cursor: 'pointer' }
+    : { background: P.card, borderRadius: '14px', overflow: 'hidden', boxShadow: P.shadow, border: `1px solid ${P.border}` };
+  return (
+    <div style={cardStyle}>
+      {meal.photo && (
+        <div style={{ position: 'relative' }}>
+          <img src={meal.photo} alt={meal.name} loading="lazy"
+            style={{ width: '100%', height: compact ? '90px' : '120px', objectFit: 'cover', display: 'block' }} />
+          <button onClick={e => { e.stopPropagation(); onFav(); }}
+            style={{ position: 'absolute', top: '6px', right: '6px', background: 'rgba(255,255,255,0.85)', border: 'none', borderRadius: '20px', width: '28px', height: '28px', cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {isFav ? '★' : '☆'}
+          </button>
+        </div>
+      )}
+      <div style={{ padding: compact ? '8px' : '10px 12px 12px' }}>
+        <div style={{ fontWeight: 700, fontSize: compact ? '12px' : '13px', lineHeight: 1.3, marginBottom: '3px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          {meal.name}
+        </div>
+        <div style={{ fontSize: '11px', color: P.muted, marginBottom: compact ? '6px' : '8px' }}>⏱ {meal.time}</div>
+        {!compact && (
+          <button onClick={onAdd}
+            style={{ width: '100%', background: P.accentLight, border: 'none', borderRadius: '8px', padding: '7px', fontSize: '12px', fontWeight: 700, color: P.accentDark, cursor: 'pointer' }}>
+            + Add to plan
+          </button>
+        )}
+        {compact && (
+          <button onClick={onAdd}
+            style={{ width: '100%', background: P.accentLight, border: 'none', borderRadius: '6px', padding: '5px', fontSize: '11px', fontWeight: 700, color: P.accentDark, cursor: 'pointer' }}>
+            + Add
+          </button>
+        )}
       </div>
     </div>
   );
