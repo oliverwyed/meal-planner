@@ -263,7 +263,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   useEffect(() => {
     if (step === 'plan' && !state.plan && !loading) setStep('setup');
     if (step === 'shopping' && !state.shopList && !loading) setStep('plan');
-  }, [step, state.plan, state.shopList, loading]);
+    if (step === 'setup' && !isFirstRun) setStep('prefs');
+  }, [step, state.plan, state.shopList, loading, isFirstRun]);
 
   useEffect(() => { setPantryDraft(state.preferences.pantry); }, [state.preferences.pantry]);
 
@@ -397,43 +398,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       );
     }
 
-    // Returning users: settings screen
-    return (
-      <Screen>
-        <Header eyebrow="Meal Planner" title="Set up your week" subtitle="Choose your days and preferences" />
-        <Section>
-          <Row label="People eating">
-            <Stepper value={state.familySize} min={1} max={12} onChange={actions.setFamilySize} />
-          </Row>
-        </Section>
-        <Section>
-          <Row label="Max cook time"><span /></Row>
-          <TimeSlider value={state.preferences.timeFilter} onChange={v => actions.setPreferences({ timeFilter: v })} />
-        </Section>
-        <Section>
-          <Row label="Dietary"><span /></Row>
-          <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-            {([['none', 'All'], ['noFish', 'No fish'], ['noPork', 'No pork'], ['noRed', 'No red meat'], ['veggie', '🌱 Veggie']] as [string, string][]).map(([v, l]) => (
-              <Chip key={v} active={state.preferences.dietaryMode === v} onClick={() => actions.setPreferences({ dietaryMode: v as any })}>{l}</Chip>
-            ))}
-          </div>
-        </Section>
-        {DAYS.map(day => (
-          <DayToggle key={day} day={day} mode={(state.dayConfig[day] as DayMode) ?? 'home'} onChange={mode => actions.setDayMode(day, mode)} />
-        ))}
-        <div style={{ marginTop: '16px' }}>
-          <Primary onClick={() => { actions.generate(); setStep('plan'); }}>Generate this week's meals</Primary>
-        </div>
-        <BottomNav
-          onPlan={() => setStep('plan')}
-          onShopping={() => setStep('shopping')}
-          onBrowse={() => setStep('browse')}
-          onSettings={() => setStep('setup')}
-          onProfile={() => setStep('prefs')}
-          active="settings"
-        />
-      </Screen>
-    );
+    // Returning users redirected to Me screen via useEffect
+    return null;
   }
 
   // ── Cooking mode overlay ─────────────────────────────────────────────────
@@ -455,20 +421,16 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       {isDesktop && (
         <div style={{ width: '220px', background: P.card, borderRight: `1px solid ${P.border}`, position: 'sticky', top: 0, height: '100vh', display: 'flex', flexDirection: 'column', padding: '24px 0', flexShrink: 0 }}>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', padding: '0 20px 20px', borderBottom: `1px solid ${P.border}`, marginBottom: '12px' }}>🍽️ Meal Planner</div>
-          {(['plan', 'shopping', 'setup'] as const).map(s => {
-            const labels: Record<string, string> = { plan: '📅 Plan', shopping: '🛒 Shopping', setup: '⚙️ Settings' };
+          {(['plan', 'shopping', 'prefs'] as const).map(s => {
+            const labels: Record<string, string> = { plan: '📅 Plan', shopping: '🛒 Shopping', prefs: '👤 Me' };
             const active = s === 'plan';
             return (
-              <button key={s} onClick={() => setStep(s === 'shopping' ? 'shopping' : s === 'setup' ? 'setup' : 'plan')}
+              <button key={s} onClick={() => setStep(s)}
                 style={{ background: active ? P.accentLight : 'none', border: 'none', borderRadius: '10px', margin: '2px 12px', padding: '9px 12px', fontSize: '14px', fontWeight: 700, color: active ? P.accentDark : P.muted, cursor: 'pointer', textAlign: 'left' }}>
                 {labels[s]}
               </button>
             );
           })}
-          <button onClick={() => setStep('prefs')}
-            style={{ background: 'none', border: 'none', borderRadius: '10px', margin: '2px 12px', padding: '9px 12px', fontSize: '14px', fontWeight: 700, color: P.muted, cursor: 'pointer', textAlign: 'left' }}>
-            👤 Preferences
-          </button>
           <div style={{ borderTop: `1px solid ${P.border}`, margin: '12px 0', padding: '12px 12px 0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <button onClick={() => setStep('browse')}
               style={{ background: P.accentLight, border: 'none', borderRadius: '10px', padding: '9px 12px', fontSize: '14px', fontWeight: 700, color: P.accentDark, cursor: 'pointer', textAlign: 'left' }}>
@@ -638,7 +600,6 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           onPlan={() => setStep('plan')}
           onShopping={() => setStep('shopping')}
           onBrowse={() => setStep('browse')}
-          onSettings={() => setStep('setup')}
           onProfile={() => setStep('prefs')}
           active="plan"
         />
@@ -784,7 +745,6 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         onPlan={() => setStep('plan')}
         onShopping={() => setStep('shopping')}
         onBrowse={() => setStep('browse')}
-        onSettings={() => setStep('setup')}
         onProfile={() => setStep('prefs')}
         active="shopping"
       />
@@ -1153,18 +1113,50 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           onPlan={() => setStep('plan')}
           onShopping={() => setStep('shopping')}
           onBrowse={() => setStep('browse')}
-            onSettings={() => setStep('setup')}
-          onProfile={() => setStep('prefs')}
+            onProfile={() => setStep('prefs')}
           active="browse"
         />
       </div>
     );
   }
 
-  // ── Prefs screen ──────────────────────────────────────────────────────────
+  // ── Me screen (merged settings + prefs) ──────────────────────────────────
   if (step === 'prefs') return (
     <Screen>
-      <Header eyebrow="Preferences" title="Your settings" />
+      <Header eyebrow="Me" title="Your account" />
+
+      {!state.plan && (
+        <div style={{ marginBottom: '16px' }}>
+          <Primary onClick={() => { actions.generate(); setStep('plan'); }}>✨ Generate this week's meals</Primary>
+        </div>
+      )}
+
+      <Section>
+        <div style={{ fontWeight: 700, marginBottom: '12px' }}>Your week</div>
+        <Row label="People eating">
+          <Stepper value={state.familySize} min={1} max={12} onChange={actions.setFamilySize} />
+        </Row>
+        <div style={{ marginTop: '12px', marginBottom: '4px' }}>
+          <TimeSlider value={state.preferences.timeFilter} label="Max cook time" onChange={v => actions.setPreferences({ timeFilter: v })} />
+        </div>
+        <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginTop: '12px' }}>
+          {([['none', 'All'], ['noFish', 'No fish'], ['noPork', 'No pork'], ['noRed', 'No red meat'], ['veggie', '🌱 Veggie']] as [string, string][]).map(([v, l]) => (
+            <Chip key={v} active={state.preferences.dietaryMode === v} onClick={() => actions.setPreferences({ dietaryMode: v as any })}>{l}</Chip>
+          ))}
+        </div>
+      </Section>
+
+      <Section>
+        <div style={{ fontWeight: 700, marginBottom: '8px' }}>Cooking days</div>
+        {DAYS.map(day => (
+          <DayToggle key={day} day={day} mode={(state.dayConfig[day] as DayMode) ?? 'home'} onChange={mode => actions.setDayMode(day, mode)} />
+        ))}
+        {state.plan && (
+          <div style={{ marginTop: '12px' }}>
+            <Secondary muted onClick={() => { actions.generate(); setStep('plan'); showToast('Plan regenerated!'); }}>🔄 Regenerate plan</Secondary>
+          </div>
+        )}
+      </Section>
 
       <Section>
         <div style={{ fontWeight: 700, marginBottom: '8px' }}>Household</div>
@@ -1366,7 +1358,6 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         onPlan={() => setStep('plan')}
         onShopping={() => setStep('shopping')}
         onBrowse={() => setStep('browse')}
-        onSettings={() => setStep('setup')}
         onProfile={() => setStep('prefs')}
         active="profile"
       />

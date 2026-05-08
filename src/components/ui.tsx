@@ -137,11 +137,10 @@ export function TimeSlider({ value, onChange, onCommit, label }: {
 
 export const BOTTOM_NAV_HEIGHT = 56;
 
-export function BottomNav({ onPlan, onShopping, onBrowse, onSettings, onProfile, active }: {
+export function BottomNav({ onPlan, onShopping, onBrowse, onProfile, active }: {
   onPlan: () => void;
   onShopping: () => void;
   onBrowse: () => void;
-  onSettings: () => void;
   onProfile: () => void;
   active?: 'shopping' | 'browse' | 'plan' | 'settings' | 'profile';
 }) {
@@ -149,14 +148,13 @@ export function BottomNav({ onPlan, onShopping, onBrowse, onSettings, onProfile,
     { id: 'plan', icon: '📅', label: 'Week', onClick: onPlan },
     { id: 'shopping', icon: '🛒', label: 'Shopping', onClick: onShopping },
     { id: 'browse', icon: '🍴', label: 'Recipes', onClick: onBrowse, primary: true },
-    { id: 'settings', icon: '⚙️', label: 'Settings', onClick: onSettings },
-    { id: 'profile', icon: '👤', label: 'Profile', onClick: onProfile },
+    { id: 'profile', icon: '👤', label: 'Me', onClick: onProfile },
   ];
   return (
     <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
       background: P.card, borderTop: `1px solid ${P.border}`,
       paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-      display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)' }}>
+      display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}>
       {tabs.map(({ id, icon, label, onClick, primary }) => {
         const isActive = active === id;
         return (
