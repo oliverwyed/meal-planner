@@ -119,6 +119,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [browseAIOpen, setBrowseAIOpen] = useState(false);
   const [planDetailMeal, setPlanDetailMeal] = useState<{ meal: Meal; daySize: number } | null>(null);
   const [browseTab, setBrowseTab] = useState<'all' | 'community'>('all');
+  const [planWeek, setPlanWeek] = useState<'this' | 'next'>('this');
 
   // Community meals
   const [communityMeals, setCommunityMeals] = useState<CommunityMeal[]>([]);
@@ -261,7 +262,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   }, [loading, state.plan]);
 
   useEffect(() => {
-    if (step === 'plan' && !state.plan && !loading) setStep('setup');
+    if (step === 'plan' && !state.plan && !state.nextWeekPlan && !loading) setStep('setup');
     if (step === 'shopping' && !state.shopList && !loading) setStep('plan');
     if (step === 'setup' && !isFirstRun) setStep('prefs');
   }, [step, state.plan, state.shopList, loading, isFirstRun]);
@@ -415,17 +416,22 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   );
 
   // ── Plan screen ───────────────────────────────────────────────────────────
-  if (step === 'plan' && state.plan) {
+  if (step === 'plan' && (state.plan || state.nextWeekPlan)) {
   const todayName = new Date().toLocaleDateString('en-GB', { weekday: 'long' }) as DayName;
-  const weekMonday = (() => {
+  const thisWeekMonday = (() => {
     const d = new Date(); const dow = d.getDay();
     d.setDate(d.getDate() + (dow === 0 ? -6 : 1 - dow)); d.setHours(0,0,0,0); return d;
   })();
+  const activeWeekMonday = planWeek === 'next'
+    ? new Date(thisWeekMonday.getTime() + 7 * 24 * 60 * 60 * 1000)
+    : thisWeekMonday;
   const dayDate = (dayName: DayName) => {
-    const d = new Date(weekMonday); d.setDate(weekMonday.getDate() + DAYS.indexOf(dayName));
+    const d = new Date(activeWeekMonday);
+    d.setDate(activeWeekMonday.getDate() + DAYS.indexOf(dayName));
     return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   };
-  const todayMeal = state.plan.meals.find(m => m.day === todayName);
+  const activePlan = planWeek === 'this' ? state.plan : state.nextWeekPlan;
+  const todayMeal = planWeek === 'this' ? state.plan?.meals.find(m => m.day === todayName) ?? null : null;
   const todayDaySize = state.dayOverrides[todayName]?.size ?? state.familySize;
   return (
     <div style={{ display: isDesktop ? 'flex' : 'block', minHeight: '100vh', background: P.bg }}>
@@ -449,11 +455,16 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               🍴 Browse recipes
             </button>
             <button onClick={() => {
-              const prevPlan = state.plan;
-              const prevOverrides = state.dayOverrides;
-              actions.generate();
-              actions.setShopChecked({});
-              showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); actions.setShopChecked({}); } : undefined);
+              if (planWeek === 'next') {
+                actions.generateNextWeek();
+                showToast('Next week regenerated!');
+              } else {
+                const prevPlan = state.plan;
+                const prevOverrides = state.dayOverrides;
+                actions.generate();
+                actions.setShopChecked({});
+                showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); actions.setShopChecked({}); } : undefined);
+              }
             }} style={{ background: 'none', border: 'none', borderRadius: '10px', padding: '9px 12px', fontSize: '14px', fontWeight: 700, color: P.muted, cursor: 'pointer', textAlign: 'left' }}>
               🔄 Regenerate
             </button>
@@ -472,22 +483,27 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           <div>
             <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1.5px', color: P.accent, fontWeight: 700, marginBottom: '5px' }}>Your week</div>
             <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '22px', lineHeight: 1.3, marginBottom: '4px' }}>Here's the plan</div>
-            {(() => {
-              const isStale = Date.now() - state.plan.generatedAt > 7 * 24 * 60 * 60 * 1000;
+            {activePlan && (() => {
+              const isStale = Date.now() - activePlan.generatedAt > 7 * 24 * 60 * 60 * 1000;
               return (
                 <div style={{ fontSize: '12px', color: isStale ? P.accent : P.muted, fontWeight: isStale ? 600 : 400, marginBottom: '6px' }}>
-                  Generated {formatLastUsed(state.plan.generatedAt) ?? 'today'}{isStale ? ' — time to refresh?' : ''}
+                  Generated {formatLastUsed(activePlan.generatedAt) ?? 'today'}{isStale ? ' — time to refresh?' : ''}
                 </div>
               );
             })()}
           </div>
           <div style={{ display: 'flex', gap: '8px', paddingTop: '4px' }}>
             <IconBtn onClick={() => {
-              const prevPlan = state.plan;
-              const prevOverrides = state.dayOverrides;
-              actions.generate();
-              actions.setShopChecked({});
-              showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); actions.setShopChecked({}); } : undefined);
+              if (planWeek === 'next') {
+                actions.generateNextWeek();
+                showToast('Next week regenerated!');
+              } else {
+                const prevPlan = state.plan;
+                const prevOverrides = state.dayOverrides;
+                actions.generate();
+                actions.setShopChecked({});
+                showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); actions.setShopChecked({}); } : undefined);
+              }
             }} title="Regenerate plan">🔄</IconBtn>
             <IconBtn onClick={() => downloadICS(state.plan!, state.familySize)} title="Export to calendar">📅</IconBtn>
             {state.planHistory.length > 0 && (
@@ -505,6 +521,19 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               style={{ background: 'none', border: 'none', color: P.muted, cursor: 'pointer', fontSize: '16px', flexShrink: 0, padding: '0 2px', lineHeight: 1 }}>×</button>
           </div>
         )}
+      </div>
+
+      {/* Week toggle */}
+      <div style={{ display: 'flex', background: P.border, borderRadius: '22px', padding: '3px', marginBottom: '16px' }}>
+        {(['this', 'next'] as const).map(w => (
+          <button key={w} onClick={() => setPlanWeek(w)}
+            style={{ flex: 1, padding: '8px', borderRadius: '19px', border: 'none', fontSize: '13px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s',
+              background: planWeek === w ? P.card : 'transparent',
+              color: planWeek === w ? P.accent : P.muted,
+              boxShadow: planWeek === w ? P.shadow : 'none' }}>
+            {w === 'this' ? 'This week' : 'Next week'}
+          </button>
+        ))}
       </div>
 
       {/* Tonight hero */}
@@ -532,9 +561,24 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         );
       })()}
 
+      {!activePlan ? (
+        <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+          <div style={{ fontSize: '36px', marginBottom: '12px' }}>📅</div>
+          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', marginBottom: '8px' }}>
+            No plan for next week yet
+          </div>
+          <div style={{ fontSize: '14px', color: P.muted, marginBottom: '24px' }}>
+            Generate a plan to see what you'll be cooking.
+          </div>
+          <button onClick={() => { actions.generateNextWeek(); showToast('Next week plan generated!'); }}
+            style={{ background: P.accent, color: '#fff', border: 'none', borderRadius: '14px', padding: '14px 28px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
+            ✨ Generate next week
+          </button>
+        </div>
+      ) : (
       <div style={isDesktop ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '12px' } : {}}>
       {DAYS.map(day => {
-        const isToday = day === todayName;
+        const isToday = planWeek === 'this' && day === todayName;
         const rawMode = state.dayConfig[day] as string;
         const mode: DayMode = (rawMode === 'gousto' || rawMode === 'off') ? 'off' : 'home';
 
@@ -551,7 +595,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           </div>
         );
 
-        const meal = state.plan!.meals.find(m => m.day === day);
+        const meal = activePlan.meals.find(m => m.day === day);
         if (!meal) return null;
 
         const lu = state.cookHistory.filter(h => h.name === meal.name);
@@ -583,15 +627,21 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                 else { setPreviewDay(day); setExpandedDay(day); fetchReviews(meal.name); }
               }}
               onFav={() => actions.toggleFav(meal.name)}
-              onSwap={() => { actions.swap(day); setPreviewDay(null); setExpandedDay(null); showToast('Swapped!'); }}
+              onSwap={() => {
+                if (planWeek === 'next') { actions.swapNextWeek(day); }
+                else { actions.swap(day); }
+                setPreviewDay(null); setExpandedDay(null); showToast('Swapped!');
+              }}
               onDislike={() => {
                 const dislikedMeal = meal;
                 actions.addDislike(dislikedMeal.name);
-                actions.swap(day);
+                if (planWeek === 'next') { actions.swapNextWeek(day); }
+                else { actions.swap(day); }
                 setPreviewDay(null); setExpandedDay(null);
                 showToast("Won't suggest again", () => {
                   actions.setPreferences({ dislikes: state.preferences.dislikes.filter(d => d !== dislikedMeal.name) });
-                  actions.replaceMealInPlan(day, dislikedMeal);
+                  if (planWeek === 'next') actions.replaceMealInNextWeekPlan(day, dislikedMeal);
+                  else actions.replaceMealInPlan(day, dislikedMeal);
                 });
               }}
               onChoose={() => setPickerFor(day)}
@@ -620,6 +670,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         );
       })}
       </div>
+      )}
 
       <ActiveTimers timers={timers} onDismiss={dismissTimer} />
 
@@ -656,7 +707,9 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               if (pickerFor === 'cookNow') {
                 setCookNow(meal); setCookNowExp(true); setPickerFor(null);
               } else {
-                actions.replaceMealInPlan(pickerFor as DayName, meal); setPickerFor(null); showToast(`Switched to ${meal.name}`);
+                if (planWeek === 'next') actions.replaceMealInNextWeekPlan(pickerFor as DayName, meal);
+                else actions.replaceMealInPlan(pickerFor as DayName, meal);
+                setPickerFor(null); showToast(`Switched to ${meal.name}`);
               }
             }}
             onToggleFav={actions.toggleFav}

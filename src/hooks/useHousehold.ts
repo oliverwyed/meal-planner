@@ -20,11 +20,15 @@ export type AppState = HouseholdState & {
   householdId: string;
   shopList: ReturnType<typeof buildShop> | null;
   season: string;
+  nextWeekPlan: Plan | null;
 };
 
 export type AppActions = {
   generate: () => void;
+  generateNextWeek: () => void;
   swap: (day: DayName, extraDislikes?: string[]) => void;
+  swapNextWeek: (day: DayName) => void;
+  replaceMealInNextWeekPlan: (day: DayName, meal: Meal) => void;
   setDayMode: (day: DayName, mode: DayMode) => void;
   setKidsMode: (day: DayName, mode: KidsMode) => void;
   cycleKids: (day: DayName) => void;
@@ -60,6 +64,16 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
     customMeals: [],
     shopChecked: {},
   });
+
+  const [nextWeekPlan, setNextWeekPlan] = useState<Plan | null>(() => {
+    try { return JSON.parse(localStorage.getItem(`nwp_${householdId}`) ?? 'null'); }
+    catch { return null; }
+  });
+
+  useEffect(() => {
+    if (nextWeekPlan) localStorage.setItem(`nwp_${householdId}`, JSON.stringify(nextWeekPlan));
+    else localStorage.removeItem(`nwp_${householdId}`);
+  }, [nextWeekPlan, householdId]);
 
   const isRemoteUpdate = useRef(false);
   const pendingShopSave = useRef(false);
@@ -163,6 +177,31 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
         : prev.planHistory,
     }));
   }, [hs.dayConfig, hs.cookHistory, hs.plan, hs.dayOverrides, pool, smartOpts]);
+
+  const generateNextWeek = useCallback(() => {
+    const homeDays = DAYS.filter(d => !hs.dayConfig[d] || hs.dayConfig[d] === 'home');
+    const thisWeekNames = hs.plan?.meals.map(m => m.name) ?? [];
+    const selected: PlanMeal[] = [];
+    for (const day of homeDays) {
+      const p = pool(day).filter(m => !selected.find(s => s.name === m.name) && !thisWeekNames.includes(m.name));
+      const [pick] = smartPick(p.length ? p : pool(day), 1, smartOpts(day));
+      if (pick) selected.push({ ...pick, day });
+    }
+    setNextWeekPlan({ meals: selected, generatedAt: Date.now() });
+  }, [hs.dayConfig, hs.plan, pool, smartOpts]);
+
+  const swapNextWeek = useCallback((day: DayName) => {
+    if (!nextWeekPlan) return;
+    const used = nextWeekPlan.meals.map(m => m.name);
+    const avail = pool(day).filter(m => !used.includes(m.name) && !hs.preferences.dislikes.includes(m.name));
+    const [pick] = smartPick(avail.length ? avail : pool(day), 1, { ...smartOpts(day), dislikes: hs.preferences.dislikes });
+    if (!pick) return;
+    setNextWeekPlan(prev => prev ? { ...prev, meals: prev.meals.map(m => m.day === day ? { ...pick, day } : m) } : prev);
+  }, [nextWeekPlan, hs.preferences.dislikes, pool, smartOpts]);
+
+  const replaceMealInNextWeekPlan = useCallback((day: DayName, meal: Meal) => {
+    setNextWeekPlan(prev => prev ? { ...prev, meals: prev.meals.map(m => m.day === day ? { ...meal, day } : m) } : prev);
+  }, []);
 
   const swap = useCallback((day: DayName, extraDislikes: string[] = []) => {
     if (!hs.plan) return;
@@ -311,8 +350,8 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
   }, [allMeals, hs.plan, hs.preferences, hs.cookHistory]);
 
   return {
-    state: { ...hs, householdId, shopList, season },
-    actions: { generate, swap, setDayMode, setKidsMode, cycleKids, setFamilySize, setDaySize, setDayTime, setPreferences, toggleFav, addDislike, addMeal, editMeal, removeMeal, replaceMealInPlan, restorePlan, clearHistory, addToHistory, pickCookNow, setShopChecked, clearPlanHistory },
+    state: { ...hs, householdId, shopList, season, nextWeekPlan },
+    actions: { generate, generateNextWeek, swap, swapNextWeek, setDayMode, setKidsMode, cycleKids, setFamilySize, setDaySize, setDayTime, setPreferences, toggleFav, addDislike, addMeal, editMeal, removeMeal, replaceMealInPlan, replaceMealInNextWeekPlan, restorePlan, clearHistory, addToHistory, pickCookNow, setShopChecked, clearPlanHistory },
     loading,
   };
 }
