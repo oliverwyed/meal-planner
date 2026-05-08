@@ -265,7 +265,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     if (step === 'plan' && !state.plan && !state.nextWeekPlan && !loading) setStep('setup');
     if (step === 'shopping' && !state.shopList && !loading) setStep('plan');
     if (step === 'setup' && !isFirstRun) setStep('prefs');
-  }, [step, state.plan, state.shopList, loading, isFirstRun]);
+  }, [step, state.plan, state.nextWeekPlan, state.shopList, loading, isFirstRun]);
 
   useEffect(() => { setPantryDraft(state.preferences.pantry); }, [state.preferences.pantry]);
 
@@ -481,7 +481,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       <div style={{ padding: '24px 0 16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1.5px', color: P.accent, fontWeight: 700, marginBottom: '5px' }}>Your week</div>
+            <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1.5px', color: P.accent, fontWeight: 700, marginBottom: '5px' }}>{planWeek === 'next' ? 'Next week' : 'This week'}</div>
             <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '22px', lineHeight: 1.3, marginBottom: '4px' }}>Here's the plan</div>
             {activePlan && (() => {
               const isStale = Date.now() - activePlan.generatedAt > 7 * 24 * 60 * 60 * 1000;
@@ -505,7 +505,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                 showToast('New plan generated!', prevPlan ? () => { actions.restorePlan(prevPlan, prevOverrides); actions.setShopChecked({}); } : undefined);
               }
             }} title="Regenerate plan">🔄</IconBtn>
-            <IconBtn onClick={() => downloadICS(state.plan!, state.familySize)} title="Export to calendar">📅</IconBtn>
+            {(activePlan ?? state.plan) && <IconBtn onClick={() => downloadICS((activePlan ?? state.plan)!, state.familySize)} title="Export to calendar">📅</IconBtn>}
             {state.planHistory.length > 0 && (
               <IconBtn onClick={() => setShowPlanHistory(true)} title="Previous plans">🕐</IconBtn>
             )}
@@ -526,7 +526,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       {/* Week toggle */}
       <div style={{ display: 'flex', background: P.border, borderRadius: '22px', padding: '3px', marginBottom: '16px' }}>
         {(['this', 'next'] as const).map(w => (
-          <button key={w} onClick={() => setPlanWeek(w)}
+          <button key={w} onClick={() => { setPlanWeek(w); setPreviewDay(null); setExpandedDay(null); }}
             style={{ flex: 1, padding: '8px', borderRadius: '19px', border: 'none', fontSize: '13px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s',
               background: planWeek === w ? P.card : 'transparent',
               color: planWeek === w ? P.accent : P.muted,
@@ -565,14 +565,16 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         <div style={{ textAlign: 'center', padding: '60px 20px' }}>
           <div style={{ fontSize: '36px', marginBottom: '12px' }}>📅</div>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', marginBottom: '8px' }}>
-            No plan for next week yet
+            {planWeek === 'next' ? 'No plan for next week yet' : 'No plan for this week yet'}
           </div>
           <div style={{ fontSize: '14px', color: P.muted, marginBottom: '24px' }}>
             Generate a plan to see what you'll be cooking.
           </div>
-          <button onClick={() => { actions.generateNextWeek(); showToast('Next week plan generated!'); }}
-            style={{ background: P.accent, color: '#fff', border: 'none', borderRadius: '14px', padding: '14px 28px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
-            ✨ Generate next week
+          <button onClick={() => {
+            if (planWeek === 'next') { actions.generateNextWeek(); showToast('Next week plan generated!'); }
+            else { actions.generate(); actions.setShopChecked({}); showToast('Plan generated!'); }
+          }} style={{ background: P.accent, color: '#fff', border: 'none', borderRadius: '14px', padding: '14px 28px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
+            ✨ {planWeek === 'next' ? 'Generate next week' : 'Generate this week'}
           </button>
         </div>
       ) : (
@@ -659,7 +661,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               nutrition={meal.nutrition ?? nutritionCache[meal.name]}
               onCookMode={() => setCookingMeal({ meal, familySize: daySize })}
               onAdapt={request => adaptRecipe(meal, request)}
-              onSaveAdapted={adapted => { actions.addMeal(adapted); actions.replaceMealInPlan(day, adapted); showToast(`Saved: ${adapted.name}`); }}
+              onSaveAdapted={adapted => { actions.addMeal(adapted); if (planWeek === 'next') actions.replaceMealInNextWeekPlan(day, adapted); else actions.replaceMealInPlan(day, adapted); showToast(`Saved: ${adapted.name}`); }}
               reviews={reviewsCache[meal.name]}
               reviewsLoading={reviewsLoadingSet.has(meal.name)}
               onAddReview={(stars, comment) => handleAddReview(meal.name, stars, comment)}
