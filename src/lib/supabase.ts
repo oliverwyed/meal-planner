@@ -28,6 +28,16 @@ export async function joinHousehold(inviteCode: string): Promise<{ id: string } 
   return { id: data.id };
 }
 
+export async function getHouseholdInviteCode(householdId: string): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('households')
+    .select('invite_code')
+    .eq('id', householdId)
+    .single();
+  if (error) { console.error(error); return null; }
+  return data.invite_code;
+}
+
 // ── State ────────────────────────────────────────────────────────────────────
 
 export async function loadState(householdId: string): Promise<HouseholdState | null> {

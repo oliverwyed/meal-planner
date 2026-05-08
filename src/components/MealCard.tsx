@@ -17,6 +17,7 @@ interface Props {
   onView?: () => void;
   onOverview: () => void;
   onFullExpand: () => void;
+  highlight?: boolean;
   onFav: () => void;
   onSwap?: () => void;
   onDislike?: () => void;
@@ -50,7 +51,7 @@ function getMealEmoji(meal: Meal): string {
   return p[meal.protein] ?? c[meal.cuisine] ?? '🍽️';
 }
 
-export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOpen, expanded, familySize, onView, onOverview, onFullExpand, onFav,
+export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOpen, expanded, familySize, highlight, onView, onOverview, onFullExpand, onFav,
   onSwap, onDislike, onChoose, onMarkOff, onMarkCooked, onChangeMealSize, kidsMode, onCycleKids, dayTimeFilter, onSetDayTime,
   readOnly, lastUsedStr, onStartTimer, onEstimateNutrition, nutritionLoading, nutrition, onCookMode, onAdapt, onSaveAdapted,
   reviews, reviewsLoading, onAddReview, householdReviewId, onDeleteReview }: Props) {
@@ -93,7 +94,7 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
 
   return (
     <div style={{ background: P.card, borderRadius: '16px', marginBottom: '10px',
-      boxShadow: P.shadow, border: `2px solid ${isFav ? P.gold : P.border}`, overflow: 'hidden' }}>
+      boxShadow: highlight ? `0 0 0 2px ${P.accent}, ${P.shadow}` : P.shadow, border: `2px solid ${highlight ? P.accent : isFav ? P.gold : P.border}`, overflow: 'hidden' }}>
 
       {/* Hero photo */}
       {displayMeal.photo && (

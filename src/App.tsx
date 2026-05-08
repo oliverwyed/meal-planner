@@ -13,7 +13,7 @@ import { playBeep } from './lib/timers';
 import { CAT_EMOJI } from './lib/shopping';
 import { log, logFetch, recordCost } from './lib/logger';
 import { downloadICS } from './lib/ics';
-import { loadCommunityMeals, publishMeal, unpublishMeal, uploadRecipePhoto, loadReviews, addReview, deleteReview } from './lib/supabase';
+import { loadCommunityMeals, publishMeal, unpublishMeal, uploadRecipePhoto, loadReviews, addReview, deleteReview, getHouseholdInviteCode } from './lib/supabase';
 import RECIPES from './data/recipes.json';
 
 const ALL_RECIPES = RECIPES as Meal[];
@@ -415,7 +415,19 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   );
 
   // ── Plan screen ───────────────────────────────────────────────────────────
-  if (step === 'plan' && state.plan) return (
+  if (step === 'plan' && state.plan) {
+  const todayName = new Date().toLocaleDateString('en-GB', { weekday: 'long' }) as DayName;
+  const weekMonday = (() => {
+    const d = new Date(); const dow = d.getDay();
+    d.setDate(d.getDate() + (dow === 0 ? -6 : 1 - dow)); d.setHours(0,0,0,0); return d;
+  })();
+  const dayDate = (dayName: DayName) => {
+    const d = new Date(weekMonday); d.setDate(weekMonday.getDate() + DAYS.indexOf(dayName));
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  };
+  const todayMeal = state.plan.meals.find(m => m.day === todayName);
+  const todayDaySize = state.dayOverrides[todayName]?.size ?? state.familySize;
+  return (
     <div style={{ display: isDesktop ? 'flex' : 'block', minHeight: '100vh', background: P.bg }}>
       {/* Desktop sidebar */}
       {isDesktop && (
@@ -495,8 +507,34 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         )}
       </div>
 
+      {/* Tonight hero */}
+      {todayMeal && !isDesktop && (() => {
+        const mode = (state.dayConfig[todayName] as string);
+        if (mode === 'off' || mode === 'gousto') return null;
+        return (
+          <div style={{ background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`, borderRadius: '18px', padding: '16px 18px', marginBottom: '20px', color: '#fff' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', opacity: 0.8, marginBottom: '4px' }}>
+              Tonight · {dayDate(todayName)}
+            </div>
+            <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', lineHeight: 1.25, marginBottom: '4px' }}>{todayMeal.name}</div>
+            <div style={{ fontSize: '13px', opacity: 0.8, marginBottom: '14px' }}>{todayMeal.time} · {todayMeal.cuisine}</div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={() => setCookingMeal({ meal: todayMeal, familySize: todayDaySize })}
+                style={{ flex: 1, background: '#fff', color: P.accent, border: 'none', borderRadius: '10px', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
+                👨‍🍳 Cook now
+              </button>
+              <button onClick={() => setPlanDetailMeal({ meal: todayMeal, daySize: todayDaySize })}
+                style={{ flex: 1, background: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', borderRadius: '10px', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
+                View recipe →
+              </button>
+            </div>
+          </div>
+        );
+      })()}
+
       <div style={isDesktop ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '12px' } : {}}>
       {DAYS.map(day => {
+        const isToday = day === todayName;
         const rawMode = state.dayConfig[day] as string;
         const mode: DayMode = (rawMode === 'gousto' || rawMode === 'off') ? 'off' : 'home';
 
@@ -505,7 +543,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
             <div style={{ display: 'flex', gap: '12px' }}>
               <div style={{ fontSize: '26px', flexShrink: 0, paddingTop: '2px' }}>—</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '12px', color: P.accent, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{day}</div>
+                <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '12px', color: P.accent, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{day} <span style={{ fontWeight: 400, opacity: 0.7 }}>· {dayDate(day)}</span></div>
                 <div style={{ fontWeight: 700, fontSize: '16px', color: P.muted }}>Day off</div>
               </div>
             </div>
@@ -524,13 +562,14 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         return (
           <div key={day}>
             <MealCard
-              meal={meal} day={day}
+              meal={meal} day={`${day} · ${dayDate(day)}`}
               isFav={state.preferences.favourites.includes(meal.name)}
               isSeasonal={!!(meal.seasons?.includes(state.season as any))}
               seasonLabel={si.label}
               overviewOpen={previewDay === day || expandedDay === day}
               expanded={expandedDay === day}
               familySize={daySize}
+              highlight={isToday}
               onView={() => setPlanDetailMeal({ meal, daySize })}
               onOverview={() => {
                 if (previewDay === day || expandedDay === day) {
@@ -694,6 +733,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       </div>
     </div>
   );
+  } // end plan screen
 
   // ── Shopping screen ───────────────────────────────────────────────────────
   if (step === 'shopping' && state.shopList) return (
@@ -1131,60 +1171,31 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         </div>
       )}
 
+      {/* 1. Preferences */}
       <Section>
-        <div style={{ fontWeight: 700, marginBottom: '12px' }}>Your week</div>
+        <div style={{ fontWeight: 700, marginBottom: '12px' }}>Preferences</div>
         <Row label="People eating">
           <Stepper value={state.familySize} min={1} max={12} onChange={actions.setFamilySize} />
         </Row>
         <div style={{ marginTop: '12px', marginBottom: '4px' }}>
           <TimeSlider value={state.preferences.timeFilter} label="Max cook time" onChange={v => actions.setPreferences({ timeFilter: v })} />
         </div>
-        <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginTop: '12px' }}>
+        <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginTop: '12px', marginBottom: '16px' }}>
           {([['none', 'All'], ['noFish', 'No fish'], ['noPork', 'No pork'], ['noRed', 'No red meat'], ['veggie', '🌱 Veggie']] as [string, string][]).map(([v, l]) => (
             <Chip key={v} active={state.preferences.dietaryMode === v} onClick={() => actions.setPreferences({ dietaryMode: v as any })}>{l}</Chip>
           ))}
         </div>
-      </Section>
-
-      <Section>
-        <div style={{ fontWeight: 700, marginBottom: '8px' }}>Cooking days</div>
-        {DAYS.map(day => (
-          <DayToggle key={day} day={day} mode={(state.dayConfig[day] as DayMode) ?? 'home'} onChange={mode => actions.setDayMode(day, mode)} />
-        ))}
-        {state.plan && (
-          <div style={{ marginTop: '12px' }}>
-            <Secondary muted onClick={() => { actions.generate(); setStep('plan'); showToast('Plan regenerated!'); }}>🔄 Regenerate plan</Secondary>
-          </div>
-        )}
-      </Section>
-
-      <Section>
-        <div style={{ fontWeight: 700, marginBottom: '8px' }}>Household</div>
-        <div style={{ fontSize: '13px', color: P.muted, marginBottom: '10px' }}>Share this code so your partner can join on their device.</div>
-        {inviteCode && <div style={{ fontSize: '16px', fontWeight: 700, letterSpacing: '2px', marginBottom: '8px', color: P.text }}>{inviteCode}</div>}
-        <button disabled={inviteLoading} onClick={async () => {
-          if (inviteCode) {
-            navigator.clipboard?.writeText(inviteCode).then(() => showToast('Invite code copied!'));
-            return;
-          }
-          setInviteLoading(true);
-          try {
-            const { supabase } = await import('./lib/supabase');
-            const { data } = await supabase.from('households').select('invite_code').eq('id', householdId).single();
-            if (data?.invite_code) {
-              setInviteCode(data.invite_code);
-              navigator.clipboard?.writeText(data.invite_code).then(() => showToast('Invite code copied!'));
-            } else {
-              showToast('Could not load invite code');
-            }
-          } catch {
-            showToast('Could not load invite code');
-          } finally {
-            setInviteLoading(false);
-          }
-        }} style={{ background: inviteLoading ? P.border : P.accentLight, border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '13px', fontWeight: 700, color: inviteLoading ? P.muted : P.accentDark, cursor: inviteLoading ? 'default' : 'pointer' }}>
-          {inviteLoading ? 'Loading…' : '📋 Copy invite code'}
-        </button>
+        <div style={{ borderTop: `1px solid ${P.border}`, paddingTop: '14px' }}>
+          <div style={{ fontWeight: 700, marginBottom: '8px' }}>Cooking days</div>
+          {DAYS.map(day => (
+            <DayToggle key={day} day={day} mode={(state.dayConfig[day] as DayMode) ?? 'home'} onChange={mode => actions.setDayMode(day, mode)} />
+          ))}
+          {state.plan && (
+            <div style={{ marginTop: '12px' }}>
+              <Secondary muted onClick={() => { actions.generate(); setStep('plan'); showToast('Plan regenerated!'); }}>🔄 Regenerate plan</Secondary>
+            </div>
+          )}
+        </div>
       </Section>
 
       <Section>
@@ -1247,30 +1258,36 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       </Section>
 
       <Section>
-        <div style={{ fontWeight: 700, marginBottom: '8px' }}>Favourites ({state.preferences.favourites.length})</div>
-        {state.preferences.favourites.length === 0
-          ? <div style={{ fontSize: '13px', color: P.muted }}>Star a meal from the plan view.</div>
-          : state.preferences.favourites.map(name => (
-            <div key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0' }}>
-              <span style={{ fontSize: '14px' }}>⭐ {name}</span>
-              <button onClick={() => actions.toggleFav(name)} style={{ background: 'none', border: 'none', color: P.muted, cursor: 'pointer' }}>✕</button>
-            </div>
-          ))
-        }
-      </Section>
-
-      <Section>
-        <div style={{ fontWeight: 700, marginBottom: '8px' }}>Dislikes ({state.preferences.dislikes.length})</div>
-        {state.preferences.dislikes.length === 0
-          ? <div style={{ fontSize: '13px', color: P.muted }}>Thumbs-down a meal to add it here.</div>
-          : state.preferences.dislikes.map(name => (
-            <div key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0' }}>
-              <span style={{ fontSize: '14px' }}>👎 {name}</span>
-              <button onClick={() => actions.setPreferences({ dislikes: state.preferences.dislikes.filter(d => d !== name) })}
-                style={{ background: 'none', border: 'none', color: P.muted, cursor: 'pointer' }}>✕</button>
-            </div>
-          ))
-        }
+        <div style={{ fontWeight: 700, marginBottom: '12px' }}>Tastes</div>
+        <div style={{ marginBottom: '12px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>
+            Favourites ({state.preferences.favourites.length})
+          </div>
+          {state.preferences.favourites.length === 0
+            ? <div style={{ fontSize: '13px', color: P.muted }}>Star a meal to add it here.</div>
+            : state.preferences.favourites.map(name => (
+              <div key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 0' }}>
+                <span style={{ fontSize: '14px' }}>⭐ {name}</span>
+                <button onClick={() => actions.toggleFav(name)} style={{ background: 'none', border: 'none', color: P.muted, cursor: 'pointer' }}>✕</button>
+              </div>
+            ))
+          }
+        </div>
+        <div style={{ borderTop: `1px solid ${P.border}`, paddingTop: '12px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>
+            Won't cook ({state.preferences.dislikes.length})
+          </div>
+          {state.preferences.dislikes.length === 0
+            ? <div style={{ fontSize: '13px', color: P.muted }}>Thumbs-down a meal to add it here.</div>
+            : state.preferences.dislikes.map(name => (
+              <div key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 0' }}>
+                <span style={{ fontSize: '14px' }}>👎 {name}</span>
+                <button onClick={() => actions.setPreferences({ dislikes: state.preferences.dislikes.filter(d => d !== name) })}
+                  style={{ background: 'none', border: 'none', color: P.muted, cursor: 'pointer' }}>✕</button>
+              </div>
+            ))
+          }
+        </div>
       </Section>
 
       <Section>
@@ -1302,9 +1319,35 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         {showAdvanced && <Section><LogsPanel /></Section>}
       </div>
 
-      <Secondary muted onClick={() => { if (window.confirm('Leave this household? You can rejoin with the invite code.')) onLeave(); }}>
-        Leave household
-      </Secondary>
+      <Section>
+        <div style={{ fontWeight: 700, marginBottom: '12px' }}>Account</div>
+        <div style={{ marginBottom: '14px' }}>
+          <div style={{ fontSize: '13px', color: P.muted, marginBottom: '8px' }}>Share your invite code so others can join your household.</div>
+          {inviteCode ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ flex: 1, background: P.bg, border: `1.5px solid ${P.border}`, borderRadius: '8px', padding: '9px 12px', fontFamily: 'monospace', fontSize: '15px', fontWeight: 700, letterSpacing: '2px', color: P.accent }}>
+                {inviteCode}
+              </div>
+              <button onClick={() => { navigator.clipboard?.writeText(inviteCode); showToast('Copied!'); }}
+                style={{ background: P.accentLight, border: 'none', borderRadius: '8px', padding: '9px 12px', fontSize: '13px', fontWeight: 700, color: P.accentDark, cursor: 'pointer', flexShrink: 0 }}>
+                Copy
+              </button>
+            </div>
+          ) : (
+            <button onClick={async () => { setInviteLoading(true); const code = await getHouseholdInviteCode(householdId); setInviteCode(code); setInviteLoading(false); }}
+              disabled={inviteLoading}
+              style={{ background: P.accentLight, border: 'none', borderRadius: '8px', padding: '9px 14px', fontSize: '13px', fontWeight: 700, color: P.accentDark, cursor: 'pointer', opacity: inviteLoading ? 0.7 : 1 }}>
+              {inviteLoading ? 'Loading…' : '🔗 Show invite code'}
+            </button>
+          )}
+        </div>
+        <div style={{ borderTop: `1px solid ${P.border}`, paddingTop: '12px' }}>
+          <button onClick={() => { if (window.confirm('Leave this household? You can rejoin with the invite code.')) onLeave(); }}
+            style={{ background: 'none', border: 'none', color: '#EF4444', fontSize: '14px', fontWeight: 600, cursor: 'pointer', padding: 0 }}>
+            Leave household
+          </button>
+        </div>
+      </Section>
 
       {toast && <Toast message={toast} onUndo={toastUndoRef.current ?? undefined} />}
 
