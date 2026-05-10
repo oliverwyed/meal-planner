@@ -75,6 +75,7 @@ export interface CookHistoryEntry {
 
 export interface HouseholdState {
   plan: Plan | null;
+  nextWeekPlan: Plan | null;
   planHistory: PlanHistoryEntry[];
   dayConfig: DayConfig;
   kidsConfig: KidsConfig;

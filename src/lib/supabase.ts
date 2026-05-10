@@ -86,6 +86,7 @@ export async function loadState(householdId: string): Promise<HouseholdState | n
   const { shopChecked: loadedChecked, ...cleanPlan } = rawPlan ?? {};
   return {
     plan: rawPlan ? (cleanPlan as import('./types').Plan) : null,
+    nextWeekPlan: (s.next_week_plan as import('./types').Plan) ?? null,
     planHistory: s.plan_history ?? [],
     dayConfig: s.day_config ?? {},
     kidsConfig: s.kids_config ?? {},
@@ -103,13 +104,14 @@ export async function saveState(
   patch: Partial<Omit<HouseholdState, 'customMeals' | 'familySize'>>,
 ): Promise<void> {
   const update: Record<string, any> = {};
-  if ('plan' in patch)        update.plan          = patch.plan;
-  if ('planHistory' in patch) update.plan_history  = patch.planHistory;
-  if ('dayConfig' in patch)   update.day_config    = patch.dayConfig;
-  if ('kidsConfig' in patch)  update.kids_config   = patch.kidsConfig;
-  if ('dayOverrides' in patch) update.day_overrides = patch.dayOverrides;
-  if ('preferences' in patch) update.preferences   = patch.preferences;
-  if ('cookHistory' in patch) update.cook_history  = patch.cookHistory;
+  if ('plan' in patch)         update.plan           = patch.plan;
+  if ('nextWeekPlan' in patch) update.next_week_plan = patch.nextWeekPlan;
+  if ('planHistory' in patch)  update.plan_history   = patch.planHistory;
+  if ('dayConfig' in patch)    update.day_config     = patch.dayConfig;
+  if ('kidsConfig' in patch)   update.kids_config    = patch.kidsConfig;
+  if ('dayOverrides' in patch) update.day_overrides  = patch.dayOverrides;
+  if ('preferences' in patch)  update.preferences    = patch.preferences;
+  if ('cookHistory' in patch)  update.cook_history   = patch.cookHistory;
   if (!Object.keys(update).length) return;
   const { error } = await supabase
     .from('household_state')
@@ -161,6 +163,7 @@ export function subscribeToState(householdId: string, onUpdate: (state: Partial<
       const { shopChecked: remoteChecked, ...cleanPlan } = rawPlan ?? {};
       onUpdate({
         plan: rawPlan ? cleanPlan : null,
+        nextWeekPlan: (s.next_week_plan as import('./types').Plan) ?? null,
         planHistory: s.plan_history ?? [],
         dayConfig: s.day_config ?? {},
         kidsConfig: s.kids_config ?? {},
