@@ -13,7 +13,7 @@ import { playBeep } from './lib/timers';
 import { CAT_EMOJI } from './lib/shopping';
 import { log, logFetch, recordCost } from './lib/logger';
 import { downloadICS } from './lib/ics';
-import { loadCommunityMeals, publishMeal, unpublishMeal, uploadRecipePhoto, loadReviews, addReview, deleteReview, getHouseholdInviteCode } from './lib/supabase';
+import { loadCommunityMeals, publishMeal, unpublishMeal, uploadRecipePhoto, loadReviews, addReview, deleteReview, getHouseholdInviteCode, authSignOut } from './lib/supabase';
 import RECIPES from './data/recipes.json';
 
 const ALL_RECIPES = RECIPES as Meal[];
@@ -26,7 +26,7 @@ export default function App() {
   if (!householdId) {
     return <HouseholdGate onReady={id => { localStorage.setItem(HOUSEHOLD_ID_KEY, id); setHouseholdId(id); }} />;
   }
-  return <AppInner householdId={householdId} onLeave={() => { localStorage.removeItem(HOUSEHOLD_ID_KEY); setHouseholdId(null); }} />;
+  return <AppInner householdId={householdId} onLeave={() => { localStorage.removeItem(HOUSEHOLD_ID_KEY); setHouseholdId(null); authSignOut(); }} />;
 }
 
 function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () => void }) {
@@ -57,7 +57,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     kids: 'either', size: 4, time: 'any', dietary: 'none',
   });
   const [timers, setTimers] = useState<{ id: string; label: string; remaining: number; total: number; done: boolean }[]>([]);
-  const [nutritionCache, setNutritionCache] = useState<Record<string, { calories: number; protein: number; carbs: number; fat: number }>>({});
+  const [nutritionCache, setNutritionCache] = useState<Record<string, { calories: number; protein: number; carbs: number; fat: number }>>({}); 
   const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= DESKTOP_BREAKPOINT);
   const [cookingMeal, setCookingMeal] = useState<{ meal: Meal; familySize: number } | null>(null);
 
@@ -323,7 +323,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
 
   if (loading) return <Spinner />;
 
-  // ── Setup / Onboarding screen ─────────────────────────────────────────────
+  // ── Setup / Onboarding screen ───────────────────────────────────────────────────
   if (step === 'setup') {
     // First-run: 3-step onboarding wizard
     if (isFirstRun) {
@@ -403,7 +403,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     return null;
   }
 
-  // ── Cooking mode overlay ─────────────────────────────────────────────────
+  // ── Cooking mode overlay ─────────────────────────────────────────────────────
   if (cookingMeal) return (
     <CookingMode
       meal={cookingMeal.meal}
@@ -415,7 +415,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     />
   );
 
-  // ── Plan screen ───────────────────────────────────────────────────────────
+  // ── Plan screen ──────────────────────────────────────────────────────────────────────
   if (step === 'plan' && (state.plan || state.nextWeekPlan)) {
   const todayName = new Date().toLocaleDateString('en-GB', { weekday: 'long' }) as DayName;
   const thisWeekMonday = (() => {
@@ -790,7 +790,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   );
   } // end plan screen
 
-  // ── Shopping screen ───────────────────────────────────────────────────────
+  // ── Shopping screen ───────────────────────────────────────────────────────────────────────
   if (step === 'shopping' && state.shopList) return (
     <Screen>
       <Header eyebrow="Shopping" title="What to buy" />
@@ -846,7 +846,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     </Screen>
   );
 
-  // ── Browse screen ─────────────────────────────────────────────────────────
+  // ── Browse screen ─────────────────────────────────────────────────────────────────────────
   if (step === 'browse') {
     const si = SEASON_INFO[state.season] ?? { label: '' };
     const allMeals = ALL_RECIPES.concat(state.customMeals);
@@ -1215,7 +1215,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     );
   }
 
-  // ── Me screen (merged settings + prefs) ──────────────────────────────────
+  // ── Me screen (merged settings + prefs) ──────────────────────────────────────────────────────
   if (step === 'prefs') return (
     <Screen>
       <Header eyebrow="Me" title="Your account" />
