@@ -6,7 +6,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ── Household ────────────────────────────────────────────────────────────────────────────
+// ── Household ────────────────────────────────────────────────────────────────
 
 export async function createHousehold(familySize: number): Promise<{ id: string; inviteCode: string } | null> {
   const { data, error } = await supabase
@@ -28,7 +28,7 @@ export async function joinHousehold(inviteCode: string): Promise<{ id: string } 
   return { id: data.id };
 }
 
-// ── Auth (email OTP for recovery) ────────────────────────────────────────────────────
+// ── Auth (email OTP for recovery) ────────────────────────────────────────────
 
 export async function sendLoginOTP(email: string): Promise<{ error: string | null }> {
   const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
@@ -71,7 +71,7 @@ export async function getHouseholdInviteCode(householdId: string): Promise<strin
   return data.invite_code;
 }
 
-// ── State ──────────────────────────────────────────────────────────────────────────────
+// ── State ────────────────────────────────────────────────────────────────────
 
 export async function loadState(householdId: string): Promise<HouseholdState | null> {
   const [stateRes, mealsRes, houseRes] = await Promise.all([
@@ -121,7 +121,7 @@ export async function saveFamilySize(householdId: string, familySize: number): P
   await supabase.from('households').update({ family_size: familySize }).eq('id', householdId);
 }
 
-// ── Custom meals ───────────────────────────────────────────────────────────────────────
+// ── Custom meals ─────────────────────────────────────────────────────────────
 
 export async function addCustomMeal(householdId: string, meal: Meal): Promise<Meal | null> {
   const { sourceUrl, id: _id, ...mealData } = meal;
@@ -150,7 +150,7 @@ export async function deleteCustomMeal(mealId: string): Promise<void> {
   await supabase.from('custom_meals').delete().eq('id', mealId);
 }
 
-// ── Real-time ─────────────────────────────────────────────────────────────────────────────
+// ── Real-time ─────────────────────────────────────────────────────────────────
 
 export function subscribeToState(householdId: string, onUpdate: (state: Partial<HouseholdState>) => void) {
   return supabase
@@ -178,7 +178,7 @@ export function subscribeToState(householdId: string, onUpdate: (state: Partial<
     .subscribe();
 }
 
-// ── Community meals ─────────────────────────────────────────────────────────────────────────
+// ── Community meals ───────────────────────────────────────────────────────────
 
 export async function loadCommunityMeals(): Promise<CommunityMeal[]> {
   const { data, error } = await supabase
@@ -239,7 +239,7 @@ export async function uploadRecipePhoto(file: File): Promise<string | null> {
   return data.publicUrl;
 }
 
-// ── Reviews ─────────────────────────────────────────────────────────────────────────────
+// ── Reviews ───────────────────────────────────────────────────────────────────
 
 export async function loadReviews(recipeName: string): Promise<RecipeReview[]> {
   const { data, error } = await supabase
