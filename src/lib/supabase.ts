@@ -6,7 +6,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ── Household ────────────────────────────────────────────────────────────────
+// ── Household ────────────────────────────────────────────────────────────────────────────
 
 export async function createHousehold(familySize: number): Promise<{ id: string; inviteCode: string } | null> {
   const { data, error } = await supabase
@@ -28,6 +28,39 @@ export async function joinHousehold(inviteCode: string): Promise<{ id: string } 
   return { id: data.id };
 }
 
+// ── Auth (email OTP for recovery) ────────────────────────────────────────────────────
+
+export async function sendLoginOTP(email: string): Promise<{ error: string | null }> {
+  const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+  return { error: error?.message ?? null };
+}
+
+export async function verifyLoginOTP(email: string, token: string): Promise<{ userId: string | null; error: string | null }> {
+  const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email' });
+  if (error || !data.user) return { userId: null, error: error?.message ?? 'Verification failed' };
+  return { userId: data.user.id, error: null };
+}
+
+export async function getAuthSession(): Promise<{ userId: string; email: string } | null> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) return null;
+  return { userId: session.user.id, email: session.user.email ?? '' };
+}
+
+export async function authSignOut(): Promise<void> {
+  await supabase.auth.signOut();
+}
+
+export async function findHouseholdByAuthUser(userId: string): Promise<string | null> {
+  const { data } = await supabase.from('households').select('id').eq('auth_user_id', userId).maybeSingle();
+  return data?.id ?? null;
+}
+
+export async function linkHouseholdToAuthUser(householdId: string, userId: string): Promise<void> {
+  // Only link if the household has no existing auth owner
+  await supabase.from('households').update({ auth_user_id: userId }).eq('id', householdId).is('auth_user_id', null);
+}
+
 export async function getHouseholdInviteCode(householdId: string): Promise<string | null> {
   const { data, error } = await supabase
     .from('households')
@@ -38,7 +71,7 @@ export async function getHouseholdInviteCode(householdId: string): Promise<strin
   return data.invite_code;
 }
 
-// ── State ────────────────────────────────────────────────────────────────────
+// ── State ──────────────────────────────────────────────────────────────────────────────
 
 export async function loadState(householdId: string): Promise<HouseholdState | null> {
   const [stateRes, mealsRes, houseRes] = await Promise.all([
@@ -88,7 +121,7 @@ export async function saveFamilySize(householdId: string, familySize: number): P
   await supabase.from('households').update({ family_size: familySize }).eq('id', householdId);
 }
 
-// ── Custom meals ─────────────────────────────────────────────────────────────
+// ── Custom meals ───────────────────────────────────────────────────────────────────────
 
 export async function addCustomMeal(householdId: string, meal: Meal): Promise<Meal | null> {
   const { sourceUrl, id: _id, ...mealData } = meal;
@@ -117,7 +150,7 @@ export async function deleteCustomMeal(mealId: string): Promise<void> {
   await supabase.from('custom_meals').delete().eq('id', mealId);
 }
 
-// ── Real-time ─────────────────────────────────────────────────────────────────
+// ── Real-time ─────────────────────────────────────────────────────────────────────────────
 
 export function subscribeToState(householdId: string, onUpdate: (state: Partial<HouseholdState>) => void) {
   return supabase
@@ -145,7 +178,7 @@ export function subscribeToState(householdId: string, onUpdate: (state: Partial<
     .subscribe();
 }
 
-// ── Community meals ───────────────────────────────────────────────────────────
+// ── Community meals ─────────────────────────────────────────────────────────────────────────
 
 export async function loadCommunityMeals(): Promise<CommunityMeal[]> {
   const { data, error } = await supabase
@@ -206,7 +239,7 @@ export async function uploadRecipePhoto(file: File): Promise<string | null> {
   return data.publicUrl;
 }
 
-// ── Reviews ───────────────────────────────────────────────────────────────────
+// ── Reviews ─────────────────────────────────────────────────────────────────────────────
 
 export async function loadReviews(recipeName: string): Promise<RecipeReview[]> {
   const { data, error } = await supabase
