@@ -1,8 +1,9 @@
 name: Deploy Supabase Edge Functions
 
 on:
+  workflow_dispatch:
   push:
-    branches: [main, v2, claude/deploy-vercel-v2-F7pwA]
+    branches: [main, v2, claude/deploy-vercel-v2-F7pwA, claude/brainstorm-app-ideas-1zykJ]
     paths:
       - 'supabase/functions/**'
 
@@ -37,5 +38,8 @@ jobs:
             --project-ref ejinmxvbeaolypwmkuhh \
             --no-verify-jwt
           supabase functions deploy adapt-recipe \
+            --project-ref ejinmxvbeaolypwmkuhh \
+            --no-verify-jwt
+          supabase functions deploy parse-recipe-photo \
             --project-ref ejinmxvbeaolypwmkuhh \
             --no-verify-jwt
