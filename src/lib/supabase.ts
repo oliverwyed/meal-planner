@@ -31,7 +31,8 @@ export async function joinHousehold(inviteCode: string): Promise<{ id: string } 
 // ── Auth (email OTP for recovery) ────────────────────────────────────────────
 
 export async function sendLoginOTP(email: string): Promise<{ error: string | null }> {
-  const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+  const redirectTo = `${window.location.origin}`;
+  const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: redirectTo } });
   return { error: error?.message ?? null };
 }
 
