@@ -19,6 +19,8 @@ function getCurrentSeason() {
 export type AppState = HouseholdState & {
   householdId: string;
   shopList: ReturnType<typeof buildShop> | null;
+  nextWeekShopList: ReturnType<typeof buildShop> | null;
+  bothShopList: ReturnType<typeof buildShop> | null;
   season: string;
 };
 
@@ -47,6 +49,7 @@ export type AppActions = {
   pickCookNow: (time: string, kidsMode: KidsMode, dietary: string) => Meal | null;
   setShopChecked: (checked: Record<string, boolean>) => void;
   clearPlanHistory: () => void;
+  promoteNextWeekPlan: () => void;
 };
 
 export function useHousehold(householdId: string): { state: AppState; actions: AppActions; loading: boolean } {
@@ -74,6 +77,12 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
   const shopList = hs.plan
     ? buildShop(hs.plan, hs.preferences.pantry, hs.familySize, hs.dayConfig, hs.dayOverrides)
     : null;
+  const nextWeekShopList = hs.nextWeekPlan
+    ? buildShop(hs.nextWeekPlan, hs.preferences.pantry, hs.familySize, hs.dayConfig, hs.dayOverrides)
+    : null;
+  const bothShopList = (hs.plan && hs.nextWeekPlan)
+    ? buildShop({ ...hs.plan, meals: [...hs.plan.meals, ...hs.nextWeekPlan.meals] }, hs.preferences.pantry, hs.familySize, hs.dayConfig, hs.dayOverrides)
+    : (shopList ?? nextWeekShopList);
 
   // Load initial state
   useEffect(() => {
@@ -333,6 +342,13 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
     setHs(prev => ({ ...prev, shopChecked: checked }));
   }, []);
 
+  const promoteNextWeekPlan = useCallback(() => {
+    setHs(prev => {
+      if (!prev.nextWeekPlan) return prev;
+      return { ...prev, plan: prev.nextWeekPlan, nextWeekPlan: null, shopChecked: {}, dayOverrides: {} };
+    });
+  }, []);
+
   const pickCookNow = useCallback((time: string, kidsMode: KidsMode, dietary: string): Meal | null => {
     const p = getPool(allMeals, time, kidsMode, dietary as any);
     const used = hs.plan?.meals.map(m => m.name) ?? [];
@@ -345,8 +361,8 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
   }, [allMeals, hs.plan, hs.preferences, hs.cookHistory]);
 
   return {
-    state: { ...hs, householdId, shopList, season },
-    actions: { generate, generateNextWeek, swap, swapNextWeek, setDayMode, setKidsMode, cycleKids, setFamilySize, setDaySize, setDayTime, setPreferences, toggleFav, addDislike, addMeal, editMeal, removeMeal, replaceMealInPlan, replaceMealInNextWeekPlan, restorePlan, clearHistory, addToHistory, pickCookNow, setShopChecked, clearPlanHistory },
+    state: { ...hs, householdId, shopList, nextWeekShopList, bothShopList, season },
+    actions: { generate, generateNextWeek, swap, swapNextWeek, setDayMode, setKidsMode, cycleKids, setFamilySize, setDaySize, setDayTime, setPreferences, toggleFav, addDislike, addMeal, editMeal, removeMeal, replaceMealInPlan, replaceMealInNextWeekPlan, restorePlan, clearHistory, addToHistory, pickCookNow, setShopChecked, clearPlanHistory, promoteNextWeekPlan },
     loading,
   };
 }

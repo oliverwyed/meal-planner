@@ -120,6 +120,19 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [planDetailMeal, setPlanDetailMeal] = useState<{ meal: Meal; daySize: number } | null>(null);
   const [browseTab, setBrowseTab] = useState<'all' | 'community'>('all');
   const [planWeek, setPlanWeek] = useState<'this' | 'next'>('this');
+  const [shopWeek, setShopWeek] = useState<'this' | 'next' | 'both'>('this');
+
+  // Rollover: show banner when current plan predates this Monday
+  const [showRollover, setShowRollover] = useState(false);
+  useEffect(() => {
+    if (!state.plan || !state.nextWeekPlan) { setShowRollover(false); return; }
+    const now = new Date();
+    const dow = now.getDay();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
+    monday.setHours(0, 0, 0, 0);
+    setShowRollover(state.plan.generatedAt < monday.getTime());
+  }, [state.plan, state.nextWeekPlan]);
 
   // Community meals
   const [communityMeals, setCommunityMeals] = useState<CommunityMeal[]>([]);
@@ -263,7 +276,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
 
   useEffect(() => {
     if (step === 'plan' && !state.plan && !state.nextWeekPlan && !loading) setStep('setup');
-    if (step === 'shopping' && !state.shopList && !loading) setStep('plan');
+    if (step === 'shopping' && !state.shopList && !state.nextWeekShopList && !loading) setStep('plan');
     if (step === 'setup' && !isFirstRun) setStep('prefs');
   }, [step, state.plan, state.nextWeekPlan, state.shopList, loading, isFirstRun]);
 
@@ -522,6 +535,24 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           </div>
         )}
       </div>
+
+      {/* Rollover banner */}
+      {showRollover && (
+        <div style={{ background: P.accentLight, border: `1px solid ${P.accent}`, borderRadius: '14px', padding: '12px 14px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, fontSize: '13px', color: P.accent, marginBottom: '2px' }}>New week started</div>
+            <div style={{ fontSize: '12px', color: P.muted }}>Promote next week's plan to this week?</div>
+          </div>
+          <button onClick={() => { actions.promoteNextWeekPlan(); setPlanWeek('this'); setShowRollover(false); }}
+            style={{ background: P.accent, color: '#fff', border: 'none', borderRadius: '10px', padding: '7px 12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            Promote
+          </button>
+          <button onClick={() => setShowRollover(false)}
+            style={{ background: 'transparent', border: 'none', color: P.muted, fontSize: '18px', cursor: 'pointer', lineHeight: 1, padding: '0 2px' }}>
+            ×
+          </button>
+        </div>
+      )}
 
       {/* Week toggle */}
       <div style={{ display: 'flex', background: P.border, borderRadius: '22px', padding: '3px', marginBottom: '16px' }}>
@@ -791,13 +822,35 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   } // end plan screen
 
   // ── Shopping screen ───────────────────────────────────────────────────────
-  if (step === 'shopping' && state.shopList) return (
+  if (step === 'shopping' && (state.shopList || state.nextWeekShopList)) {
+  const hasNext = !!state.nextWeekShopList;
+  const activeShopList =
+    shopWeek === 'next' ? state.nextWeekShopList :
+    shopWeek === 'both' ? state.bothShopList :
+    state.shopList;
+  const activeShopListSafe = activeShopList ?? {};
+  const totalItems = Object.values(activeShopListSafe).flat().length;
+  const checkedCount = Object.values(state.shopChecked).filter(Boolean).length;
+  return (
     <Screen>
       <Header eyebrow="Shopping" title="What to buy" />
+      {hasNext && (
+        <div style={{ display: 'flex', background: P.border, borderRadius: '22px', padding: '3px', marginBottom: '14px' }}>
+          {(['this', 'next', 'both'] as const).map(w => (
+            <button key={w} onClick={() => setShopWeek(w)}
+              style={{ flex: 1, padding: '7px 4px', borderRadius: '19px', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s',
+                background: shopWeek === w ? P.card : 'transparent',
+                color: shopWeek === w ? P.accent : P.muted,
+                boxShadow: shopWeek === w ? P.shadow : 'none' }}>
+              {w === 'this' ? 'This week' : w === 'next' ? 'Next week' : 'Both'}
+            </button>
+          ))}
+        </div>
+      )}
       <div style={{ fontSize: '13px', color: P.muted, marginBottom: '16px' }}>
-        {Object.values(state.shopList).flat().length} items · {Object.values(state.shopChecked).filter(Boolean).length} checked
+        {totalItems} items · {checkedCount} checked
       </div>
-      {Object.entries(state.shopList).map(([cat, items]) => (
+      {Object.entries(activeShopListSafe).map(([cat, items]) => (
         <Section key={cat}>
           <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '10px' }}>{CAT_EMOJI[cat]} {cat}</div>
           {items.map((item, i) => {
@@ -824,14 +877,19 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         <Secondary muted onClick={() => actions.setShopChecked({})}>Clear checks</Secondary>
       )}
       <Primary onClick={() => {
-        const mealLines = state.plan!.meals.map(m => `${m.day}: ${m.name}`).join('\n');
-        const lines = Object.entries(state.shopList!).map(([cat, items]) => {
+        const weekLabel = shopWeek === 'both' ? 'Both weeks' : shopWeek === 'next' ? 'Next week' : 'This week';
+        const planForLabel = shopWeek === 'next' ? state.nextWeekPlan : state.plan;
+        const mealLines = planForLabel?.meals.map(m => `${m.day}: ${m.name}`).join('\n') ?? '';
+        const bothMealLines = shopWeek === 'both'
+          ? [state.plan?.meals, state.nextWeekPlan?.meals].flatMap(ms => ms ?? []).map(m => `${m.day}: ${m.name}`).join('\n')
+          : mealLines;
+        const lines = Object.entries(activeShopListSafe).map(([cat, items]) => {
           const unchecked = items.filter(item => !state.shopChecked[`${cat}:${item.display}`]);
           if (!unchecked.length) return '';
           return `${CAT_EMOJI[cat] ?? '•'} ${cat}\n${unchecked.map(i => `  • ${i.display}`).join('\n')}`;
         }).filter(Boolean).join('\n\n');
         const hasChecked = Object.values(state.shopChecked).some(Boolean);
-        const body = `🛒 Shopping list${hasChecked ? ' (remaining)' : ''} — serves ${state.familySize}\n\n📅 This week\n${mealLines}\n\n${lines}`;
+        const body = `🛒 Shopping list${hasChecked ? ' (remaining)' : ''} — serves ${state.familySize}\n\n📅 ${weekLabel}\n${bothMealLines}\n\n${lines}`;
         if (navigator.share) navigator.share({ title: 'Shopping List', text: body }).catch(() => {});
         else navigator.clipboard?.writeText(body).then(() => showToast('Copied!'));
       }}>🔗 Share list</Primary>
@@ -845,6 +903,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       />
     </Screen>
   );
+  } // end shopping screen
 
   // ── Browse screen ─────────────────────────────────────────────────────────
   if (step === 'browse') {
