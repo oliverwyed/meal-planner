@@ -71,22 +71,10 @@ export function buildShop(
   dayConfig: DayConfig,
   dayOverrides: DayOverrides,
 ): ShopList {
-  return buildShopFromPlans([plan], pantry, familySize, dayConfig, dayOverrides);
-}
-
-export function buildShopFromPlans(
-  plans: Plan[],
-  pantry: string,
-  familySize: number,
-  dayConfig: DayConfig,
-  dayOverrides: DayOverrides,
-): ShopList {
   const pw = (pantry ?? '').toLowerCase().split(/[,\n]/).map(s => s.trim()).filter(Boolean);
   const seen = new Map<string, ScaledIngredient & { category: string }>();
 
-  const meals = plans.flatMap(plan =>
-    plan.meals.filter(m => !dayConfig[m.day] || dayConfig[m.day] === 'home')
-  );
+  const meals = plan.meals.filter(m => !dayConfig[m.day] || dayConfig[m.day] === 'home');
   meals.forEach(m => {
     const size = dayOverrides[m.day]?.size ?? familySize;
     const scale = size / (m.serves ?? 4);
