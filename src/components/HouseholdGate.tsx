@@ -61,7 +61,7 @@ export function HouseholdGate({ onReady }: Props) {
   };
 
   const handleVerifyOTP = async () => {
-    if (otp.trim().length !== 6) { setError('Enter the 6-digit code from your email.'); return; }
+    if (otp.trim().length < 6) { setError('Enter the code from your email.'); return; }
     setLoading(true); setError('');
     const { userId: uid, error: err } = await verifyLoginOTP(email.trim().toLowerCase(), otp.trim());
     if (err || !uid) { setError('Code incorrect or expired — try again.'); setLoading(false); return; }
@@ -133,15 +133,15 @@ export function HouseholdGate({ onReady }: Props) {
           <div style={{ background: P.card, borderRadius: '16px', padding: '24px', boxShadow: P.shadow }}>
             <div style={{ fontWeight: 700, fontSize: '18px', marginBottom: '6px' }}>Check your email</div>
             <div style={{ fontSize: '14px', color: P.muted, marginBottom: '20px' }}>
-              We sent a 6-digit code to <strong>{email}</strong>.
+              We sent a code to <strong>{email}</strong>.
             </div>
             <input
               type="text"
               inputMode="numeric"
               value={otp}
-              onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 8))}
               onKeyDown={e => e.key === 'Enter' && handleVerifyOTP()}
-              placeholder="000000"
+              placeholder="00000000"
               autoFocus
               style={{ width: '100%', padding: '12px 14px', border: `2px solid ${P.border}`, borderRadius: '10px',
                 fontSize: '28px', letterSpacing: '8px', fontWeight: 700, textAlign: 'center',
