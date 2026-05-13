@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { P } from '../lib/constants';
-import { createHousehold, joinHousehold, sendLoginOTP, verifyLoginOTP, getAuthSession, findHouseholdByAuthUser, linkHouseholdToAuthUser } from '../lib/supabase';
+import { createHousehold, joinHousehold, sendLoginOTP, verifyLoginOTP, getAuthSession, findHouseholdByAuthUser, linkHouseholdToAuthUser, supabase } from '../lib/supabase';
 import { HOUSEHOLD_ID_KEY } from '../lib/constants';
 import { Primary, Secondary, Spinner } from './ui';
 
@@ -20,22 +20,34 @@ export function HouseholdGate({ onReady }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // On mount: if there's an active Supabase session, auto-restore the household
+  // On mount: check for existing session, and listen for magic-link callbacks
   useEffect(() => {
-    getAuthSession().then(async session => {
+    async function handleSession(uid: string) {
+      const id = await findHouseholdByAuthUser(uid);
+      if (id) {
+        localStorage.setItem(HOUSEHOLD_ID_KEY, id);
+        onReady(id);
+        return;
+      }
+      setUserId(uid);
+      setView('choice');
+    }
+
+    // Subscribe first so we catch the SIGNED_IN event fired when a magic link
+    // redirects back to the app (fires before or after the getSession call)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) handleSession(session.user.id);
+    });
+
+    getAuthSession().then(session => {
       if (session) {
-        const id = await findHouseholdByAuthUser(session.userId);
-        if (id) {
-          localStorage.setItem(HOUSEHOLD_ID_KEY, id);
-          onReady(id);
-          return;
-        }
-        setUserId(session.userId);
-        setView('choice');
+        handleSession(session.userId);
       } else {
         setView('email');
       }
     });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleSendOTP = async () => {
