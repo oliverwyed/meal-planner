@@ -55,7 +55,7 @@ export function HouseholdGate({ onReady }: Props) {
     if (!trimmed || !trimmed.includes('@')) { setError('Enter a valid email address.'); return; }
     setLoading(true); setError('');
     const { error: err } = await sendLoginOTP(trimmed);
-    if (err) { setError('Could not send email — check your connection.'); setLoading(false); return; }
+    if (err) { setError(err); setLoading(false); return; }
     setLoading(false);
     setView('otp');
   };
