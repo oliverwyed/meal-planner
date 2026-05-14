@@ -1,4 +1,4 @@
-const CACHE = 'mp2-v2';
+const CACHE = 'mp2-v3';
 const PRECACHE = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
