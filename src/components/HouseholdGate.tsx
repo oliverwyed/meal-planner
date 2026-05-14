@@ -33,10 +33,10 @@ export function HouseholdGate({ onReady }: Props) {
       setView('choice');
     }
 
-    // Subscribe first so we catch the SIGNED_IN event fired when a magic link
-    // redirects back to the app (fires before or after the getSession call)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) handleSession(session.user.id);
+    // Only listen for SIGNED_IN (magic-link redirect) — the initial session
+    // is handled by getAuthSession() below to avoid calling handleSession twice.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) handleSession(session.user.id);
     });
 
     getAuthSession().then(session => {
