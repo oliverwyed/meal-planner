@@ -856,11 +856,12 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const totalItems = Object.values(activeShopListSafe).flat().length;
   const checkedCount = Object.keys(state.shopChecked).filter(k => !k.startsWith('__skip__:') && state.shopChecked[k]).length;
 
-  const ShopCheckbox = ({ itemKey, label }: { itemKey: string; label: string }) => {
+  const renderShopItem = (itemKey: string, label: string, border: boolean) => {
     const checked = !!state.shopChecked[itemKey];
     return (
-      <div onClick={() => actions.setShopChecked({ ...state.shopChecked, [itemKey]: !checked })}
-        style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', cursor: 'pointer' }}>
+      <div key={itemKey} onClick={() => actions.setShopChecked({ ...state.shopChecked, [itemKey]: !checked })}
+        style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', cursor: 'pointer',
+          borderBottom: border ? `1px solid ${P.border}` : 'none' }}>
         <div style={{ width: '24px', height: '24px', borderRadius: '7px', border: `2px solid ${checked ? P.green : P.border}`,
           background: checked ? P.greenLight : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0, fontSize: '13px', color: P.greenDark, fontWeight: 700 }}>
@@ -916,11 +917,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       {shopView === 'aisle' && Object.entries(activeShopListSafe).map(([cat, items]) => (
         <Section key={cat}>
           <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '10px' }}>{CAT_EMOJI[cat]} {cat}</div>
-          {items.map((item, i) => (
-            <div key={i} style={{ borderBottom: i < items.length - 1 ? `1px solid ${P.border}` : 'none' }}>
-              <ShopCheckbox itemKey={`${cat}:${item.display}`} label={item.display} />
-            </div>
-          ))}
+          {items.map((item, i) => renderShopItem(`${cat}:${item.display}`, item.display, i < items.length - 1))}
         </Section>
       ))}
 
@@ -959,11 +956,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               </button>
             </div>
             {!skipped && Object.entries(mealShop).map(([cat, items]) =>
-              items.map((item, i) => (
-                <div key={i} style={{ borderBottom: `1px solid ${P.border}` }}>
-                  <ShopCheckbox itemKey={`${cat}:${item.display}`} label={item.display} />
-                </div>
-              ))
+              items.map((item, i) => renderShopItem(`${cat}:${item.display}`, item.display, i < items.length - 1 || cat !== Object.keys(mealShop).at(-1)))
             )}
           </Section>
         );
