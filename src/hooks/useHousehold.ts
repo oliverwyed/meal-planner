@@ -30,7 +30,7 @@ export type AppActions = {
   swap: (day: DayName, extraDislikes?: string[]) => void;
   swapNextWeek: (day: DayName) => void;
   replaceMealInNextWeekPlan: (day: DayName, meal: Meal) => void;
-  setDayMode: (day: DayName, mode: DayMode) => void;
+  setDayMode: (day: DayName, mode: DayMode, week?: 'this' | 'next') => void;
   setKidsMode: (day: DayName, mode: KidsMode) => void;
   cycleKids: (day: DayName) => void;
   setFamilySize: (n: number) => void;
@@ -220,21 +220,24 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
     }));
   }, [hs.plan, hs.preferences.dislikes, pool, smartOpts]);
 
-  const setDayMode = useCallback((day: DayName, mode: DayMode) => {
+  const setDayMode = useCallback((day: DayName, mode: DayMode, week: 'this' | 'next' = 'this') => {
     setHs(prev => {
       const newDayConfig: DayConfig = { ...prev.dayConfig, [day]: mode };
-      let newPlan = prev.plan;
-      if (mode === 'home' && prev.plan && !prev.plan.meals.find(m => m.day === day)) {
+      const targetPlan = week === 'next' ? prev.nextWeekPlan : prev.plan;
+      let newTargetPlan = targetPlan;
+      if (mode === 'home' && targetPlan && !targetPlan.meals.find(m => m.day === day)) {
         const p = pool(day);
-        const used = prev.plan.meals.map(m => m.name);
+        const used = targetPlan.meals.map(m => m.name);
         const avail = p.filter(m => !used.includes(m.name));
         const [pick] = smartPick(avail.length ? avail : p, 1, smartOpts(day));
-        if (pick) newPlan = { ...prev.plan, meals: [...prev.plan.meals, { ...pick, day }] };
+        if (pick) newTargetPlan = { ...targetPlan, meals: [...targetPlan.meals, { ...pick, day }] };
       }
-      if (mode !== 'home' && prev.plan) {
-        newPlan = { ...prev.plan, meals: prev.plan.meals.filter(m => m.day !== day) };
+      if (mode !== 'home' && targetPlan) {
+        newTargetPlan = { ...targetPlan, meals: targetPlan.meals.filter(m => m.day !== day) };
       }
-      return { ...prev, dayConfig: newDayConfig, plan: newPlan };
+      return week === 'next'
+        ? { ...prev, dayConfig: newDayConfig, nextWeekPlan: newTargetPlan }
+        : { ...prev, dayConfig: newDayConfig, plan: newTargetPlan };
     });
   }, [pool, smartOpts]);
 
