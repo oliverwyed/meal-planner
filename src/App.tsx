@@ -10,7 +10,7 @@ import { useHousehold } from './hooks/useHousehold';
 import { DAYS, HOUSEHOLD_ID_KEY, P, DESKTOP_BREAKPOINT } from './lib/constants';
 import type { DayName, DayMode, KidsMode, Meal, CommunityMeal, RecipeReview } from './lib/types';
 import { playBeep } from './lib/timers';
-import { CAT_EMOJI } from './lib/shopping';
+import { CAT_EMOJI, buildShop, buildMealShop } from './lib/shopping';
 import { log, logFetch, recordCost } from './lib/logger';
 import { downloadICS } from './lib/ics';
 import { loadCommunityMeals, publishMeal, unpublishMeal, uploadRecipePhoto, loadReviews, addReview, deleteReview, getHouseholdInviteCode, authSignOut } from './lib/supabase';
@@ -121,6 +121,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [browseTab, setBrowseTab] = useState<'all' | 'community'>('all');
   const [planWeek, setPlanWeek] = useState<'this' | 'next'>('this');
   const [shopWeek, setShopWeek] = useState<'this' | 'next' | 'both'>('this');
+  const [shopView, setShopView] = useState<'aisle' | 'recipe'>('aisle');
 
   // Rollover: show banner when current plan predates this Monday
   const [showRollover, setShowRollover] = useState(false);
@@ -824,18 +825,62 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   // ── Shopping screen ───────────────────────────────────────────────────────
   if (step === 'shopping' && (state.shopList || state.nextWeekShopList)) {
   const hasNext = !!state.nextWeekShopList;
-  const activeShopList =
-    shopWeek === 'next' ? state.nextWeekShopList :
-    shopWeek === 'both' ? state.bothShopList :
-    state.shopList;
-  const activeShopListSafe = activeShopList ?? {};
+
+  // Meals for the active week selection
+  const activePlanMeals: import('./lib/types').PlanMeal[] = shopWeek === 'both'
+    ? [...(state.plan?.meals ?? []), ...(state.nextWeekPlan?.meals ?? [])]
+    : shopWeek === 'next' ? (state.nextWeekPlan?.meals ?? []) : (state.plan?.meals ?? []);
+
+  // Which meals are excluded (skip their ingredients from the aisle view)
+  const excludedRecipes = new Set(
+    Object.entries(state.shopChecked)
+      .filter(([k, v]) => k.startsWith('__skip__:') && v)
+      .map(([k]) => k.slice('__skip__:'.length))
+  );
+  const toggleExclude = (name: string) => {
+    const key = `__skip__:${name}`;
+    actions.setShopChecked({ ...state.shopChecked, [key]: !state.shopChecked[key] });
+  };
+
+  // Recompute aisle list excluding skipped meals
+  const activePlan = shopWeek === 'next' ? state.nextWeekPlan : shopWeek === 'both'
+    ? (state.plan && state.nextWeekPlan ? { ...state.plan, meals: activePlanMeals } : state.plan ?? state.nextWeekPlan)
+    : state.plan;
+  const filteredPlan = activePlan
+    ? { ...activePlan, meals: activePlan.meals.filter(m => !excludedRecipes.has(m.name)) }
+    : null;
+  const activeShopListSafe = filteredPlan
+    ? buildShop(filteredPlan, state.preferences.pantry, state.familySize, state.dayConfig, state.dayOverrides)
+    : {};
+
   const totalItems = Object.values(activeShopListSafe).flat().length;
-  const checkedCount = Object.values(state.shopChecked).filter(Boolean).length;
+  const checkedCount = Object.keys(state.shopChecked).filter(k => !k.startsWith('__skip__:') && state.shopChecked[k]).length;
+
+  const ShopCheckbox = ({ itemKey, label }: { itemKey: string; label: string }) => {
+    const checked = !!state.shopChecked[itemKey];
+    return (
+      <div onClick={() => actions.setShopChecked({ ...state.shopChecked, [itemKey]: !checked })}
+        style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', cursor: 'pointer' }}>
+        <div style={{ width: '24px', height: '24px', borderRadius: '7px', border: `2px solid ${checked ? P.green : P.border}`,
+          background: checked ? P.greenLight : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0, fontSize: '13px', color: P.greenDark, fontWeight: 700 }}>
+          {checked ? '✓' : ''}
+        </div>
+        <div style={{ fontSize: '14px', textDecoration: checked ? 'line-through' : 'none',
+          color: checked ? P.muted : P.text, flex: 1 }}>
+          {label}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <Screen>
       <Header eyebrow="Shopping" title="What to buy" />
+
+      {/* Week toggle */}
       {hasNext && (
-        <div style={{ display: 'flex', background: P.border, borderRadius: '22px', padding: '3px', marginBottom: '14px' }}>
+        <div style={{ display: 'flex', background: P.border, borderRadius: '22px', padding: '3px', marginBottom: '10px' }}>
           {(['this', 'next', 'both'] as const).map(w => (
             <button key={w} onClick={() => setShopWeek(w)}
               style={{ flex: 1, padding: '7px 4px', borderRadius: '19px', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s',
@@ -847,49 +892,110 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           ))}
         </div>
       )}
-      <div style={{ fontSize: '13px', color: P.muted, marginBottom: '16px' }}>
-        {totalItems} items · {checkedCount} checked
+
+      {/* Aisle / Recipe view toggle */}
+      <div style={{ display: 'flex', background: P.border, borderRadius: '22px', padding: '3px', marginBottom: '14px' }}>
+        {(['aisle', 'recipe'] as const).map(v => (
+          <button key={v} onClick={() => setShopView(v)}
+            style={{ flex: 1, padding: '7px 4px', borderRadius: '19px', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s',
+              background: shopView === v ? P.card : 'transparent',
+              color: shopView === v ? P.accent : P.muted,
+              boxShadow: shopView === v ? P.shadow : 'none' }}>
+            {v === 'aisle' ? '🛒 By aisle' : '🍽️ By recipe'}
+          </button>
+        ))}
       </div>
-      {Object.entries(activeShopListSafe).map(([cat, items]) => (
+
+      <div style={{ fontSize: '13px', color: P.muted, marginBottom: '16px' }}>
+        {shopView === 'aisle'
+          ? `${totalItems} items · ${checkedCount} checked${excludedRecipes.size ? ` · ${excludedRecipes.size} recipe${excludedRecipes.size > 1 ? 's' : ''} skipped` : ''}`
+          : `${activePlanMeals.length} recipes · ${excludedRecipes.size} skipped`}
+      </div>
+
+      {/* Aisle view */}
+      {shopView === 'aisle' && Object.entries(activeShopListSafe).map(([cat, items]) => (
         <Section key={cat}>
           <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '10px' }}>{CAT_EMOJI[cat]} {cat}</div>
-          {items.map((item, i) => {
-            const key = `${cat}:${item.display}`;
-            return (
-              <div key={i} onClick={() => actions.setShopChecked({ ...state.shopChecked, [key]: !state.shopChecked[key] })}
-                style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0',
-                  borderBottom: i < items.length - 1 ? `1px solid ${P.border}` : 'none', cursor: 'pointer' }}>
-                <div style={{ width: '24px', height: '24px', borderRadius: '7px', border: `2px solid ${state.shopChecked[key] ? P.green : P.border}`,
-                  background: state.shopChecked[key] ? P.greenLight : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0, fontSize: '13px', color: P.greenDark, fontWeight: 700 }}>
-                  {state.shopChecked[key] ? '✓' : ''}
-                </div>
-                <div style={{ fontSize: '14px', textDecoration: state.shopChecked[key] ? 'line-through' : 'none',
-                  color: state.shopChecked[key] ? P.muted : P.text, flex: 1 }}>
-                  {item.display}
-                </div>
-              </div>
-            );
-          })}
+          {items.map((item, i) => (
+            <div key={i} style={{ borderBottom: i < items.length - 1 ? `1px solid ${P.border}` : 'none' }}>
+              <ShopCheckbox itemKey={`${cat}:${item.display}`} label={item.display} />
+            </div>
+          ))}
         </Section>
       ))}
-      {Object.values(state.shopChecked).some(Boolean) && (
-        <Secondary muted onClick={() => actions.setShopChecked({})}>Clear checks</Secondary>
+
+      {/* Recipe view */}
+      {shopView === 'recipe' && activePlanMeals.map(meal => {
+        const skipped = excludedRecipes.has(meal.name);
+        const mealShop = buildMealShop(meal, (state.dayOverrides[meal.day]?.size ?? state.familySize) / (meal.serves ?? 4));
+        const allItems = Object.entries(mealShop).flatMap(([cat, items]) => items.map(item => ({ cat, item })));
+        const allChecked = allItems.length > 0 && allItems.every(({ cat, item }) => state.shopChecked[`${cat}:${item.display}`]);
+        return (
+          <Section key={`${meal.day}:${meal.name}`}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: skipped ? 0 : '8px' }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 700, fontSize: '14px', color: skipped ? P.muted : P.text,
+                  textDecoration: skipped ? 'line-through' : 'none' }}>{meal.name}</div>
+                <div style={{ fontSize: '12px', color: P.muted }}>{meal.day}</div>
+              </div>
+              {/* Tick all */}
+              {!skipped && (
+                <button onClick={() => {
+                  const patch = { ...state.shopChecked };
+                  allItems.forEach(({ cat, item }) => { patch[`${cat}:${item.display}`] = !allChecked; });
+                  actions.setShopChecked(patch);
+                }} style={{ padding: '5px 10px', borderRadius: '8px', border: `1px solid ${P.border}`,
+                  background: allChecked ? P.greenLight : P.bg, color: allChecked ? P.greenDark : P.muted,
+                  fontSize: '12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  {allChecked ? '✓ All got' : 'Got all'}
+                </button>
+              )}
+              {/* Skip recipe */}
+              <button onClick={() => toggleExclude(meal.name)}
+                style={{ padding: '5px 10px', borderRadius: '8px', border: `1px solid ${P.border}`,
+                  background: skipped ? P.accent : P.bg, color: skipped ? '#fff' : P.muted,
+                  fontSize: '12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                {skipped ? 'Unskip' : 'Skip'}
+              </button>
+            </div>
+            {!skipped && Object.entries(mealShop).map(([cat, items]) =>
+              items.map((item, i) => (
+                <div key={i} style={{ borderBottom: `1px solid ${P.border}` }}>
+                  <ShopCheckbox itemKey={`${cat}:${item.display}`} label={item.display} />
+                </div>
+              ))
+            )}
+          </Section>
+        );
+      })}
+
+      {Object.keys(state.shopChecked).some(k => !k.startsWith('__skip__:') && state.shopChecked[k]) && (
+        <Secondary muted onClick={() => {
+          // Preserve skip state when clearing checks
+          const skipEntries = Object.fromEntries(
+            Object.entries(state.shopChecked).filter(([k]) => k.startsWith('__skip__:'))
+          );
+          actions.setShopChecked(skipEntries);
+        }}>Clear checks</Secondary>
+      )}
+      {excludedRecipes.size > 0 && (
+        <Secondary muted onClick={() => {
+          const nonSkip = Object.fromEntries(
+            Object.entries(state.shopChecked).filter(([k]) => !k.startsWith('__skip__:'))
+          );
+          actions.setShopChecked(nonSkip);
+        }}>Unskip all recipes</Secondary>
       )}
       <Primary onClick={() => {
         const weekLabel = shopWeek === 'both' ? 'Both weeks' : shopWeek === 'next' ? 'Next week' : 'This week';
-        const planForLabel = shopWeek === 'next' ? state.nextWeekPlan : state.plan;
-        const mealLines = planForLabel?.meals.map(m => `${m.day}: ${m.name}`).join('\n') ?? '';
-        const bothMealLines = shopWeek === 'both'
-          ? [state.plan?.meals, state.nextWeekPlan?.meals].flatMap(ms => ms ?? []).map(m => `${m.day}: ${m.name}`).join('\n')
-          : mealLines;
+        const mealLines = activePlanMeals.filter(m => !excludedRecipes.has(m.name)).map(m => `${m.day}: ${m.name}`).join('\n');
         const lines = Object.entries(activeShopListSafe).map(([cat, items]) => {
           const unchecked = items.filter(item => !state.shopChecked[`${cat}:${item.display}`]);
           if (!unchecked.length) return '';
           return `${CAT_EMOJI[cat] ?? '•'} ${cat}\n${unchecked.map(i => `  • ${i.display}`).join('\n')}`;
         }).filter(Boolean).join('\n\n');
-        const hasChecked = Object.values(state.shopChecked).some(Boolean);
-        const body = `🛒 Shopping list${hasChecked ? ' (remaining)' : ''} — serves ${state.familySize}\n\n📅 ${weekLabel}\n${bothMealLines}\n\n${lines}`;
+        const hasChecked = checkedCount > 0;
+        const body = `🛒 Shopping list${hasChecked ? ' (remaining)' : ''} — serves ${state.familySize}\n\n📅 ${weekLabel}\n${mealLines}\n\n${lines}`;
         if (navigator.share) navigator.share({ title: 'Shopping List', text: body }).catch(() => {});
         else navigator.clipboard?.writeText(body).then(() => showToast('Copied!'));
       }}>🔗 Share list</Primary>
