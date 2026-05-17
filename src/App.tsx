@@ -624,7 +624,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                 <div style={{ fontWeight: 700, fontSize: '16px', color: P.muted }}>Day off</div>
               </div>
             </div>
-            <DayActions onHome={() => actions.setDayMode(day, 'home')} />
+            <DayActions onHome={() => actions.setDayMode(day, 'home', planWeek)} />
           </div>
         );
 
@@ -678,7 +678,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
                 });
               }}
               onChoose={() => setPickerFor(day)}
-              onMarkOff={() => actions.setDayMode(day, 'off')}
+              onMarkOff={() => actions.setDayMode(day, 'off', planWeek)}
               onMarkCooked={() => { actions.addToHistory([{ name: meal.name }]); showToast('Logged as cooked!'); }}
               onChangeMealSize={d => actions.setDaySize(day, Math.max(1, Math.min(20, daySize + d)))}
               kidsMode={(state.kidsConfig[day] as KidsMode) ?? 'either'}
