@@ -825,11 +825,13 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   // ── Shopping screen ───────────────────────────────────────────────────────
   if (step === 'shopping' && (state.shopList || state.nextWeekShopList)) {
   const hasNext = !!state.nextWeekShopList;
+  // If 'this' week has no plan, fall back to 'next' automatically
+  const effectiveShopWeek = shopWeek === 'this' && !state.plan ? 'next' : shopWeek;
 
   // Meals for the active week selection
-  const activePlanMeals: import('./lib/types').PlanMeal[] = shopWeek === 'both'
+  const activePlanMeals: import('./lib/types').PlanMeal[] = effectiveShopWeek === 'both'
     ? [...(state.plan?.meals ?? []), ...(state.nextWeekPlan?.meals ?? [])]
-    : shopWeek === 'next' ? (state.nextWeekPlan?.meals ?? []) : (state.plan?.meals ?? []);
+    : effectiveShopWeek === 'next' ? (state.nextWeekPlan?.meals ?? []) : (state.plan?.meals ?? []);
 
   // Which meals are excluded (skip their ingredients from the aisle view)
   const excludedRecipes = new Set(
@@ -843,7 +845,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   };
 
   // Recompute aisle list excluding skipped meals
-  const activePlan = shopWeek === 'next' ? state.nextWeekPlan : shopWeek === 'both'
+  const activePlan = effectiveShopWeek === 'next' ? state.nextWeekPlan : effectiveShopWeek === 'both'
     ? (state.plan && state.nextWeekPlan ? { ...state.plan, meals: activePlanMeals } : state.plan ?? state.nextWeekPlan)
     : state.plan;
   const filteredPlan = activePlan
@@ -885,9 +887,9 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           {(['this', 'next', 'both'] as const).map(w => (
             <button key={w} onClick={() => setShopWeek(w)}
               style={{ flex: 1, padding: '7px 4px', borderRadius: '19px', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s',
-                background: shopWeek === w ? P.card : 'transparent',
-                color: shopWeek === w ? P.accent : P.muted,
-                boxShadow: shopWeek === w ? P.shadow : 'none' }}>
+                background: effectiveShopWeek === w ? P.card : 'transparent',
+                color: effectiveShopWeek === w ? P.accent : P.muted,
+                boxShadow: effectiveShopWeek === w ? P.shadow : 'none' }}>
               {w === 'this' ? 'This week' : w === 'next' ? 'Next week' : 'Both'}
             </button>
           ))}
@@ -980,7 +982,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         }}>Unskip all recipes</Secondary>
       )}
       <Primary onClick={() => {
-        const weekLabel = shopWeek === 'both' ? 'Both weeks' : shopWeek === 'next' ? 'Next week' : 'This week';
+        const weekLabel = effectiveShopWeek === 'both' ? 'Both weeks' : effectiveShopWeek === 'next' ? 'Next week' : 'This week';
         const mealLines = activePlanMeals.filter(m => !excludedRecipes.has(m.name)).map(m => `${m.day}: ${m.name}`).join('\n');
         const lines = Object.entries(activeShopListSafe).map(([cat, items]) => {
           const unchecked = items.filter(item => !state.shopChecked[`${cat}:${item.display}`]);
