@@ -19,6 +19,7 @@ export function HouseholdGate({ onReady }: Props) {
   const [inviteCode, setInviteCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const isReturning = !!localStorage.getItem(HOUSEHOLD_ID_KEY);
 
   // On mount: check for existing session, and listen for magic-link callbacks
   useEffect(() => {
@@ -109,9 +110,13 @@ export function HouseholdGate({ onReady }: Props) {
 
         {view === 'email' && (
           <div style={{ background: P.card, borderRadius: '16px', padding: '24px', boxShadow: P.shadow }}>
-            <div style={{ fontWeight: 700, fontSize: '18px', marginBottom: '6px' }}>Get started</div>
+            <div style={{ fontWeight: 700, fontSize: '18px', marginBottom: '6px' }}>
+              {isReturning ? 'Welcome back' : 'Get started'}
+            </div>
             <div style={{ fontSize: '14px', color: P.muted, marginBottom: '20px' }}>
-              Enter your email to sign in or create a new household.
+              {isReturning
+                ? 'Enter your email to pick up where you left off.'
+                : 'Enter your email to sign in or create a new household.'}
             </div>
             <input
               type="email"
