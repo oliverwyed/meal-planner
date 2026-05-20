@@ -50,6 +50,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [pantryDraft, setPantryDraft] = useState(state.preferences.pantry);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const toastUndoRef = useRef<(() => void) | null>(null);
+  const lastGenRef = useRef(0);
   const [cookNow, setCookNow] = useState<Meal | null>(null);
   const [cookNowExp, setCookNowExp] = useState(false);
   const [cookNowAddToPlan, setCookNowAddToPlan] = useState(false);
@@ -281,6 +282,20 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     if (step === 'setup' && !isFirstRun) setStep('prefs');
   }, [step, state.plan, state.nextWeekPlan, state.shopList, loading, isFirstRun]);
 
+  // Auto-select next week tab when there's no current week plan
+  useEffect(() => {
+    if (step === 'plan' && !state.plan && state.nextWeekPlan) setPlanWeek('next');
+  }, [step, state.plan, state.nextWeekPlan]);
+
+  // Save pantry draft when navigating away from prefs
+  const prevStep = useRef(step);
+  useEffect(() => {
+    if (prevStep.current === 'prefs' && step !== 'prefs') {
+      actions.setPreferences({ pantry: pantryDraft });
+    }
+    prevStep.current = step;
+  }, [step]);
+
   useEffect(() => { setPantryDraft(state.preferences.pantry); }, [state.preferences.pantry]);
 
   // Load community meals when browse tab is opened
@@ -469,6 +484,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
               🍴 Browse recipes
             </button>
             <button onClick={() => {
+              if (Date.now() - lastGenRef.current < 2000) return;
+              lastGenRef.current = Date.now();
               if (planWeek === 'next') {
                 actions.generateNextWeek();
                 showToast('Next week regenerated!');
@@ -508,6 +525,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           </div>
           <div style={{ display: 'flex', gap: '8px', paddingTop: '4px' }}>
             <IconBtn onClick={() => {
+              if (Date.now() - lastGenRef.current < 2000) return;
+              lastGenRef.current = Date.now();
               if (planWeek === 'next') {
                 actions.generateNextWeek();
                 showToast('Next week regenerated!');
@@ -555,18 +574,20 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         </div>
       )}
 
-      {/* Week toggle */}
-      <div style={{ display: 'flex', background: P.border, borderRadius: '22px', padding: '3px', marginBottom: '16px' }}>
-        {(['this', 'next'] as const).map(w => (
-          <button key={w} onClick={() => { setPlanWeek(w); setPreviewDay(null); setExpandedDay(null); }}
-            style={{ flex: 1, padding: '8px', borderRadius: '19px', border: 'none', fontSize: '13px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s',
-              background: planWeek === w ? P.card : 'transparent',
-              color: planWeek === w ? P.accent : P.muted,
-              boxShadow: planWeek === w ? P.shadow : 'none' }}>
-            {w === 'this' ? 'This week' : 'Next week'}
-          </button>
-        ))}
-      </div>
+      {/* Week toggle — only show when both plans exist */}
+      {state.plan && state.nextWeekPlan && (
+        <div style={{ display: 'flex', background: P.border, borderRadius: '22px', padding: '3px', marginBottom: '16px' }}>
+          {(['this', 'next'] as const).map(w => (
+            <button key={w} onClick={() => { setPlanWeek(w); setPreviewDay(null); setExpandedDay(null); }}
+              style={{ flex: 1, padding: '8px', borderRadius: '19px', border: 'none', fontSize: '13px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s',
+                background: planWeek === w ? P.card : 'transparent',
+                color: planWeek === w ? P.accent : P.muted,
+                boxShadow: planWeek === w ? P.shadow : 'none' }}>
+              {w === 'this' ? 'This week' : 'Next week'}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Tonight hero */}
       {todayMeal && !isDesktop && (() => {
