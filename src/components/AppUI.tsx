@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { Meal, DayName, DayMode } from '../lib/types';
 import { P } from '../lib/constants';
 import { Primary, Secondary } from './ui';
 import { getLogs, clearLogs, getTotalCost } from '../lib/logger';
+import { uploadRecipePhoto } from '../lib/supabase';
 
 export function formatLastUsed(date: number | null): string | null {
   if (!date) return null;
@@ -208,48 +209,96 @@ export function AddMealForm({ onSave, onCancel, initial }: { onSave: (m: Meal) =
     ingredients: initial?.ingredients?.join('\n') ?? '',
     steps: initial?.steps?.join('\n') ?? '',
   });
+  const allInitialPhotos = [
+    ...(initial?.photos ?? []),
+    ...(initial?.photo && !(initial?.photos ?? []).includes(initial.photo) ? [initial.photo] : []),
+  ];
+  const [photos, setPhotos] = useState<string[]>(allInitialPhotos);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
   const set = (k: string, v: string) => setF(p => ({ ...p, [k]: v }));
   const ss: React.CSSProperties = { width: '100%', padding: '10px 12px', border: `2px solid ${P.border}`, borderRadius: '10px', fontSize: '14px', background: P.card, boxSizing: 'border-box' };
   const valid = f.name.trim().length > 0;
   const desktop = window.innerWidth >= 768;
+
+  const handlePhotoFiles = async (files: FileList) => {
+    setUploading(true);
+    const urls: string[] = [];
+    for (const file of Array.from(files)) {
+      const url = await uploadRecipePhoto(file);
+      if (url) urls.push(url);
+    }
+    setPhotos(p => [...p, ...urls]);
+    setUploading(false);
+  };
+
   const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
     <div style={{ marginBottom: '14px' }}>
       <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '1px' }}>{label}</div>
       {children}
     </div>
   );
-  return (
-    <div>
-      <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', marginBottom: '20px' }}>{initial ? 'Edit meal' : 'Add a meal'}</div>
+
+  const fields = (
+    <>
       {desktop ? (
-        <>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <Field label="Meal name"><input value={f.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Leftover Curry Rice" style={ss} /></Field>
-            <Field label="Cook time (min)"><select value={f.minutes} onChange={e => set('minutes', e.target.value)} style={ss}>{[10,15,20,25,30,35,40,45,50,60,75,90].map(n => <option key={n} value={n}>{n}</option>)}</select></Field>
-            <Field label="Protein"><select value={f.protein} onChange={e => set('protein', e.target.value)} style={ss}>{['chicken','beef','fish','pork','lamb','seafood','eggs','veggie'].map(p => <option key={p}>{p}</option>)}</select></Field>
-            <Field label="Cuisine"><select value={f.cuisine} onChange={e => set('cuisine', e.target.value)} style={ss}>{['british','italian','asian','mexican','indian','american','middleeastern','other'].map(c => <option key={c}>{c}</option>)}</select></Field>
-          </div>
-          <Field label="Description (optional)"><textarea value={f.description} onChange={e => set('description', e.target.value)} placeholder="A short summary shown on the meal card" style={{ ...ss, resize: 'vertical', minHeight: '60px' }} /></Field>
-          <Field label="Ingredients (one per line)"><textarea value={f.ingredients} onChange={e => set('ingredients', e.target.value)} placeholder={'400g pasta\n2 x chicken breasts'} style={{ ...ss, resize: 'vertical', minHeight: '80px' }} /></Field>
-          <Field label="Steps (one per line)"><textarea value={f.steps} onChange={e => set('steps', e.target.value)} style={{ ...ss, resize: 'vertical', minHeight: '80px' }} /></Field>
-        </>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <Field label="Meal name"><input value={f.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Leftover Curry Rice" style={ss} /></Field>
+          <Field label="Cook time (min)"><select value={f.minutes} onChange={e => set('minutes', e.target.value)} style={ss}>{[10,15,20,25,30,35,40,45,50,60,75,90].map(n => <option key={n} value={n}>{n}</option>)}</select></Field>
+          <Field label="Protein"><select value={f.protein} onChange={e => set('protein', e.target.value)} style={ss}>{['chicken','beef','fish','pork','lamb','seafood','eggs','veggie'].map(p => <option key={p}>{p}</option>)}</select></Field>
+          <Field label="Cuisine"><select value={f.cuisine} onChange={e => set('cuisine', e.target.value)} style={ss}>{['british','italian','asian','mexican','indian','american','middleeastern','other'].map(c => <option key={c}>{c}</option>)}</select></Field>
+        </div>
       ) : (
         <>
           <Field label="Meal name"><input value={f.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Leftover Curry Rice" style={ss} /></Field>
           <Field label="Cook time (min)"><select value={f.minutes} onChange={e => set('minutes', e.target.value)} style={ss}>{[10,15,20,25,30,35,40,45,50,60,75,90].map(n => <option key={n} value={n}>{n}</option>)}</select></Field>
           <Field label="Protein"><select value={f.protein} onChange={e => set('protein', e.target.value)} style={ss}>{['chicken','beef','fish','pork','lamb','seafood','eggs','veggie'].map(p => <option key={p}>{p}</option>)}</select></Field>
           <Field label="Cuisine"><select value={f.cuisine} onChange={e => set('cuisine', e.target.value)} style={ss}>{['british','italian','asian','mexican','indian','american','middleeastern','other'].map(c => <option key={c}>{c}</option>)}</select></Field>
-          <Field label="Description (optional)"><textarea value={f.description} onChange={e => set('description', e.target.value)} placeholder="A short summary shown on the meal card" style={{ ...ss, resize: 'vertical', minHeight: '60px' }} /></Field>
-          <Field label="Ingredients (one per line)"><textarea value={f.ingredients} onChange={e => set('ingredients', e.target.value)} placeholder={'400g pasta\n2 x chicken breasts'} style={{ ...ss, resize: 'vertical', minHeight: '80px' }} /></Field>
-          <Field label="Steps (one per line)"><textarea value={f.steps} onChange={e => set('steps', e.target.value)} style={{ ...ss, resize: 'vertical', minHeight: '80px' }} /></Field>
         </>
       )}
-      <Primary disabled={!valid} onClick={async () => {
-        await onSave({ name: f.name.trim(), time: `${f.minutes} min`, minutes: parseInt(f.minutes) || 20,
+      <Field label="Description (optional)"><textarea value={f.description} onChange={e => set('description', e.target.value)} placeholder="A short summary shown on the meal card" style={{ ...ss, resize: 'vertical', minHeight: '60px' }} /></Field>
+      <Field label="Ingredients (one per line)"><textarea value={f.ingredients} onChange={e => set('ingredients', e.target.value)} placeholder={'400g pasta\n2 x chicken breasts'} style={{ ...ss, resize: 'vertical', minHeight: '80px' }} /></Field>
+      <Field label="Steps (one per line)"><textarea value={f.steps} onChange={e => set('steps', e.target.value)} style={{ ...ss, resize: 'vertical', minHeight: '80px' }} /></Field>
+    </>
+  );
+
+  return (
+    <div>
+      <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', marginBottom: '20px' }}>{initial ? 'Edit meal' : 'Add a meal'}</div>
+      {fields}
+
+      {/* Photo gallery */}
+      <Field label="Photos">
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: photos.length ? '10px' : 0 }}>
+          {photos.map((url, i) => (
+            <div key={url} style={{ position: 'relative', flexShrink: 0 }}>
+              <img src={url} alt="" style={{ width: '72px', height: '72px', objectFit: 'cover', borderRadius: '10px', border: `2px solid ${i === 0 ? P.accent : P.border}`, display: 'block' }} />
+              {i === 0 && <div style={{ position: 'absolute', bottom: '3px', left: '3px', background: P.accent, color: '#fff', fontSize: '9px', fontWeight: 700, borderRadius: '4px', padding: '1px 4px' }}>HERO</div>}
+              <button onClick={() => setPhotos(p => p.filter((_, j) => j !== i))}
+                style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#c0392b', border: 'none', color: '#fff', borderRadius: '50%', width: '20px', height: '20px', fontSize: '11px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>×</button>
+            </div>
+          ))}
+          <button onClick={() => fileRef.current?.click()} disabled={uploading}
+            style={{ width: '72px', height: '72px', borderRadius: '10px', border: `2px dashed ${P.border}`, background: P.bg, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', color: P.muted, fontSize: '11px', fontWeight: 700 }}>
+            {uploading ? '…' : <><span style={{ fontSize: '20px' }}>📷</span>Add</>}
+          </button>
+        </div>
+        <input ref={fileRef} type="file" accept="image/*" multiple style={{ display: 'none' }}
+          onChange={e => e.target.files?.length && handlePhotoFiles(e.target.files)} />
+        {photos.length > 1 && <div style={{ fontSize: '12px', color: P.muted }}>Drag to reorder — first photo is the hero image shown on cards.</div>}
+      </Field>
+
+      <Primary disabled={!valid || uploading} onClick={async () => {
+        await onSave({
+          name: f.name.trim(), time: `${f.minutes} min`, minutes: parseInt(f.minutes) || 20,
           protein: f.protein as any, cuisine: f.cuisine as any, carb: f.carb as any, serves: initial?.serves ?? 4,
           description: f.description.trim() || f.steps.split('\n')[0] || f.name,
           ingredients: f.ingredients.split('\n').map(s => s.trim()).filter(Boolean),
-          steps: f.steps.split('\n').map(s => s.trim()).filter(Boolean), custom: true });
+          steps: f.steps.split('\n').map(s => s.trim()).filter(Boolean),
+          photo: photos[0],
+          photos: photos.length > 0 ? photos : undefined,
+          custom: true,
+        });
       }}>{initial ? 'Save changes' : 'Save meal'}</Primary>
       <Secondary muted onClick={onCancel}>Cancel</Secondary>
     </div>
@@ -372,18 +421,37 @@ export function RecipeDetailSheet({ meal, isFav, onFav, onAdd, onCook, onClose, 
         <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 0' }}>
           <div style={{ width: '36px', height: '4px', borderRadius: '2px', background: P.border }} />
         </div>
-        {/* Photo or gradient header */}
-        {meal.photo ? (
-          <div style={{ position: 'relative', flexShrink: 0 }}>
-            <img src={meal.photo} alt={meal.name} style={{ width: '100%', height: '200px', objectFit: 'cover', display: 'block' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)' }} />
-            <button onClick={onClose} style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(0,0,0,0.4)', border: 'none', color: '#fff', borderRadius: '20px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 16px 4px' }}>
-            <button onClick={onClose} style={{ background: 'none', border: 'none', color: P.muted, fontSize: '22px', cursor: 'pointer', padding: '4px 8px' }}>✕</button>
-          </div>
-        )}
+        {/* Photo gallery or gradient header */}
+        {(() => {
+          const allPhotos = meal.photos?.length ? meal.photos : meal.photo ? [meal.photo] : [];
+          if (!allPhotos.length) return (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 16px 4px' }}>
+              <button onClick={onClose} style={{ background: 'none', border: 'none', color: P.muted, fontSize: '22px', cursor: 'pointer', padding: '4px 8px' }}>✕</button>
+            </div>
+          );
+          if (allPhotos.length === 1) return (
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <img src={allPhotos[0]} alt={meal.name} style={{ width: '100%', height: '200px', objectFit: 'cover', display: 'block' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)' }} />
+              <button onClick={onClose} style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(0,0,0,0.4)', border: 'none', color: '#fff', borderRadius: '20px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            </div>
+          );
+          return (
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <div style={{ display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' } as React.CSSProperties}>
+                {allPhotos.map((url, i) => (
+                  <img key={i} src={url} alt={`${meal.name} ${i + 1}`} loading="lazy"
+                    style={{ width: '100%', height: '220px', objectFit: 'cover', display: 'block', flexShrink: 0, scrollSnapAlign: 'start' }} />
+                ))}
+              </div>
+              <div style={{ position: 'absolute', bottom: '8px', left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: '5px', pointerEvents: 'none' }}>
+                {allPhotos.map((_, i) => <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255,255,255,0.8)' }} />)}
+              </div>
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%)', pointerEvents: 'none' }} />
+              <button onClick={onClose} style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(0,0,0,0.4)', border: 'none', color: '#fff', borderRadius: '20px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            </div>
+          );
+        })()}
         {/* Scrollable content */}
         <div style={{ overflowY: 'auto', padding: '16px 20px 32px', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
           {/* Title + meta */}
