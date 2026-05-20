@@ -24,7 +24,8 @@ export interface Meal {
   kidNote?: string;
   tip?: string;
   nutrition?: { calories: number; protein: number; carbs: number; fat: number };
-  photo?: string;                // hero image URL
+  photo?: string;                // hero image (first of photos, kept for compat)
+  photos?: string[];             // all uploaded photos
   sourceUrl?: string;           // set when imported from a URL
   custom?: boolean;
 }
