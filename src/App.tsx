@@ -1599,8 +1599,22 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       {showPhotoImport && (
         <PhotoImport
           onImport={async meal => {
-            // Upload photo to storage if we have a data URL — replace with storage URL
-            if (meal.photo?.startsWith('data:')) {
+            // Upload all photos to storage, replacing data URLs with storage URLs
+            if (meal.photos && meal.photos.length > 0) {
+              const urls: string[] = [];
+              for (const dataUrl of meal.photos) {
+                if (dataUrl.startsWith('data:')) {
+                  const res = await fetch(dataUrl);
+                  const blob = await res.blob();
+                  const file = new File([blob], 'recipe.jpg', { type: blob.type });
+                  const url = await uploadRecipePhoto(file);
+                  if (url) urls.push(url);
+                } else {
+                  urls.push(dataUrl);
+                }
+              }
+              meal = { ...meal, photos: urls, photo: urls[0] };
+            } else if (meal.photo?.startsWith('data:')) {
               const res = await fetch(meal.photo);
               const blob = await res.blob();
               const file = new File([blob], 'recipe.jpg', { type: blob.type });
