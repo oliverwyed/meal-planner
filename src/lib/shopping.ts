@@ -64,6 +64,44 @@ export function buildMealShop(meal: Meal, scale: number): ShopList {
   return buildCategorised(meal.ingredients ?? [], scale);
 }
 
+export function buildEventShop(
+  dishes: Array<{ meal: Meal; servings: number }>,
+  pantry: string,
+): ShopList {
+  const pw = (pantry ?? '').toLowerCase().split(/[,\n]/).map(s => s.trim()).filter(Boolean);
+  const seen = new Map<string, ScaledIngredient & { category: string }>();
+  for (const { meal, servings } of dishes) {
+    const scale = servings / (meal.serves ?? 4);
+    scaledIngredients(meal.ingredients ?? [], scale).forEach(ing => {
+      const lc = ing.label.toLowerCase();
+      if (pw.some(w => {
+        const re = new RegExp(`(?:^|\\b)${w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:\\b|$)`, 'i');
+        return re.test(lc) || re.test(ing.display.toLowerCase());
+      })) return;
+      if (seen.has(lc)) {
+        const ex = seen.get(lc)!;
+        const em = ex.qty.match(/^([\d.]+)\s*(g|kg|ml|l|tbsp|tsp|x|)$/i);
+        const nm = ing.qty.match(/^([\d.]+)\s*(g|kg|ml|l|tbsp|tsp|x|)$/i);
+        if (em && nm && em[2].toLowerCase() === nm[2].toLowerCase()) {
+          const tot = parseFloat(em[1]) + parseFloat(nm[1]);
+          const rounded = tot % 1 < 0.1 || tot % 1 > 0.9 ? Math.round(tot) : parseFloat(tot.toFixed(1));
+          const u = em[2].toLowerCase();
+          const sp = ['g', 'kg', 'ml', 'l'].includes(u) ? '' : ' ';
+          seen.set(lc, { qty: rounded + (u ? sp + u : ''), label: ing.label, display: u ? `${rounded}${sp}${u} ${ing.label}` : `${rounded} ${ing.label}`, category: categoriseItem(lc) });
+        }
+        return;
+      }
+      seen.set(lc, { ...ing, category: categoriseItem(lc) });
+    });
+  }
+  const result: Record<string, ScaledIngredient[]> = {};
+  for (const cat of CATEGORY_ORDER) result[cat] = [];
+  seen.forEach(item => (result[item.category] ?? result['Fresh Produce']).push(item));
+  const out: ShopList = {};
+  for (const cat of CATEGORY_ORDER) { if (result[cat]?.length) out[cat] = result[cat]; }
+  return out;
+}
+
 export function buildShop(
   plan: Plan,
   pantry: string,

@@ -4,6 +4,7 @@ import { MealCard } from './components/MealCard';
 import { CookingMode } from './components/CookingMode';
 import { ImportRecipe } from './components/ImportRecipe';
 import { PhotoImport } from './components/PhotoImport';
+import { EventsScreen } from './components/Events';
 import { Primary, Secondary, Toast, Spinner, Section, TimeSlider, ActiveTimers, BottomNav } from './components/ui';
 import { Screen, Header, IconBtn, Row, Stepper, Chip, DayActions, DayToggle, Modal, MealPicker, AddMealForm, HelpModal, BrowseMealCard, RecipeDetailSheet, LogsPanel, formatLastUsed, SEASON_INFO } from './components/AppUI';
 import { useHousehold } from './hooks/useHousehold';
@@ -18,7 +19,7 @@ import RECIPES from './data/recipes.json';
 
 const ALL_RECIPES = RECIPES as Meal[];
 
-type Step = 'setup' | 'plan' | 'shopping' | 'prefs' | 'browse';
+type Step = 'setup' | 'plan' | 'shopping' | 'prefs' | 'browse' | 'events';
 
 export default function App() {
   const [householdId, setHouseholdId] = useState<string | null>(() => localStorage.getItem(HOUSEHOLD_ID_KEY));
@@ -745,6 +746,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           onPlan={() => setStep('plan')}
           onShopping={() => setStep('shopping')}
           onBrowse={() => setStep('browse')}
+          onEvents={() => setStep('events')}
           onProfile={() => setStep('prefs')}
           active="plan"
         />
@@ -1020,6 +1022,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         onPlan={() => setStep('plan')}
         onShopping={() => setStep('shopping')}
         onBrowse={() => setStep('browse')}
+        onEvents={() => setStep('events')}
         onProfile={() => setStep('prefs')}
         active="shopping"
       />
@@ -1389,7 +1392,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           onPlan={() => setStep('plan')}
           onShopping={() => setStep('shopping')}
           onBrowse={() => setStep('browse')}
-            onProfile={() => setStep('prefs')}
+          onEvents={() => setStep('events')}
+          onProfile={() => setStep('prefs')}
           active="browse"
         />
       </div>
@@ -1651,8 +1655,30 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         onPlan={() => setStep('plan')}
         onShopping={() => setStep('shopping')}
         onBrowse={() => setStep('browse')}
+        onEvents={() => setStep('events')}
         onProfile={() => setStep('prefs')}
         active="profile"
+      />
+    </Screen>
+  );
+
+  if (step === 'events') return (
+    <Screen>
+      <EventsScreen
+        events={state.events ?? []}
+        allMeals={[...ALL_RECIPES, ...state.customMeals]}
+        pantry={state.preferences.pantry}
+        onCreateEvent={actions.createEvent}
+        onUpdateEvent={actions.updateEvent}
+        onDeleteEvent={actions.deleteEvent}
+      />
+      <BottomNav
+        onPlan={() => setStep('plan')}
+        onShopping={() => setStep('shopping')}
+        onBrowse={() => setStep('browse')}
+        onEvents={() => setStep('events')}
+        onProfile={() => setStep('prefs')}
+        active="events"
       />
     </Screen>
   );
