@@ -4,6 +4,7 @@ import { MealCard } from './components/MealCard';
 import { CookingMode } from './components/CookingMode';
 import { ImportRecipe } from './components/ImportRecipe';
 import { PhotoImport } from './components/PhotoImport';
+import { EventsScreen } from './components/Events';
 import { Primary, Secondary, Toast, Spinner, Section, TimeSlider, ActiveTimers, BottomNav } from './components/ui';
 import { Screen, Header, IconBtn, Row, Stepper, Chip, DayActions, DayToggle, Modal, MealPicker, AddMealForm, HelpModal, BrowseMealCard, RecipeDetailSheet, LogsPanel, formatLastUsed, SEASON_INFO } from './components/AppUI';
 import { useHousehold } from './hooks/useHousehold';
@@ -18,7 +19,7 @@ import RECIPES from './data/recipes.json';
 
 const ALL_RECIPES = RECIPES as Meal[];
 
-type Step = 'setup' | 'plan' | 'shopping' | 'prefs' | 'browse';
+type Step = 'setup' | 'plan' | 'shopping' | 'prefs' | 'browse' | 'events';
 
 export default function App() {
   const [householdId, setHouseholdId] = useState<string | null>(() => localStorage.getItem(HOUSEHOLD_ID_KEY));
@@ -745,6 +746,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           onPlan={() => setStep('plan')}
           onShopping={() => setStep('shopping')}
           onBrowse={() => setStep('browse')}
+          onEvents={() => setStep('events')}
           onProfile={() => setStep('prefs')}
           active="plan"
         />
@@ -1020,6 +1022,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         onPlan={() => setStep('plan')}
         onShopping={() => setStep('shopping')}
         onBrowse={() => setStep('browse')}
+        onEvents={() => setStep('events')}
         onProfile={() => setStep('prefs')}
         active="shopping"
       />
@@ -1389,7 +1392,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
           onPlan={() => setStep('plan')}
           onShopping={() => setStep('shopping')}
           onBrowse={() => setStep('browse')}
-            onProfile={() => setStep('prefs')}
+          onEvents={() => setStep('events')}
+          onProfile={() => setStep('prefs')}
           active="browse"
         />
       </div>
@@ -1599,8 +1603,22 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
       {showPhotoImport && (
         <PhotoImport
           onImport={async meal => {
-            // Upload photo to storage if we have a data URL — replace with storage URL
-            if (meal.photo?.startsWith('data:')) {
+            // Upload all photos to storage, replacing data URLs with storage URLs
+            if (meal.photos && meal.photos.length > 0) {
+              const urls: string[] = [];
+              for (const dataUrl of meal.photos) {
+                if (dataUrl.startsWith('data:')) {
+                  const res = await fetch(dataUrl);
+                  const blob = await res.blob();
+                  const file = new File([blob], 'recipe.jpg', { type: blob.type });
+                  const url = await uploadRecipePhoto(file);
+                  if (url) urls.push(url);
+                } else {
+                  urls.push(dataUrl);
+                }
+              }
+              meal = { ...meal, photos: urls, photo: urls[0] };
+            } else if (meal.photo?.startsWith('data:')) {
               const res = await fetch(meal.photo);
               const blob = await res.blob();
               const file = new File([blob], 'recipe.jpg', { type: blob.type });
@@ -1637,8 +1655,30 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
         onPlan={() => setStep('plan')}
         onShopping={() => setStep('shopping')}
         onBrowse={() => setStep('browse')}
+        onEvents={() => setStep('events')}
         onProfile={() => setStep('prefs')}
         active="profile"
+      />
+    </Screen>
+  );
+
+  if (step === 'events') return (
+    <Screen>
+      <EventsScreen
+        events={state.events ?? []}
+        allMeals={[...ALL_RECIPES, ...state.customMeals]}
+        pantry={state.preferences.pantry}
+        onCreateEvent={actions.createEvent}
+        onUpdateEvent={actions.updateEvent}
+        onDeleteEvent={actions.deleteEvent}
+      />
+      <BottomNav
+        onPlan={() => setStep('plan')}
+        onShopping={() => setStep('shopping')}
+        onBrowse={() => setStep('browse')}
+        onEvents={() => setStep('events')}
+        onProfile={() => setStep('prefs')}
+        active="events"
       />
     </Screen>
   );

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import type { HouseholdState, DayName, DayMode, KidsMode, Meal, Plan, PlanMeal, DayConfig, DayOverrides, Preferences, PlanHistoryEntry } from '../lib/types';
+import type { HouseholdState, DayName, DayMode, KidsMode, Meal, Plan, PlanMeal, DayConfig, DayOverrides, Preferences, PlanHistoryEntry, DinnerEvent } from '../lib/types';
 import { DEFAULT_DAY_CONFIG, DAYS } from '../lib/constants';
 import { loadState, saveState, saveFamilySize, addCustomMeal, updateCustomMeal, deleteCustomMeal, subscribeToState } from '../lib/supabase';
 import { getPool, smartPick } from '../lib/scoring';
@@ -50,6 +50,9 @@ export type AppActions = {
   setShopChecked: (checked: Record<string, boolean>) => void;
   clearPlanHistory: () => void;
   promoteNextWeekPlan: () => void;
+  createEvent: (event: Omit<DinnerEvent, 'id'>) => string;
+  updateEvent: (id: string, patch: Partial<DinnerEvent>) => void;
+  deleteEvent: (id: string) => void;
 };
 
 export function useHousehold(householdId: string): { state: AppState; actions: AppActions; loading: boolean } {
@@ -66,6 +69,7 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
     cookHistory: [],
     customMeals: [],
     shopChecked: {},
+    events: [],
   });
 
   const isRemoteUpdate = useRef(false);
@@ -126,6 +130,7 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
       if (hs.preferences !== p.preferences)   patch.preferences  = hs.preferences;
       if (hs.cookHistory !== p.cookHistory)   patch.cookHistory  = hs.cookHistory;
       if (hs.planHistory !== p.planHistory)   patch.planHistory  = hs.planHistory;
+      if (hs.events !== p.events)            patch.events       = hs.events;
       prevHs.current = hs;
       if (Object.keys(patch).length) {
         saveState(householdId, patch).then(() => { pendingShopSave.current = false; });
@@ -345,6 +350,20 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
     setHs(prev => ({ ...prev, shopChecked: checked }));
   }, []);
 
+  const createEvent = useCallback((event: Omit<DinnerEvent, 'id'>): string => {
+    const id = crypto.randomUUID();
+    setHs(prev => ({ ...prev, events: [...prev.events, { ...event, id }] }));
+    return id;
+  }, []);
+
+  const updateEvent = useCallback((id: string, patch: Partial<DinnerEvent>) => {
+    setHs(prev => ({ ...prev, events: prev.events.map(e => e.id === id ? { ...e, ...patch } : e) }));
+  }, []);
+
+  const deleteEvent = useCallback((id: string) => {
+    setHs(prev => ({ ...prev, events: prev.events.filter(e => e.id !== id) }));
+  }, []);
+
   const promoteNextWeekPlan = useCallback(() => {
     setHs(prev => {
       if (!prev.nextWeekPlan) return prev;
@@ -365,7 +384,7 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
 
   return {
     state: { ...hs, householdId, shopList, nextWeekShopList, bothShopList, season },
-    actions: { generate, generateNextWeek, swap, swapNextWeek, setDayMode, setKidsMode, cycleKids, setFamilySize, setDaySize, setDayTime, setPreferences, toggleFav, addDislike, addMeal, editMeal, removeMeal, replaceMealInPlan, replaceMealInNextWeekPlan, restorePlan, clearHistory, addToHistory, pickCookNow, setShopChecked, clearPlanHistory, promoteNextWeekPlan },
+    actions: { generate, generateNextWeek, swap, swapNextWeek, setDayMode, setKidsMode, cycleKids, setFamilySize, setDaySize, setDayTime, setPreferences, toggleFav, addDislike, addMeal, editMeal, removeMeal, replaceMealInPlan, replaceMealInNextWeekPlan, restorePlan, clearHistory, addToHistory, pickCookNow, setShopChecked, clearPlanHistory, promoteNextWeekPlan, createEvent, updateEvent, deleteEvent },
     loading,
   };
 }

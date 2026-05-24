@@ -86,6 +86,7 @@ export interface HouseholdState {
   cookHistory: CookHistoryEntry[];
   customMeals: Meal[];
   shopChecked: Record<string, boolean>;
+  events: DinnerEvent[];
   updatedAt?: number;
 }
 
@@ -116,4 +117,31 @@ export interface SmartPickOpts {
   favourites?: string[];
   dislikes?: string[];
   preferAdult?: boolean;
+}
+
+export type EventCategory = 'starter' | 'main' | 'side' | 'dessert' | 'drinks' | 'other';
+
+export interface EventDish {
+  meal: Meal;
+  servings: number;
+  category: EventCategory;
+}
+
+export interface ScheduleBlock {
+  startTime: string;
+  endTime: string;
+  mealName: string;
+  action: string;
+  note?: string | null;
+}
+
+export interface DinnerEvent {
+  id: string;
+  name: string;
+  date?: string;
+  serveTime: string;
+  guestCount: number;
+  dishes: EventDish[];
+  schedule?: ScheduleBlock[];
+  scheduleGeneratedAt?: number;
 }

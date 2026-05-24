@@ -1,4 +1,4 @@
-// redeployed 2026-05-07T00:00:00Z
+// redeployed 2026-05-21T00:00:00Z
 import Anthropic from 'npm:@anthropic-ai/sdk';
 
 const corsHeaders = {
@@ -8,7 +8,7 @@ const corsHeaders = {
 
 const client = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY')! });
 
-const SYSTEM = `You extract recipe data from a photo of a recipe card, cookbook page, or handwritten recipe. Return ONLY valid JSON matching this exact shape:
+const SYSTEM = `You extract recipe data from one or more photos of a recipe card, cookbook page, or handwritten recipe. The photos may show different pages or sections of the same recipe. Return ONLY valid JSON matching this exact shape:
 {
   "name": string,
   "minutes": number,
@@ -26,18 +26,34 @@ const SYSTEM = `You extract recipe data from a photo of a recipe card, cookbook 
 }
 If you cannot read a field clearly, use a sensible default. Never return markdown or explanation.`;
 
+const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+type ImageInput = { imageBase64: string; mediaType: string };
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
-    const body = await req.json() as { imageBase64: string; mediaType: string };
+    const body = await req.json() as { images?: ImageInput[]; imageBase64?: string; mediaType?: string };
 
-    if (!body.imageBase64) {
-      return new Response(JSON.stringify({ error: 'imageBase64 required' }), { status: 400, headers: corsHeaders });
+    // Normalise: accept either `images` array or legacy single `imageBase64`
+    let images: ImageInput[];
+    if (body.images && Array.isArray(body.images) && body.images.length > 0) {
+      images = body.images;
+    } else if (body.imageBase64) {
+      images = [{ imageBase64: body.imageBase64, mediaType: body.mediaType ?? 'image/jpeg' }];
+    } else {
+      return new Response(JSON.stringify({ error: 'images array or imageBase64 required' }), { status: 400, headers: corsHeaders });
     }
 
-    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    const mediaType = validTypes.includes(body.mediaType) ? body.mediaType : 'image/jpeg';
+    const imageBlocks = images.map(img => ({
+      type: 'image' as const,
+      source: {
+        type: 'base64' as const,
+        media_type: (validTypes.includes(img.mediaType) ? img.mediaType : 'image/jpeg') as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
+        data: img.imageBase64,
+      },
+    }));
 
     const message = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
@@ -46,15 +62,8 @@ Deno.serve(async (req: Request) => {
       messages: [{
         role: 'user',
         content: [
-          {
-            type: 'image',
-            source: {
-              type: 'base64',
-              media_type: mediaType as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
-              data: body.imageBase64,
-            },
-          },
-          { type: 'text', text: 'Extract the recipe from this photo.' },
+          ...imageBlocks,
+          { type: 'text', text: images.length > 1 ? 'Extract the recipe from these photos. They may show different parts of the same recipe — combine them into one complete recipe.' : 'Extract the recipe from this photo.' },
         ],
       }],
     });

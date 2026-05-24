@@ -97,6 +97,7 @@ export async function loadState(householdId: string): Promise<HouseholdState | n
     cookHistory: s.cook_history ?? [],
     customMeals,
     shopChecked: (loadedChecked as Record<string, boolean>) ?? {},
+    events: (s.events as import('./types').DinnerEvent[]) ?? [],
   };
 }
 
@@ -113,6 +114,7 @@ export async function saveState(
   if ('dayOverrides' in patch) update.day_overrides  = patch.dayOverrides;
   if ('preferences' in patch)  update.preferences    = patch.preferences;
   if ('cookHistory' in patch)  update.cook_history   = patch.cookHistory;
+  if ('events' in patch)       update.events         = patch.events;
   if (!Object.keys(update).length) return;
   const { error } = await supabase
     .from('household_state')

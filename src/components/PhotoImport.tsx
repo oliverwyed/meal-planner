@@ -9,9 +9,27 @@ interface Props {
   onCancel: () => void;
 }
 
+async function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve((e.target?.result as string).split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target?.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export function PhotoImport({ onImport, onCancel }: Props) {
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<Meal | null>(null);
   const [error, setError] = useState('');
@@ -19,34 +37,33 @@ export function PhotoImport({ onImport, onCancel }: Props) {
   const cameraRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
 
-  const handleFile = (file: File | null) => {
-    if (!file) return;
-    setImageFile(file);
+  const addFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
     setPreview(null);
     setError('');
-    const reader = new FileReader();
-    reader.onload = e => setImagePreview(e.target?.result as string);
-    reader.readAsDataURL(file);
+    const newFiles = Array.from(files);
+    const newPreviews = await Promise.all(newFiles.map(fileToDataUrl));
+    setImageFiles(prev => [...prev, ...newFiles]);
+    setImagePreviews(prev => [...prev, ...newPreviews]);
+  };
+
+  const removePhoto = (idx: number) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== idx));
+    setImagePreviews(prev => prev.filter((_, i) => i !== idx));
   };
 
   const extract = async () => {
-    if (!imageFile) return;
+    if (imageFiles.length === 0) return;
     setLoading(true);
     setError('');
     setPreview(null);
     try {
-      const reader = new FileReader();
-      const base64 = await new Promise<string>((resolve, reject) => {
-        reader.onload = e => {
-          const result = e.target?.result as string;
-          resolve(result.split(',')[1]);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(imageFile);
-      });
+      const images = await Promise.all(
+        imageFiles.map(async f => ({ imageBase64: await fileToBase64(f), mediaType: f.type }))
+      );
 
       const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-recipe-photo`;
-      log.info('parse-recipe-photo', `Extracting from photo (${imageFile.name})`);
+      log.info('parse-recipe-photo', `Extracting from ${images.length} photo(s)`);
       const res = await logFetch('parse-recipe-photo', fnUrl, {
         method: 'POST',
         headers: {
@@ -54,7 +71,7 @@ export function PhotoImport({ onImport, onCancel }: Props) {
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
         },
-        body: JSON.stringify({ imageBase64: base64, mediaType: imageFile.type }),
+        body: JSON.stringify({ images }),
       });
       let data: any;
       try { data = await res.json(); } catch { throw new Error(`Server error ${res.status}`); }
@@ -74,12 +91,17 @@ export function PhotoImport({ onImport, onCancel }: Props) {
     if (!preview) return;
     setSaving(true);
     try {
-      // Pass imagePreview as the photo field (data URL); parent will upload to storage
-      await onImport({ ...preview, photo: imagePreview ?? undefined });
+      await onImport({
+        ...preview,
+        photo: imagePreviews[0] ?? undefined,
+        photos: imagePreviews.length > 0 ? imagePreviews : undefined,
+      });
     } finally {
       setSaving(false);
     }
   };
+
+  const hasPhotos = imageFiles.length > 0;
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 500, background: 'rgba(0,0,0,0.55)', overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '24px 0 40px' } as React.CSSProperties}
@@ -100,43 +122,55 @@ export function PhotoImport({ onImport, onCancel }: Props) {
             {!preview && (
               <>
                 <div style={{ fontSize: '13px', color: P.muted, marginBottom: '16px', lineHeight: 1.5 }}>
-                  Photograph a recipe card, cookbook page, or handwritten recipe. AI will extract all the details.
+                  Photograph a recipe card, cookbook page, or handwritten recipe. Add multiple photos if it spans several pages. AI will extract all the details.
                 </div>
 
-                {/* Photo picker buttons */}
-                {!imagePreview ? (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
-                    <button onClick={() => cameraRef.current?.click()}
-                      style={{ background: P.accentLight, border: `2px dashed ${P.accent}`, borderRadius: '14px', padding: '20px 12px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '28px' }}>📷</span>
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: P.accentDark }}>Take photo</span>
-                    </button>
-                    <button onClick={() => galleryRef.current?.click()}
-                      style={{ background: P.accentLight, border: `2px dashed ${P.accent}`, borderRadius: '14px', padding: '20px 12px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '28px' }}>🖼️</span>
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: P.accentDark }}>Gallery</span>
-                    </button>
-                    <input ref={cameraRef} type="file" accept="image/*" capture="environment"
-                      style={{ display: 'none' }} onChange={e => handleFile(e.target.files?.[0] ?? null)} />
-                    <input ref={galleryRef} type="file" accept="image/*"
-                      style={{ display: 'none' }} onChange={e => handleFile(e.target.files?.[0] ?? null)} />
-                  </div>
-                ) : (
+                {/* Add photo buttons — always visible so user can add more */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: hasPhotos ? '12px' : '16px' }}>
+                  <button onClick={() => cameraRef.current?.click()}
+                    style={{ background: P.accentLight, border: `2px dashed ${P.accent}`, borderRadius: '14px', padding: '16px 12px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '24px' }}>📷</span>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: P.accentDark }}>Take photo</span>
+                  </button>
+                  <button onClick={() => galleryRef.current?.click()}
+                    style={{ background: P.accentLight, border: `2px dashed ${P.accent}`, borderRadius: '14px', padding: '16px 12px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '24px' }}>🖼️</span>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: P.accentDark }}>Gallery</span>
+                  </button>
+                  <input ref={cameraRef} type="file" accept="image/*" capture="environment"
+                    style={{ display: 'none' }} onChange={e => addFiles(e.target.files)} />
+                  <input ref={galleryRef} type="file" accept="image/*" multiple
+                    style={{ display: 'none' }} onChange={e => addFiles(e.target.files)} />
+                </div>
+
+                {/* Thumbnail strip */}
+                {hasPhotos && (
                   <div style={{ marginBottom: '16px' }}>
-                    <img src={imagePreview} alt="Recipe photo" style={{ width: '100%', maxHeight: '240px', objectFit: 'cover', borderRadius: '12px', display: 'block', marginBottom: '10px' }} />
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button onClick={() => { setImageFile(null); setImagePreview(null); setError(''); }}
-                        style={{ background: P.border, border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '13px', fontWeight: 700, color: P.muted, cursor: 'pointer' }}>
-                        Change photo
-                      </button>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>
+                      {imageFiles.length} photo{imageFiles.length > 1 ? 's' : ''} selected
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+                      {imagePreviews.map((src, i) => (
+                        <div key={i} style={{ position: 'relative', flexShrink: 0 }}>
+                          <img src={src} alt={`Photo ${i + 1}`}
+                            style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '10px', display: 'block', border: `2px solid ${i === 0 ? P.accent : P.border}` }} />
+                          {i === 0 && imageFiles.length > 1 && (
+                            <div style={{ position: 'absolute', top: '3px', left: '3px', background: P.accent, color: '#fff', fontSize: '9px', fontWeight: 700, borderRadius: '4px', padding: '1px 4px' }}>1st</div>
+                          )}
+                          <button onClick={() => removePhoto(i)}
+                            style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#DC2626', border: 'none', color: '#fff', borderRadius: '50%', width: '20px', height: '20px', fontSize: '11px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>
+                            ✕
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
 
                 {error && <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: '10px', padding: '10px 14px', color: '#DC2626', fontSize: '13px', marginBottom: '12px' }}>{error}</div>}
 
-                <Primary onClick={extract} disabled={!imageFile || loading}>
-                  {loading ? '✨ Reading recipe…' : '✨ Extract with AI'}
+                <Primary onClick={extract} disabled={!hasPhotos || loading}>
+                  {loading ? '✨ Reading recipe…' : `✨ Extract with AI${imageFiles.length > 1 ? ` (${imageFiles.length} photos)` : ''}`}
                 </Primary>
                 <div style={{ marginTop: '8px' }}>
                   <Secondary onClick={onCancel}>Cancel</Secondary>
@@ -159,10 +193,17 @@ export function PhotoImport({ onImport, onCancel }: Props) {
                   ))}
                 </div>
 
-                {imagePreview && (
+                {imagePreviews.length > 0 && (
                   <div style={{ marginBottom: '12px' }}>
-                    <img src={imagePreview} alt={preview.name} style={{ width: '100%', maxHeight: '160px', objectFit: 'cover', borderRadius: '10px', display: 'block' }} />
-                    <div style={{ fontSize: '11px', color: P.muted, marginTop: '4px' }}>Photo will be saved with the recipe</div>
+                    <div style={{ display: 'flex', gap: '6px', overflowX: 'auto' }}>
+                      {imagePreviews.map((src, i) => (
+                        <img key={i} src={src} alt={`Photo ${i + 1}`}
+                          style={{ width: imagePreviews.length === 1 ? '100%' : '72px', height: imagePreviews.length === 1 ? '160px' : '72px', objectFit: 'cover', borderRadius: '10px', display: 'block', flexShrink: 0 }} />
+                      ))}
+                    </div>
+                    <div style={{ fontSize: '11px', color: P.muted, marginTop: '4px' }}>
+                      {imagePreviews.length === 1 ? 'Photo will be saved with the recipe' : `${imagePreviews.length} photos will be saved with the recipe`}
+                    </div>
                   </div>
                 )}
 
