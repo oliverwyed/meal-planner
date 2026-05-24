@@ -43,3 +43,6 @@ jobs:
           supabase functions deploy parse-recipe-photo \
             --project-ref ejinmxvbeaolypwmkuhh \
             --no-verify-jwt
+          supabase functions deploy generate-event-schedule \
+            --project-ref ejinmxvbeaolypwmkuhh \
+            --no-verify-jwt
