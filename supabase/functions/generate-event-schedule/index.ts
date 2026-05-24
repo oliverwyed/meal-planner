@@ -9,13 +9,22 @@ const client = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY')! });
 
 const SYSTEM = `You are an expert chef planning a dinner party cooking schedule for a home cook with a standard kitchen: one oven, one hob with 4 rings, standard equipment.
 
-Given a list of dishes with their cooking steps and a serve time, generate a practical, interleaved cooking timeline. Consider:
-- Work backwards from serve time; each dish's start = serveTime minus its total minutes
-- Identify genuine parallel opportunities (e.g. prep veg while roast cooks passively, make sauce while pasta boils)
-- Flag oven temperature conflicts when dishes need different temps simultaneously
-- Add resting time for large proteins (note it in the block)
-- Group closely-timed tasks if logical
-- Keep actions specific and actionable — what to actually do, not "cook the dish"
+You will receive a list of dishes with their ingredients, total cooking time, and optional steps. Your job is to produce a practical, interleaved cooking timeline.
+
+STEP 1 — Analyse each dish:
+- Break its total time into realistic phases: active prep (chopping, mixing, marinating), active cooking (frying, stirring, reducing), and passive cooking (oven, long simmer, resting)
+- Infer phase durations from the ingredient list and dish type. Examples:
+  • A 1.5kg whole chicken with root vegetables → ~15 min prep, ~80 min passive oven, 10 min rest
+  • Risotto with arborio rice and stock → ~10 min prep, ~30 min active stirring
+  • Pasta bake with béchamel → ~20 min active sauce, ~25 min passive oven
+- Passive phases are opportunities to do active work on other dishes
+
+STEP 2 — Build an interleaved schedule working backwards from serve time:
+- Fill passive windows with active tasks from other dishes
+- Group logically related prep (e.g. all vegetable chopping in one block)
+- Flag oven temperature conflicts when simultaneous dishes need different temps
+- Note resting time for large proteins
+- Every action should be specific and actionable — not "cook the dish"
 
 Return ONLY valid JSON, no markdown:
 {
@@ -30,14 +39,21 @@ Return ONLY valid JSON, no markdown:
   ]
 }
 
-All times in 24h format. Sort schedule by startTime. Include a final block: mealName "Serve", startTime and endTime both equal to serveTime, action "Plate up and bring to the table".`;
+All times in 24h format. Sort by startTime. End with a final block: mealName "Serve", startTime and endTime both equal to serveTime, action "Plate up and serve".`;
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
     const { dishes, serveTime, guestCount } = await req.json() as {
-      dishes: Array<{ name: string; minutes: number; category: string; steps: string[] }>;
+      dishes: Array<{
+        name: string;
+        minutes: number;
+        category: string;
+        steps: string[];
+        ingredients?: string[];
+        description?: string;
+      }>;
       serveTime: string;
       guestCount: number;
     };
@@ -46,15 +62,19 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: 'dishes and serveTime required' }), { status: 400, headers: corsHeaders });
     }
 
-    const dishSummary = dishes.map(d =>
-      `## ${d.name} (${d.category}, ${d.minutes} min)\nSteps:\n${d.steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}`
-    ).join('\n\n');
+    const dishSummary = dishes.map(d => {
+      const lines = [`## ${d.name} (${d.category}, ${d.minutes} min total)`];
+      if (d.description) lines.push(`Description: ${d.description}`);
+      if (d.ingredients?.length) lines.push(`Ingredients (scaled for ${guestCount} guests):\n${d.ingredients.map(i => `- ${i}`).join('\n')}`);
+      if (d.steps?.length) lines.push(`Steps:\n${d.steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}`);
+      return lines.join('\n');
+    }).join('\n\n');
 
     const prompt = `Serve time: ${serveTime}\nGuests: ${guestCount}\n\n${dishSummary}`;
 
     const message = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 2048,
+      model: 'claude-sonnet-4-6',
+      max_tokens: 4096,
       system: SYSTEM,
       messages: [{ role: 'user', content: prompt }],
     });

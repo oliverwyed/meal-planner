@@ -74,12 +74,13 @@ export async function getHouseholdInviteCode(householdId: string): Promise<strin
 
 // ── State ────────────────────────────────────────────────────────────────────
 
-export async function loadState(householdId: string): Promise<HouseholdState | null> {
+export async function loadState(householdId: string, signal?: AbortSignal): Promise<HouseholdState | null> {
   const [stateRes, mealsRes, houseRes] = await Promise.all([
     supabase.from('household_state').select('*').eq('household_id', householdId).single(),
     supabase.from('custom_meals').select('*').eq('household_id', householdId),
     supabase.from('households').select('family_size').eq('id', householdId).single(),
   ]);
+  if (signal?.aborted) return null;
   if (stateRes.error) { console.error(stateRes.error); return null; }
   const s = stateRes.data;
   const customMeals: Meal[] = (mealsRes.data ?? []).map((r: any) => ({ ...r.meal_data, id: r.id, sourceUrl: r.source_url }));

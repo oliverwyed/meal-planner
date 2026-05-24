@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { HouseholdState, DayName, DayMode, KidsMode, Meal, Plan, PlanMeal, DayConfig, DayOverrides, Preferences, PlanHistoryEntry, DinnerEvent } from '../lib/types';
 import { DEFAULT_DAY_CONFIG, DAYS } from '../lib/constants';
 import { loadState, saveState, saveFamilySize, addCustomMeal, updateCustomMeal, deleteCustomMeal, subscribeToState } from '../lib/supabase';
@@ -75,25 +75,32 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
   const isRemoteUpdate = useRef(false);
   const pendingShopSave = useRef(false);
 
-  // Derived
-  const allMeals = [...ALL_RECIPES, ...hs.customMeals];
+  // Derived (memoized to avoid re-running O(n×m) buildShop on every render)
+  const allMeals = useMemo(() => [...ALL_RECIPES, ...hs.customMeals], [hs.customMeals]);
   const season = getCurrentSeason();
-  const shopList = hs.plan
-    ? buildShop(hs.plan, hs.preferences.pantry, hs.familySize, hs.dayConfig, hs.dayOverrides)
-    : null;
-  const nextWeekShopList = hs.nextWeekPlan
-    ? buildShop(hs.nextWeekPlan, hs.preferences.pantry, hs.familySize, hs.dayConfig, hs.dayOverrides)
-    : null;
-  const bothShopList = (hs.plan && hs.nextWeekPlan)
-    ? buildShop({ ...hs.plan, meals: [...hs.plan.meals, ...hs.nextWeekPlan.meals] }, hs.preferences.pantry, hs.familySize, hs.dayConfig, hs.dayOverrides)
-    : (shopList ?? nextWeekShopList);
+  const shopList = useMemo(
+    () => hs.plan ? buildShop(hs.plan, hs.preferences.pantry, hs.familySize, hs.dayConfig, hs.dayOverrides) : null,
+    [hs.plan, hs.preferences.pantry, hs.familySize, hs.dayConfig, hs.dayOverrides],
+  );
+  const nextWeekShopList = useMemo(
+    () => hs.nextWeekPlan ? buildShop(hs.nextWeekPlan, hs.preferences.pantry, hs.familySize, hs.dayConfig, hs.dayOverrides) : null,
+    [hs.nextWeekPlan, hs.preferences.pantry, hs.familySize, hs.dayConfig, hs.dayOverrides],
+  );
+  const bothShopList = useMemo(
+    () => (hs.plan && hs.nextWeekPlan)
+      ? buildShop({ ...hs.plan, meals: [...hs.plan.meals, ...hs.nextWeekPlan.meals] }, hs.preferences.pantry, hs.familySize, hs.dayConfig, hs.dayOverrides)
+      : (shopList ?? nextWeekShopList),
+    [hs.plan, hs.nextWeekPlan, hs.preferences.pantry, hs.familySize, hs.dayConfig, hs.dayOverrides, shopList, nextWeekShopList],
+  );
 
-  // Load initial state
+  // Load initial state — AbortController prevents stale state from a superseded householdId
   useEffect(() => {
-    loadState(householdId).then(state => {
+    const controller = new AbortController();
+    loadState(householdId, controller.signal).then(state => {
       if (state) setHs(state);
       setLoading(false);
     });
+    return () => controller.abort();
   }, [householdId]);
 
   // Real-time subscription
