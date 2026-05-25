@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Generates AI food-photography images for every recipe in recipes.json using
-// DALL-E 3, uploads them to Supabase Storage, and writes the URLs back.
+// DALL-E 3, then either uploads them to Supabase Storage (if credentials are
+// set) or saves them as static files under public/recipe-images/.
 //
 // Usage:
 //   OPENAI_API_KEY=sk-... node scripts/generate-recipe-images.mjs
@@ -9,9 +10,9 @@
 //   DELAY_MS=13000   Milliseconds between requests (default 13 s ≈ 4.6 req/min,
 //                    safe for all OpenAI tiers). Set to 0 if you have a high-rate
 //                    paid tier.
-//   SKIP_EXISTING=1  Skip recipes that already have a Supabase-hosted photo URL.
+//   SKIP_EXISTING=1  Skip recipes that already have a generated photo URL.
 
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -34,14 +35,16 @@ const envVars = Object.fromEntries(
 );
 const SUPABASE_URL = envVars.VITE_SUPABASE_URL;
 const SUPABASE_KEY = envVars.VITE_SUPABASE_ANON_KEY;
+const LOCAL_MODE = !SUPABASE_URL || SUPABASE_URL.includes('placeholder');
+const LOCAL_DIR = join(__dir, '../public/recipe-images');
 
 if (!OPENAI_KEY) {
   console.error('\nError: set OPENAI_API_KEY before running.\n');
   process.exit(1);
 }
-if (!SUPABASE_URL || SUPABASE_URL.includes('placeholder')) {
-  console.error('\nError: VITE_SUPABASE_URL in .env is not set.\n');
-  process.exit(1);
+
+if (LOCAL_MODE) {
+  mkdirSync(LOCAL_DIR, { recursive: true });
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -92,8 +95,14 @@ async function generateImage(recipe) {
   return data[0].b64_json; // base64-encoded PNG
 }
 
-async function uploadToSupabase(b64, filename) {
+async function storeImage(b64, filename) {
   const buffer = Buffer.from(b64, 'base64');
+
+  if (LOCAL_MODE) {
+    writeFileSync(join(LOCAL_DIR, filename), buffer);
+    return `/recipe-images/${filename}`;
+  }
+
   const res = await fetch(
     `${SUPABASE_URL}/storage/v1/object/recipe-photos/${filename}`,
     {
@@ -117,8 +126,8 @@ function safeFilename(name) {
   return 'ai-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) + '.png';
 }
 
-function isSupabaseUrl(url) {
-  return url && url.includes('/storage/v1/object/public/');
+function isGeneratedUrl(url) {
+  return url && (url.includes('/storage/v1/object/public/') || url.includes('/recipe-images/'));
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -127,17 +136,18 @@ async function main() {
   const recipes = JSON.parse(readFileSync(RECIPES_PATH, 'utf8'));
 
   const toProcess = SKIP_EXISTING
-    ? recipes.filter(r => !isSupabaseUrl(r.photo))
+    ? recipes.filter(r => !isGeneratedUrl(r.photo))
     : recipes;
 
   const costEst = (toProcess.length * 0.04).toFixed(2);
   const timeEst = Math.ceil((toProcess.length * DELAY_MS) / 60000);
 
   console.log(`\n🍽️  Recipe image generator`);
+  console.log(`   Mode               : ${LOCAL_MODE ? 'local (public/recipe-images/)' : 'Supabase Storage'}`);
   console.log(`   Recipes to process : ${toProcess.length} of ${recipes.length}`);
   console.log(`   Estimated cost     : ~$${costEst} (DALL-E 3 standard)`);
   console.log(`   Estimated time     : ~${timeEst} min at ${DELAY_MS / 1000}s/image`);
-  if (SKIP_EXISTING) console.log(`   Skipping existing Supabase-hosted photos`);
+  if (SKIP_EXISTING) console.log(`   Skipping already-generated photos`);
   console.log();
 
   let updated = 0;
@@ -157,7 +167,7 @@ async function main() {
     try {
       const b64 = await generateImage(recipe);
       const filename = safeFilename(recipe.name);
-      const url = await uploadToSupabase(b64, filename);
+      const url = await storeImage(b64, filename);
 
       recipes[i] = { ...recipe, photo: url };
       writeFileSync(RECIPES_PATH, JSON.stringify(recipes, null, 2));
