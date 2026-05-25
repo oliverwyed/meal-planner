@@ -115,7 +115,7 @@ export function CookingMode({ meal, familySize, onClose, onStartTimer, timers, o
       onTouchEnd={handleTouchEnd}
     >
       {/* Top bar */}
-      <div style={{ display: 'flex', alignItems: 'center', padding: '16px 16px 0', gap: '12px', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', padding: 'calc(env(safe-area-inset-top, 0px) + 16px) 16px 0', gap: '12px', flexShrink: 0 }}>
         <button onClick={onClose}
           style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '10px',
             color: '#94A3B8', fontSize: '14px', fontWeight: 600, padding: '8px 12px', cursor: 'pointer', flexShrink: 0 }}>
@@ -231,7 +231,7 @@ export function CookingMode({ meal, familySize, onClose, onStartTimer, timers, o
 
       {/* Bottom navigation */}
       {steps.length > 0 && (
-        <div style={{ display: 'flex', gap: '12px', padding: '12px 16px 20px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: '12px', padding: '12px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)', flexShrink: 0 }}>
           <button onClick={() => setStepIdx(i => Math.max(i - 1, 0))} disabled={stepIdx === 0}
             style={{ flex: 1, padding: '16px', borderRadius: '14px', border: 'none', fontSize: '16px', fontWeight: 700,
               cursor: stepIdx === 0 ? 'default' : 'pointer',
@@ -261,7 +261,7 @@ export function CookingMode({ meal, familySize, onClose, onStartTimer, timers, o
           onClick={() => { setShowIngredients(false); setPanelOffset(0); }}>
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0,
             background: '#1E293B', borderRadius: '20px 20px 0 0',
-            maxHeight: '70vh', overflowY: 'auto', padding: '16px 20px 32px',
+            maxHeight: '70vh', overflowY: 'auto', padding: '16px 20px', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 32px)',
             transform: `translateY(${panelOffset}px)`,
             transition: panelOffset > 0 ? 'none' : 'transform 0.25s ease' }}
             onClick={e => e.stopPropagation()}>
