@@ -4,7 +4,7 @@ export type KidsMode = 'kids' | 'adults' | 'either';
 export type DietaryMode = 'none' | 'noFish' | 'noPork' | 'noRed' | 'veggie';
 export type Season = 'spring' | 'summer' | 'autumn' | 'winter';
 export type Protein = 'chicken' | 'beef' | 'fish' | 'pork' | 'lamb' | 'seafood' | 'eggs' | 'veggie';
-export type Cuisine = 'british' | 'italian' | 'asian' | 'mexican' | 'indian' | 'american' | 'middleeastern' | 'other';
+export type Cuisine = 'british' | 'italian' | 'french' | 'asian' | 'mexican' | 'indian' | 'american' | 'middleeastern' | 'other';
 export type Carb = 'none' | 'pasta' | 'rice' | 'potato' | 'bread' | 'noodles';
 export type Course = 'main' | 'starter' | 'side' | 'dessert';
 

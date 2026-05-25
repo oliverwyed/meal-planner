@@ -267,7 +267,7 @@ export function BrowseScreen({
               ))}
             </div>
             <div style={{ overflowX: 'auto', whiteSpace: 'nowrap', marginBottom: '10px', scrollbarWidth: 'none' }}>
-              {([['', 'All cuisines'], ['british', '🇬🇧 British'], ['italian', '🇮🇹 Italian'], ['asian', '🥢 Asian'], ['mexican', '🌮 Mexican'], ['indian', '🍛 Indian'], ['american', '🍔 American'], ['middleeastern', '🧆 Middle Eastern'], ['other', '🌍 Other']] as [string, string][]).map(([v, l]) => (
+              {([['', 'All cuisines'], ['british', '🇬🇧 British'], ['italian', '🇮🇹 Italian'], ['french', '🥐 French'], ['asian', '🥢 Asian'], ['mexican', '🌮 Mexican'], ['indian', '🍛 Indian'], ['american', '🍔 American'], ['middleeastern', '🧆 Middle Eastern'], ['other', '🌍 Other']] as [string, string][]).map(([v, l]) => (
                 <button key={v} onClick={() => setBrowseCuisine(browseCuisine === v ? '' : v)}
                   style={{ display: 'inline-block', marginRight: '6px', padding: '5px 12px', borderRadius: '20px', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
                     background: browseCuisine === v ? P.accent : P.accentLight, color: browseCuisine === v ? '#fff' : P.accentDark }}>
