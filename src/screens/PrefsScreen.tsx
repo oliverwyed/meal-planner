@@ -59,7 +59,7 @@ export function PrefsScreen({
 
   return (
     <Screen>
-      <Header eyebrow="Me" title="Your account" />
+      <Header eyebrow="Account" title="Your account" />
 
       {!state.plan && (
         <div style={{ marginBottom: '16px' }}>

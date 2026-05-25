@@ -124,8 +124,8 @@ export function PlanScreen({
       {isDesktop && (
         <div style={{ width: '220px', background: P.card, borderRight: `1px solid ${P.border}`, position: 'sticky', top: 0, height: '100vh', display: 'flex', flexDirection: 'column', padding: '24px 0', flexShrink: 0 }}>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', padding: '0 20px 20px', borderBottom: `1px solid ${P.border}`, marginBottom: '12px' }}>🍽️ Meal Planner</div>
-          {(['plan', 'shopping', 'prefs'] as const).map(s => {
-            const labels: Record<string, string> = { plan: '📅 Plan', shopping: '🛒 Shopping', prefs: '👤 Me' };
+          {(['plan', 'shopping', 'browse', 'events', 'prefs'] as const).map(s => {
+            const labels: Record<string, string> = { plan: '📅 Plan', shopping: '🛒 Shopping', browse: '🍴 Recipes', events: '🎉 Events', prefs: '⚙️ Account' };
             const active = s === 'plan';
             return (
               <button key={s} onClick={() => setStep(s)}
@@ -135,10 +135,6 @@ export function PlanScreen({
             );
           })}
           <div style={{ borderTop: `1px solid ${P.border}`, margin: '12px 0', padding: '12px 12px 0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <button onClick={() => setStep('browse')}
-              style={{ background: P.accentLight, border: 'none', borderRadius: '10px', padding: '9px 12px', fontSize: '14px', fontWeight: 700, color: P.accentDark, cursor: 'pointer', textAlign: 'left' }}>
-              🍴 Browse recipes
-            </button>
             <button onClick={() => {
               if (Date.now() - lastGenRef.current < 2000) return;
               lastGenRef.current = Date.now();
@@ -317,7 +313,7 @@ export function PlanScreen({
         return (
           <div key={day}>
             <MealCard
-              meal={meal} day={`${day} · ${dayDate(day)}`}
+              meal={meal} day={isToday ? `Today · ${dayDate(day)}` : `${day} · ${dayDate(day)}`}
               isFav={state.preferences.favourites.includes(meal.name)}
               isSeasonal={!!(meal.seasons?.includes(state.season as any))}
               seasonLabel={si.label}

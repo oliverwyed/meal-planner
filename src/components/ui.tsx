@@ -148,16 +148,16 @@ export function BottomNav({ onPlan, onShopping, onBrowse, onProfile, onEvents, a
   const tabs = [
     { id: 'plan', icon: '📅', label: 'Week', onClick: onPlan },
     { id: 'shopping', icon: '🛒', label: 'Shopping', onClick: onShopping },
-    { id: 'browse', icon: '🍴', label: 'Recipes', onClick: onBrowse, primary: true },
+    { id: 'browse', icon: '🍴', label: 'Recipes', onClick: onBrowse },
     ...(onEvents ? [{ id: 'events', icon: '🎉', label: 'Events', onClick: onEvents }] : []),
-    { id: 'profile', icon: '👤', label: 'Me', onClick: onProfile },
+    { id: 'profile', icon: '👤', label: 'Account', onClick: onProfile },
   ];
   return (
     <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
       background: P.card, borderTop: `1px solid ${P.border}`,
       paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       display: 'grid', gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}>
-      {tabs.map(({ id, icon, label, onClick, primary }) => {
+      {tabs.map(({ id, icon, label, onClick }) => {
         const isActive = active === id;
         return (
           <button key={id} onClick={onClick}
@@ -166,7 +166,7 @@ export function BottomNav({ onPlan, onShopping, onBrowse, onProfile, onEvents, a
               borderTop: isActive ? `2px solid ${P.accent}` : '2px solid transparent' }}>
             <span style={{ fontSize: '20px', lineHeight: 1 }}>{icon}</span>
             <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.3px',
-              color: isActive ? P.accent : primary ? P.accent : P.muted }}>{label}</span>
+              color: isActive ? P.accent : P.muted }}>{label}</span>
           </button>
         );
       })}
