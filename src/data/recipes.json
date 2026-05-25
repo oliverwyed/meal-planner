@@ -3106,5 +3106,1784 @@
       "fat": 18
     },
     "photo": "https://foodish-api.com/images/biryani/biryani3.jpg"
+  },
+  {
+    "name": "Silky Dal Makhani with Warm Butter Naan",
+    "time": "55 min",
+    "minutes": 55,
+    "protein": "veggie",
+    "cuisine": "indian",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "bread",
+    "serves": 4,
+    "description": "Whole black lentils and kidney beans slow-simmered in a deeply spiced tomato and cream sauce, finished with a generous knob of butter that melts into dark, glossy richness. The dal clings to warm naan like velvet — fragrant with cumin, garam masala, and a whisper of smoke. This is the dish that makes vegetarian cooking feel genuinely indulgent.",
+    "kidNote": "Mild and creamy by nature — reduce the chilli or skip it entirely for younger eaters. Serve with extra naan for tearing and dipping.",
+    "ingredients": [
+      "250g whole black lentils (urad dal), soaked overnight",
+      "1 x 400g tin red kidney beans, drained",
+      "2 tbsp butter, plus extra to finish",
+      "1 tbsp sunflower oil",
+      "1 large onion, finely diced",
+      "4 garlic cloves, minced",
+      "25g fresh ginger, grated",
+      "1 tsp cumin seeds",
+      "2 tsp garam masala",
+      "1 tsp ground coriander",
+      "½ tsp chilli powder",
+      "1 x 400g tin chopped tomatoes",
+      "100ml double cream",
+      "1 tsp sugar",
+      "salt to taste",
+      "4 naan breads, to serve",
+      "fresh coriander, to garnish"
+    ],
+    "steps": [
+      "Rinse the soaked lentils and simmer in plenty of salted water for 35–40 min until completely tender, then drain, reserving a ladleful of the cooking liquid.",
+      "Heat the butter and oil in a large saucepan over medium heat. Add the cumin seeds and let them sizzle for 30 seconds, then add the onion and cook for 8–10 min until deep golden.",
+      "Stir in the garlic, ginger, garam masala, ground coriander, and chilli powder. Cook for 2 min, then add the chopped tomatoes and sugar. Simmer for 10 min until the sauce darkens and thickens.",
+      "Add the drained lentils, kidney beans, and a splash of the reserved cooking liquid. Stir well and simmer on low heat for 10 min, mashing a few lentils against the pan to thicken the sauce.",
+      "Pour in the double cream, stir, and simmer for a further 5 min. Taste and season with salt.",
+      "Finish with an extra knob of butter stirred through, scatter with fresh coriander, and serve with warmed naan."
+    ],
+    "tip": "The longer you can simmer the dal at the end — even 20–30 extra minutes on the lowest heat — the silkier and more restaurant-worthy it becomes. Keep a splash of water nearby to prevent sticking.",
+    "nutrition": {
+      "calories": 520,
+      "protein": 22,
+      "carbs": 68,
+      "fat": 18
+    },
+    "photo": null
+  },
+  {
+    "name": "Palak Paneer with Spiced Wilted Spinach & Rice",
+    "time": "35 min",
+    "minutes": 35,
+    "protein": "veggie",
+    "cuisine": "indian",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "rice",
+    "serves": 4,
+    "description": "Golden-edged cubes of paneer nestled in a vivid, silky spinach sauce that hums with cumin, fenugreek, and just enough chilli to keep things interesting. Blanching and blending the spinach gives the sauce a vibrant colour and a velvety texture that feels far more complex than the effort involved. Serve over basmati and dinner is done in under 40 minutes.",
+    "kidNote": "Skip the chilli and use a mild curry powder in place of the whole spices for fussy eaters. Paneer is mild and protein-rich — most children enjoy it.",
+    "ingredients": [
+      "450g fresh spinach leaves",
+      "450g paneer, cut into 2cm cubes",
+      "2 tbsp ghee or sunflower oil",
+      "1 large onion, finely chopped",
+      "4 garlic cloves, minced",
+      "20g fresh ginger, grated",
+      "1 tsp cumin seeds",
+      "1 tsp ground coriander",
+      "½ tsp ground turmeric",
+      "½ tsp garam masala",
+      "½ tsp chilli powder",
+      "1 x 400g tin chopped tomatoes",
+      "3 tbsp double cream",
+      "salt to taste",
+      "300g basmati rice, cooked to serve"
+    ],
+    "steps": [
+      "Blanch the spinach in a large pan of boiling water for 1 min, then drain and refresh under cold water. Squeeze out excess moisture and blend to a smooth purée — set aside.",
+      "Heat 1 tbsp ghee in a wide frying pan over high heat. Fry the paneer cubes in a single layer for 2–3 min per side until golden. Remove and set aside on kitchen paper.",
+      "Add the remaining ghee to the same pan over medium heat. Fry the cumin seeds for 30 seconds until fragrant, then add the onion and cook for 6–8 min until soft and golden.",
+      "Stir in the garlic and ginger and cook for 2 min. Add the ground spices, cook for 1 min, then tip in the chopped tomatoes and simmer for 8 min until the sauce thickens.",
+      "Stir in the spinach purée and 100ml water, then simmer for 5 min. Season with salt and stir through the double cream.",
+      "Add the paneer back to the pan, fold gently to coat, and warm through for 2 min. Serve over basmati rice."
+    ],
+    "tip": "Frying the paneer before adding it to the sauce gives it a golden crust that holds up in the sauce rather than turning spongy. Pat the cubes dry with kitchen paper first for the best colour.",
+    "nutrition": {
+      "calories": 490,
+      "protein": 26,
+      "carbs": 48,
+      "fat": 22
+    },
+    "photo": null
+  },
+  {
+    "name": "Chana Masala with Tomatoes, Cumin & Flatbreads",
+    "time": "30 min",
+    "minutes": 30,
+    "protein": "veggie",
+    "cuisine": "indian",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "bread",
+    "serves": 4,
+    "description": "Plump chickpeas tumbled through a bold, tangy tomato and onion masala that crackles with whole spices and finishes with a squeeze of lemon. This is a weeknight hero — deeply satisfying, packed with plant protein, and on the table in 30 minutes flat. Tearing warm flatbreads through the thick sauce is half the pleasure.",
+    "kidNote": "Chickpeas are a great protein for children — keep the chilli light and serve with plain yoghurt on the side for cooling.",
+    "ingredients": [
+      "2 x 400g tins chickpeas, drained and rinsed",
+      "2 tbsp sunflower oil",
+      "1 large onion, finely chopped",
+      "4 garlic cloves, minced",
+      "20g fresh ginger, grated",
+      "1 tsp cumin seeds",
+      "2 tsp ground coriander",
+      "1 tsp garam masala",
+      "1 tsp ground cumin",
+      "½ tsp turmeric",
+      "½ tsp chilli powder",
+      "1 x 400g tin chopped tomatoes",
+      "1 tbsp tomato purée",
+      "1 tsp sugar",
+      "juice of 1 lemon",
+      "salt to taste",
+      "fresh coriander, to garnish",
+      "4 flatbreads, to serve",
+      "plain yoghurt, to serve"
+    ],
+    "steps": [
+      "Heat the oil in a large saucepan over medium-high heat. Add the cumin seeds and let them sizzle for 30 seconds, then add the onion and cook for 7–8 min until deep golden brown.",
+      "Add the garlic and ginger and cook for 2 min, then stir in all the ground spices and cook for 1 min until fragrant.",
+      "Tip in the chopped tomatoes, tomato purée, and sugar. Stir well and simmer for 10 min until the sauce thickens and darkens.",
+      "Add the chickpeas and 100ml water. Stir everything together and simmer on medium-low for 8–10 min, mashing a few chickpeas against the side of the pan to thicken the gravy.",
+      "Squeeze in the lemon juice and season generously with salt. Taste and adjust — it should be bold and slightly tangy.",
+      "Scatter with fresh coriander and serve with warm flatbreads and yoghurt."
+    ],
+    "tip": "The colour and depth of a chana masala depends entirely on how long you caramelise the onions — don't rush this step. Deep golden, almost brown, is what you're after.",
+    "nutrition": {
+      "calories": 410,
+      "protein": 18,
+      "carbs": 58,
+      "fat": 12
+    },
+    "photo": null
+  },
+  {
+    "name": "Lamb Rogan Josh with Fragrant Basmati Rice",
+    "time": "55 min",
+    "minutes": 55,
+    "protein": "lamb",
+    "cuisine": "indian",
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "carb": "rice",
+    "serves": 4,
+    "description": "Tender chunks of slow-cooked lamb wrapped in a deeply aromatic Kashmiri sauce — brick-red with paprika, warm with cardamom and cloves, and rich with a base of caramelised onions and yoghurt. The sauce clings rather than floods, with each mouthful offering warmth and complexity. Spooned over fragrant basmati, this is curry at its most rewarding.",
+    "kidNote": "Rogan josh is warming rather than fiery — reduce the paprika to 1 tsp for sensitive palates and serve with extra yoghurt to cool.",
+    "ingredients": [
+      "800g lamb shoulder, cut into 4cm pieces",
+      "3 tbsp sunflower oil",
+      "2 large onions, thinly sliced",
+      "4 garlic cloves, minced",
+      "25g fresh ginger, grated",
+      "2 tsp Kashmiri chilli powder or mild paprika",
+      "2 tsp ground cumin",
+      "2 tsp ground coriander",
+      "1 tsp garam masala",
+      "4 cardamom pods, lightly crushed",
+      "4 cloves",
+      "1 cinnamon stick",
+      "150g natural yoghurt",
+      "1 x 400g tin chopped tomatoes",
+      "salt to taste",
+      "fresh coriander, to garnish",
+      "300g basmati rice, cooked to serve"
+    ],
+    "steps": [
+      "Heat 2 tbsp oil in a large, heavy casserole over high heat. Brown the lamb in batches for 3–4 min until deeply coloured on all sides. Remove and set aside.",
+      "Reduce heat to medium, add the remaining oil and the whole spices, and fry for 1 min. Add the onions and cook for 12–15 min, stirring often, until rich golden brown.",
+      "Stir in the garlic and ginger and cook for 2 min, then add the ground spices and cook for 1 min. Add a splash of water if the mixture catches.",
+      "Return the lamb to the pot. Add the yoghurt one large spoonful at a time, stirring between each addition to prevent it splitting. Then pour in the chopped tomatoes.",
+      "Season with salt, bring to a gentle simmer, then cover and cook over low heat for 35–40 min until the lamb is tender and the sauce has thickened.",
+      "Taste, adjust seasoning, and scatter with fresh coriander. Serve over fluffy basmati rice."
+    ],
+    "tip": "Add the yoghurt gradually and never let the sauce boil rapidly after adding it — a gentle simmer prevents the yoghurt from splitting and keeps the sauce glossy.",
+    "nutrition": {
+      "calories": 580,
+      "protein": 42,
+      "carbs": 44,
+      "fat": 24
+    },
+    "photo": null
+  },
+  {
+    "name": "Saag Aloo with Crispy Spiced Potatoes & Spinach",
+    "time": "35 min",
+    "minutes": 35,
+    "protein": "veggie",
+    "cuisine": "indian",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "potato",
+    "serves": 4,
+    "description": "Crispy-edged potatoes folded through wilted, spice-scented spinach — this classic Punjabi dish is earthy, vibrant, and deeply comforting all at once. Mustard seeds pop in hot oil, turmeric turns the potatoes gold, and fresh green chilli adds a clean, bright heat. Equally at home as a vegetarian main alongside naan or as a generous side.",
+    "kidNote": "Omit the fresh chilli and use just a pinch of mild curry powder instead of the separate spices for a child-friendly version.",
+    "ingredients": [
+      "700g Maris Piper potatoes, peeled and cut into 3cm cubes",
+      "3 tbsp sunflower oil",
+      "1 tsp mustard seeds",
+      "1 tsp cumin seeds",
+      "1 large onion, finely sliced",
+      "4 garlic cloves, minced",
+      "1 green chilli, finely sliced",
+      "1 tsp ground turmeric",
+      "1 tsp ground coriander",
+      "1 tsp garam masala",
+      "300g baby spinach",
+      "juice of ½ lemon",
+      "salt to taste",
+      "naan or rice, to serve"
+    ],
+    "steps": [
+      "Parboil the potato cubes in salted boiling water for 8 min until just tender at the edges but still holding their shape. Drain and steam-dry for a couple of minutes.",
+      "Heat 2 tbsp oil in a large frying pan or wok over high heat. Add the potatoes in a single layer and fry, turning occasionally, for 6–8 min until golden and crisp on the outside. Remove and set aside.",
+      "Add the remaining oil to the pan over medium heat. Add the mustard seeds and cumin seeds — once they start to pop, add the onion and cook for 6 min until softened.",
+      "Stir in the garlic, chilli, turmeric, ground coriander, and garam masala. Cook for 2 min, adding a splash of water if needed.",
+      "Add the spinach in large handfuls, turning with tongs until fully wilted, about 3 min. Return the potatoes to the pan and fold gently to combine.",
+      "Squeeze over the lemon juice, season with salt, and serve with warm naan or rice."
+    ],
+    "tip": "Drain the parboiled potatoes thoroughly and let them steam-dry before frying — any residual moisture will cause them to steam rather than crisp in the pan.",
+    "nutrition": {
+      "calories": 330,
+      "protein": 9,
+      "carbs": 48,
+      "fat": 12
+    },
+    "photo": null
+  },
+  {
+    "name": "Keema Matar with Spiced Mince & Peas on Rice",
+    "time": "30 min",
+    "minutes": 30,
+    "protein": "beef",
+    "cuisine": "indian",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "rice",
+    "serves": 4,
+    "description": "Warmly spiced minced beef cooked down with sweet peas into a fragrant, savoury mince that practically demands to be eaten straight from the pan. Quick to make and deeply satisfying, keema matar is the kind of weeknight curry that earns lifelong loyalty — earthy with cumin, bright with tomato, and finished with a flutter of fresh coriander.",
+    "kidNote": "This is naturally mild and very child-friendly — reduce or omit the chilli and the children will often eat it without question.",
+    "ingredients": [
+      "500g beef mince",
+      "2 tbsp sunflower oil",
+      "1 large onion, finely chopped",
+      "4 garlic cloves, minced",
+      "20g fresh ginger, grated",
+      "1 tsp cumin seeds",
+      "2 tsp ground cumin",
+      "2 tsp ground coriander",
+      "1 tsp garam masala",
+      "½ tsp turmeric",
+      "½ tsp chilli powder",
+      "2 tbsp tomato purée",
+      "1 x 400g tin chopped tomatoes",
+      "200g frozen peas",
+      "juice of ½ lemon",
+      "salt to taste",
+      "fresh coriander, to garnish",
+      "300g basmati rice, cooked to serve"
+    ],
+    "steps": [
+      "Heat the oil in a large frying pan over medium-high heat. Add the cumin seeds and sizzle for 30 seconds, then add the onion and cook for 7 min until golden.",
+      "Add the garlic and ginger and cook for 2 min, then stir in the ground spices. Cook for 1 min until the mixture smells fragrant.",
+      "Add the beef mince and break it up well with a spoon. Cook over high heat for 5–6 min until browned all over, draining off any excess fat.",
+      "Stir in the tomato purée and chopped tomatoes. Simmer on medium heat for 10–12 min, stirring occasionally, until the sauce has reduced and the oil starts to separate at the edges.",
+      "Stir in the peas and cook for 3 min until tender. Squeeze over the lemon juice and season with salt.",
+      "Scatter with fresh coriander and serve with fluffy basmati rice."
+    ],
+    "tip": "Cooking the sauce until the oil separates — a technique called 'bhunao' — concentrates the spices and drives off the raw tomato taste. Don't shortcut this step.",
+    "nutrition": {
+      "calories": 490,
+      "protein": 35,
+      "carbs": 50,
+      "fat": 16
+    },
+    "photo": null
+  },
+  {
+    "name": "Red Lentil Dhal with Coconut Milk & Crispy Shallot Tarka",
+    "time": "35 min",
+    "minutes": 35,
+    "protein": "veggie",
+    "cuisine": "indian",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "rice",
+    "serves": 4,
+    "description": "Coral red lentils simmered until silky and yielding in a fragrant coconut and tomato broth, spiced with cumin, turmeric, and mustard seeds. The finishing touch — a sizzling tarka of golden shallots, garlic, and dried chilli poured over the top — transforms a good dhal into an extraordinary one. Simple, nourishing, and endlessly comforting.",
+    "kidNote": "Dhal is naturally mild, creamy, and filling — one of the best vegetarian dishes for children. Use just a pinch of chilli and serve with warm naan or rice.",
+    "ingredients": [
+      "300g red lentils, rinsed",
+      "1 x 400ml tin coconut milk",
+      "1 x 400g tin chopped tomatoes",
+      "700ml vegetable stock",
+      "1 large onion, finely diced",
+      "4 garlic cloves, minced",
+      "20g fresh ginger, grated",
+      "1 tsp ground turmeric",
+      "1 tsp ground coriander",
+      "1 tsp garam masala",
+      "salt to taste",
+      "2 tbsp sunflower oil",
+      "2 large shallots, thinly sliced",
+      "3 garlic cloves, thinly sliced",
+      "1 tsp mustard seeds",
+      "1 tsp cumin seeds",
+      "2 dried red chillies",
+      "300g basmati rice, to serve"
+    ],
+    "steps": [
+      "Place the lentils, coconut milk, chopped tomatoes, stock, onion, garlic, ginger, turmeric, and ground coriander in a large saucepan. Bring to a boil, then reduce heat and simmer uncovered for 25–30 min, stirring occasionally, until the lentils have completely dissolved into a thick, creamy dhal.",
+      "Stir in the garam masala and season generously with salt. If the dhal is very thick, loosen with a splash of water. Keep warm over very low heat.",
+      "Cook the rice according to packet instructions.",
+      "For the tarka, heat the oil in a small frying pan over medium-high heat. Fry the shallots for 5–6 min, stirring, until crisp and deep golden. Add the garlic slices, mustard seeds, cumin seeds, and dried chillies.",
+      "Cook for 1–2 min until the seeds pop and the garlic turns golden — watch carefully as this goes from perfect to burnt quickly.",
+      "Ladle the dhal into bowls over rice. Pour the sizzling tarka over the top and serve immediately."
+    ],
+    "tip": "The tarka must be made immediately before serving and poured on while still sizzling — that crackling sound when hot oil hits the dhal carries the bloom of spice that defines the dish.",
+    "nutrition": {
+      "calories": 490,
+      "protein": 22,
+      "carbs": 72,
+      "fat": 14
+    },
+    "photo": null
+  },
+  {
+    "name": "Crispy Chicken Katsu with Golden Curry Sauce & Rice",
+    "time": "40 min",
+    "minutes": 40,
+    "protein": "chicken",
+    "cuisine": "asian",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "rice",
+    "serves": 4,
+    "description": "Panko-crusted chicken breasts fried to a shattering golden crust, served alongside a gently sweet, mildly spiced Japanese curry sauce that is nothing like its Indian cousin — smooth, glossy, and deeply savoury. The combination of crunch and silky sauce over sticky short-grain rice is one of those pairings that feels almost impossibly right.",
+    "kidNote": "The curry sauce is mild and slightly sweet — most children love it. Slice the chicken into strips for smaller eaters.",
+    "ingredients": [
+      "4 chicken breasts",
+      "50g plain flour, seasoned with salt and pepper",
+      "2 eggs, beaten",
+      "100g panko breadcrumbs",
+      "sunflower oil, for shallow frying",
+      "300g Japanese short-grain rice, cooked to serve",
+      "1 tbsp sunflower oil",
+      "1 large onion, diced",
+      "2 garlic cloves, minced",
+      "15g fresh ginger, grated",
+      "2 tbsp medium curry powder",
+      "½ tsp turmeric",
+      "1 tbsp plain flour",
+      "500ml chicken stock",
+      "1 tbsp soy sauce",
+      "1 tsp honey",
+      "1 large carrot, grated"
+    ],
+    "steps": [
+      "Make the curry sauce: heat the oil in a saucepan over medium heat and cook the onion for 8 min until softened. Add garlic, ginger, curry powder, and turmeric and cook for 2 min. Stir in the flour, then gradually whisk in the stock, soy sauce, honey, and carrot. Simmer for 10–12 min until thickened, then blend until smooth.",
+      "Place each chicken breast between two sheets of clingfilm and bash gently with a rolling pin to an even 1.5cm thickness. Season well.",
+      "Set up a breading station: seasoned flour, beaten egg, and panko in three separate shallow bowls. Coat each breast in flour, dip in egg, then press firmly into the panko to adhere on all sides.",
+      "Pour sunflower oil to a depth of 1cm in a wide frying pan and heat to 170°C. Fry the chicken breasts for 5–6 min per side until deep golden and cooked through. Drain on kitchen paper.",
+      "While the chicken rests for 2 min, reheat the curry sauce gently, adding a splash of water if it has thickened too much.",
+      "Slice the chicken thickly and serve over rice with the curry sauce poured alongside."
+    ],
+    "tip": "Test the oil temperature with a pinch of panko before adding the chicken — it should sizzle immediately and turn golden in about 20 seconds. Too cool and the breadcrumbs will absorb oil and turn soggy.",
+    "nutrition": {
+      "calories": 590,
+      "protein": 46,
+      "carbs": 62,
+      "fat": 16
+    },
+    "photo": null
+  },
+  {
+    "name": "Crispy Pork & Cabbage Gyoza with Dipping Sauce",
+    "time": "45 min",
+    "minutes": 45,
+    "protein": "pork",
+    "cuisine": "asian",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "none",
+    "serves": 4,
+    "description": "Hand-folded gyoza with juicy, ginger-spiked pork and cabbage filling, pan-fried until the bottoms are lacquered and crisp, then steam-cooked to finish — the classic Japanese technique that gives you two textures in one bite. The sharp soy and rice vinegar dipping sauce cuts beautifully through the richness. An evening of making these feels like a special occasion.",
+    "kidNote": "Gyoza are a real hit with children — they enjoy the hands-on folding. The filling is mild and the crispy base is very appealing. Offer the dipping sauce on the side.",
+    "ingredients": [
+      "300g pork mince",
+      "200g Chinese or savoy cabbage, finely shredded",
+      "3 spring onions, finely chopped",
+      "3 garlic cloves, minced",
+      "20g fresh ginger, grated",
+      "2 tbsp soy sauce",
+      "1 tbsp sesame oil",
+      "1 tsp sugar",
+      "30 round gyoza wrappers",
+      "2 tbsp sunflower oil",
+      "3 tbsp soy sauce",
+      "2 tbsp rice vinegar",
+      "1 tsp sesame oil",
+      "½ tsp chilli flakes"
+    ],
+    "steps": [
+      "Sprinkle a pinch of salt over the shredded cabbage, leave for 5 min, then squeeze out as much liquid as possible — this is essential to prevent soggy gyoza.",
+      "Combine the pork, cabbage, spring onions, garlic, ginger, soy sauce, sesame oil, and sugar in a bowl. Mix vigorously with a fork until the filling becomes slightly sticky.",
+      "Place a heaped teaspoon of filling in the centre of each wrapper. Dampen the edges with a wet fingertip, fold in half, and crimp into pleats to seal tightly.",
+      "Heat 1 tbsp oil in a wide, lidded frying pan over medium-high heat. Arrange half the gyoza flat-side down in a single layer and fry for 2–3 min until the bottoms are golden.",
+      "Pour in 80ml water, quickly cover with the lid, and steam for 4 min. Uncover and cook for 1 more min until the water has evaporated and the bases are crisp again. Repeat with the remaining gyoza.",
+      "Mix together the dipping sauce ingredients and serve alongside the gyoza, crispy-side up."
+    ],
+    "tip": "The key to gyoza that don't burst is sealing them completely — press firmly along the pleats and make sure no filling is touching the edges before crimping.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 22,
+      "carbs": 38,
+      "fat": 16
+    },
+    "photo": null
+  },
+  {
+    "name": "Beef Bulgogi Bowl with Sesame Rice & Pickled Cucumber",
+    "time": "30 min",
+    "minutes": 30,
+    "protein": "beef",
+    "cuisine": "asian",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "rice",
+    "serves": 4,
+    "description": "Thinly sliced beef marinated in a sweet-salty soy and pear dressing, seared at high heat until sticky and caramelised at the edges. The contrast with cool pickled cucumber and nutty sesame rice makes every bite satisfying in a way that balances richness with brightness. Korean bulgogi is weeknight cooking at its most compelling.",
+    "kidNote": "The marinade is sweet and mild — most children enjoy bulgogi. Serve with plain rice and leave the pickled cucumber on the side.",
+    "ingredients": [
+      "600g beef sirloin or rump, very thinly sliced",
+      "1 ripe conference or Asian pear, grated",
+      "4 tbsp soy sauce",
+      "2 tbsp caster sugar",
+      "1 tbsp sesame oil",
+      "3 garlic cloves, minced",
+      "15g fresh ginger, grated",
+      "1 tbsp sunflower oil",
+      "4 spring onions, sliced",
+      "1 tbsp sesame seeds, toasted",
+      "300g short-grain rice, cooked to serve",
+      "½ cucumber, thinly sliced",
+      "1 tbsp rice vinegar",
+      "1 tsp sugar",
+      "½ tsp salt"
+    ],
+    "steps": [
+      "Toss the cucumber slices with the rice vinegar, sugar, and salt. Leave to quick-pickle for at least 20 min while you prepare the rest of the dish.",
+      "Combine the pear, soy sauce, sugar, sesame oil, garlic, and ginger in a bowl. Add the beef and toss to coat. Marinate for at least 15 min.",
+      "Heat the sunflower oil in a wide frying pan or wok over the highest heat until smoking. Remove the beef from the marinade with tongs, shaking off excess.",
+      "Cook the beef in two batches for 2–3 min per batch, spreading it in a single layer and only stirring once so the edges caramelise properly. Don't crowd the pan.",
+      "Pour any remaining marinade into the pan and let it bubble and reduce for 1 min, coating the beef in a sticky glaze.",
+      "Serve the bulgogi over rice, topped with spring onions, sesame seeds, and the pickled cucumber alongside."
+    ],
+    "tip": "Freeze the beef for 30 minutes before slicing — it firms up enough to cut paper-thin, which is the secret to bulgogi that cooks quickly and caramelises beautifully.",
+    "nutrition": {
+      "calories": 510,
+      "protein": 38,
+      "carbs": 50,
+      "fat": 16
+    },
+    "photo": null
+  },
+  {
+    "name": "Korean Bibimbap with Beef, Vegetables & Fried Egg",
+    "time": "40 min",
+    "minutes": 40,
+    "protein": "beef",
+    "cuisine": "asian",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "rice",
+    "serves": 4,
+    "description": "A vibrant mosaic of seasoned beef, rainbow vegetables, and a runny fried egg arranged over a bowl of short-grain rice, all tied together by a bold, spicy-sweet gochujang sauce. Bibimbap is the great leveller of Korean home cooking — endlessly customisable, deeply nourishing, and visually spectacular for something assembled from a weeknight fridge.",
+    "kidNote": "Offer the gochujang sauce on the side and use a milder version — bibimbap without the sauce is still flavourful and satisfying for children.",
+    "ingredients": [
+      "300g beef mince",
+      "2 tbsp soy sauce",
+      "1 tsp sesame oil",
+      "1 garlic clove, minced",
+      "1 tsp sugar",
+      "2 carrots, julienned",
+      "150g baby spinach",
+      "150g shiitake mushrooms, sliced",
+      "4 eggs",
+      "1 tbsp sunflower oil",
+      "300g short-grain rice, cooked to serve",
+      "2 tbsp sesame seeds, toasted",
+      "3 tbsp gochujang paste",
+      "1 tbsp sesame oil",
+      "1 tbsp rice vinegar",
+      "1 tbsp honey",
+      "1 garlic clove, minced"
+    ],
+    "steps": [
+      "Mix together the gochujang, sesame oil, rice vinegar, honey, and garlic to make the sauce. Set aside. Cook the rice according to packet instructions and keep warm.",
+      "Season the beef mince with 1 tbsp soy sauce, 1 tsp sesame oil, garlic, and sugar. Fry in a dry pan over high heat for 4–5 min until browned and slightly sticky. Set aside.",
+      "In the same pan, briefly stir-fry the carrots with a pinch of salt for 2 min until just tender. Wilt the spinach in the pan with a splash of water for 1 min. Fry the mushrooms with 1 tsp oil and remaining soy sauce for 3 min until golden. Keep each component separate.",
+      "Fry the eggs in the sunflower oil over medium-high heat until the whites are just set but the yolks are still runny.",
+      "Divide the rice between four wide bowls. Arrange the beef, carrots, spinach, and mushrooms in separate sections on top.",
+      "Top each bowl with a fried egg and drizzle with gochujang sauce. Scatter with sesame seeds and stir everything together at the table before eating."
+    ],
+    "tip": "For the authentic dolsot experience, heat a cast-iron pan until very hot, add a little sesame oil, then press the rice in and add the toppings. The rice forms a glorious crispy crust on the bottom as you eat.",
+    "nutrition": {
+      "calories": 540,
+      "protein": 34,
+      "carbs": 58,
+      "fat": 18
+    },
+    "photo": null
+  },
+  {
+    "name": "Spicy Gochujang Chicken Thighs with Spring Onion Rice",
+    "time": "35 min",
+    "minutes": 35,
+    "protein": "chicken",
+    "cuisine": "asian",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "rice",
+    "serves": 4,
+    "description": "Chicken thighs lacquered in a bold gochujang and honey glaze — fiery, fermented, and sweet in equal measure — roasted until the skin blisters and the edges char. The sticky, deeply savoury sauce clings to every surface, filling the kitchen with the kind of smoky, complex aroma that makes everyone appear asking what's for dinner.",
+    "kidNote": "Gochujang is spicy — use just 1 tsp for children and increase the honey to balance. The sticky glaze alone is still delicious.",
+    "ingredients": [
+      "8 bone-in, skin-on chicken thighs",
+      "3 tbsp gochujang paste",
+      "2 tbsp soy sauce",
+      "2 tbsp honey",
+      "1 tbsp sesame oil",
+      "3 garlic cloves, minced",
+      "15g fresh ginger, grated",
+      "1 tbsp rice vinegar",
+      "300g short-grain rice",
+      "4 spring onions, finely sliced",
+      "1 tbsp sesame seeds, toasted",
+      "1 tsp sesame oil"
+    ],
+    "steps": [
+      "Preheat the oven to 220°C/200°C fan. Mix together the gochujang, soy sauce, honey, sesame oil, garlic, ginger, and rice vinegar in a bowl.",
+      "Score the chicken thighs twice through the skin and flesh with a sharp knife. Toss in the gochujang marinade until thoroughly coated.",
+      "Arrange the chicken skin-side up on a foil-lined roasting tin. Roast for 30–35 min until the skin is blistered, the edges are catching, and the juices run clear.",
+      "Meanwhile, cook the rice according to packet instructions. While still hot, stir through the spring onions, sesame seeds, and sesame oil.",
+      "Remove the chicken from the oven and rest for 5 min. Spoon any sticky pan juices over the thighs.",
+      "Serve the chicken over the spring onion rice, garnished with extra spring onion and sesame seeds."
+    ],
+    "tip": "The high oven temperature is essential — it blisters the skin and caramelises the gochujang glaze rather than just warming it. Don't be tempted to reduce the heat.",
+    "nutrition": {
+      "calories": 520,
+      "protein": 38,
+      "carbs": 52,
+      "fat": 18
+    },
+    "photo": null
+  },
+  {
+    "name": "Japanese Pork Miso Ramen with Soft-Boiled Egg",
+    "time": "40 min",
+    "minutes": 40,
+    "protein": "pork",
+    "cuisine": "asian",
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "carb": "noodles",
+    "serves": 4,
+    "description": "A warming, deeply savoury miso broth — built on pork mince, ginger, and sesame — ladled over springy ramen noodles and crowned with a jammy soft-boiled egg, sliced spring onion, and a curl of nori. This is Japanese home comfort cooking: not fussy, but full of the kind of layered, umami-rich flavour that takes broth-based soups to another level entirely.",
+    "kidNote": "Miso broth is salty and savoury but mild — children enjoy ramen. Omit the chilli oil and add sweetcorn for a child-friendly bowl.",
+    "ingredients": [
+      "4 eggs",
+      "300g ramen or egg noodles",
+      "200g pork mince",
+      "4 garlic cloves, minced",
+      "25g fresh ginger, grated",
+      "3 tbsp white miso paste",
+      "2 tbsp soy sauce",
+      "1 tbsp tahini or sesame paste",
+      "1 tsp chilli bean paste (optional)",
+      "1.2 litres chicken stock",
+      "200ml whole milk",
+      "1 tbsp sesame oil",
+      "4 spring onions, sliced",
+      "4 sheets nori, halved",
+      "chilli oil, to serve (optional)"
+    ],
+    "steps": [
+      "Lower the eggs into boiling water and cook for exactly 7 min for a jammy centre. Transfer to iced water, peel, and set aside. Cook the noodles according to packet instructions, drain, and rinse with cold water.",
+      "Heat the sesame oil in a large saucepan over high heat. Add the pork mince and break up well, cooking for 4–5 min until browned. Add the garlic and ginger and cook for 2 min.",
+      "Add the chilli bean paste if using and stir for 1 min. Spoon in the miso paste, soy sauce, and tahini, stirring to coat the pork.",
+      "Pour in the stock and milk, bring to a gentle simmer, and cook for 10 min. Taste and adjust seasoning with extra miso or soy — the broth should be boldly savoury.",
+      "Divide the noodles between four deep bowls. Ladle over the hot broth and pork.",
+      "Halve the soft-boiled eggs and arrange on top alongside spring onions, nori, and a drizzle of chilli oil if you like."
+    ],
+    "tip": "Never boil the broth hard after adding the miso — the heat destroys the live cultures and flattens the flavour. A gentle simmer is all you need.",
+    "nutrition": {
+      "calories": 560,
+      "protein": 34,
+      "carbs": 54,
+      "fat": 22
+    },
+    "photo": null
+  },
+  {
+    "name": "Japchae — Korean Glass Noodles with Beef & Vegetables",
+    "time": "40 min",
+    "minutes": 40,
+    "protein": "beef",
+    "cuisine": "asian",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "noodles",
+    "serves": 4,
+    "description": "Silky Korean sweet potato glass noodles tossed with strips of sesame-marinated beef, rainbow vegetables, and a glossy, savoury-sweet soy and sesame dressing. Japchae is simultaneously light and filling, chewy and tender, rich and bright — a Korean celebration dish that translates beautifully to a weeknight bowl.",
+    "kidNote": "Japchae is naturally mild and the glass noodles are fun to eat. Reduce the soy sauce slightly for younger palates and omit the chilli if needed.",
+    "ingredients": [
+      "200g Korean sweet potato glass noodles (dangmyeon)",
+      "300g beef sirloin, very thinly sliced",
+      "4 tbsp soy sauce",
+      "2 tbsp sesame oil",
+      "1 tbsp sugar",
+      "2 garlic cloves, minced",
+      "2 large carrots, julienned",
+      "1 red pepper, thinly sliced",
+      "150g baby spinach",
+      "200g shiitake mushrooms, sliced",
+      "4 spring onions, cut into 3cm pieces",
+      "3 tbsp sunflower oil",
+      "1 tbsp sesame seeds, toasted"
+    ],
+    "steps": [
+      "Cook the glass noodles in boiling water for 6–8 min until tender. Drain, rinse with cold water, and cut roughly with scissors. Toss with 1 tsp sesame oil to prevent sticking.",
+      "Marinate the beef with 2 tbsp soy sauce, 1 tsp sesame oil, 1 tsp sugar, and garlic for 15 min. Mix the remaining soy sauce, sesame oil, and sugar together for the dressing.",
+      "Cook the beef in 1 tbsp sunflower oil over high heat for 2–3 min until browned. Remove. In the same wok, stir-fry the carrots, mushrooms, and red pepper separately with a pinch of salt, each for 2–3 min until just tender. Wilt the spinach briefly.",
+      "Add the remaining sunflower oil and the spring onions to the wok. Add the noodles, beef, and all the vegetables. Pour over the dressing and toss everything together vigorously over high heat for 2 min.",
+      "Taste and adjust with more soy or sesame oil as needed.",
+      "Plate up and scatter with sesame seeds. Serve warm or at room temperature."
+    ],
+    "tip": "Cooking each vegetable component separately before combining ensures each retains its colour and texture — combined from the start, they steam each other into a uniform mush.",
+    "nutrition": {
+      "calories": 510,
+      "protein": 28,
+      "carbs": 58,
+      "fat": 18
+    },
+    "photo": null
+  },
+  {
+    "name": "Coq au Vin with Mushrooms, Lardons & Crusty Bread",
+    "time": "55 min",
+    "minutes": 55,
+    "protein": "chicken",
+    "cuisine": "french",
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "carb": "bread",
+    "serves": 4,
+    "description": "Chicken thighs braised slowly in a deep Burgundy red wine sauce with lardons, pearl onions, and earthy mushrooms until the meat is close to falling from the bone. The sauce reduces to something almost velvety — dark, complex, and deeply savoury — in a way that rewards every moment of patience. This is French home cooking at its most comforting.",
+    "kidNote": "The alcohol cooks off fully during the long braise. Serve children with extra bread to soak up the sauce, which is rich and mild rather than sharp.",
+    "ingredients": [
+      "8 bone-in, skin-on chicken thighs",
+      "200g smoked lardons",
+      "250g chestnut mushrooms, halved",
+      "200g baby shallots, peeled",
+      "4 garlic cloves, minced",
+      "1 tbsp tomato purée",
+      "500ml red wine",
+      "300ml chicken stock",
+      "2 sprigs fresh thyme",
+      "2 bay leaves",
+      "1 tbsp olive oil",
+      "2 tbsp plain flour",
+      "2 tbsp butter",
+      "salt and black pepper",
+      "fresh parsley, to garnish",
+      "crusty bread, to serve"
+    ],
+    "steps": [
+      "Season the chicken thighs all over with salt and pepper. Heat the oil in a large casserole over high heat and brown the chicken skin-side down for 5 min until deeply golden. Turn and cook for 2 more min. Remove and set aside.",
+      "Add the lardons to the casserole and fry over medium heat for 4 min until crisp. Add the shallots and cook for 5 min until golden. Add the garlic and tomato purée and cook for 1 min.",
+      "Sprinkle the flour over the pan and stir to coat everything. Pour in the wine and stock, stirring well to dissolve any browned bits. Add the thyme and bay leaves.",
+      "Return the chicken to the casserole, skin-side up. Bring to a simmer, then cover and cook over low heat for 30 min.",
+      "Fry the mushrooms in butter in a separate pan over high heat for 4 min until golden. Add to the casserole for the final 10 min of cooking uncovered, allowing the sauce to reduce slightly.",
+      "Discard the bay leaves and thyme. Scatter with fresh parsley and serve with crusty bread to soak up every drop."
+    ],
+    "tip": "Browning the chicken skin thoroughly — until properly deep golden — creates the flavour foundation for the entire dish. Resist the urge to move it during those first 5 minutes.",
+    "nutrition": {
+      "calories": 560,
+      "protein": 42,
+      "carbs": 22,
+      "fat": 28
+    },
+    "photo": null
+  },
+  {
+    "name": "Classic Beef Bourguignon with Buttered Egg Noodles",
+    "time": "1 hr 30 min",
+    "minutes": 90,
+    "protein": "beef",
+    "cuisine": "french",
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "carb": "noodles",
+    "serves": 4,
+    "description": "Chunks of beef shin braised until collapsing-tender in a Burgundy red wine sauce with lardons, button mushrooms, and pearl onions — a stew so rich and deeply flavoured that it barely needs accompaniment beyond buttered egg noodles and a good loaf. Julia Child made this dish famous for good reason; once you smell it in the oven, the wait becomes part of the ritual.",
+    "kidNote": "The alcohol fully cooks off over the long braise and the resulting sauce is rich and mild. Serve children with extra noodles if they skip the mushrooms.",
+    "ingredients": [
+      "900g beef shin or braising steak, cut into 5cm chunks",
+      "200g smoked lardons",
+      "250g button mushrooms, halved",
+      "200g pearl onions, peeled",
+      "4 garlic cloves, minced",
+      "2 carrots, roughly chopped",
+      "500ml Burgundy or Pinot Noir",
+      "300ml beef stock",
+      "2 tbsp tomato purée",
+      "2 tbsp plain flour",
+      "2 sprigs thyme",
+      "2 bay leaves",
+      "2 tbsp sunflower oil",
+      "2 tbsp butter",
+      "salt and black pepper",
+      "400g egg noodles, cooked with butter to serve",
+      "fresh parsley, to garnish"
+    ],
+    "steps": [
+      "Preheat the oven to 160°C/140°C fan. Pat the beef dry and season very generously with salt and pepper.",
+      "Heat the oil in a large, heavy casserole over high heat. Brown the beef in two batches for 4–5 min per batch until deeply seared on all sides. Remove and set aside.",
+      "Fry the lardons in the same casserole until crisp. Add the pearl onions, carrots, and garlic and cook for 4 min. Stir in the flour and tomato purée and cook for 1 min.",
+      "Pour in the wine and stock, scraping up all the caramelised bits from the bottom. Return the beef to the casserole with the thyme and bay leaves. Bring to a simmer, then cover tightly and transfer to the oven.",
+      "Braise for 1 hr 15 min until the beef is very tender and the sauce has reduced and thickened. Fry the mushrooms in butter over high heat for 4 min until golden, then stir into the casserole for the final 10 min uncovered.",
+      "Discard the thyme and bay leaves, scatter with parsley, and serve over buttered egg noodles."
+    ],
+    "tip": "Make this a day ahead — like most braises, beef bourguignon is significantly better the next day as the flavours meld and deepen. Reheat gently on the hob, adding a splash of stock if needed.",
+    "nutrition": {
+      "calories": 640,
+      "protein": 48,
+      "carbs": 52,
+      "fat": 24
+    },
+    "photo": null
+  },
+  {
+    "name": "Silky French Onion Soup with Gruyère Croûtons",
+    "time": "55 min",
+    "minutes": 55,
+    "protein": "veggie",
+    "cuisine": "french",
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "carb": "bread",
+    "serves": 4,
+    "description": "Onions cooked low and slow until they collapse into a jam-like sweetness, lifted by a splash of brandy and rich stock, then crowned with thick slices of toasted sourdough melting under a shield of molten Gruyère. The soup beneath is dark amber, deeply savoury, and impossibly fragrant — a bowl that makes the 50-minute wait feel like nothing at all.",
+    "kidNote": "French onion soup's sweetness often appeals to children — use vegetable stock for a milder flavour and offer buttered bread on the side instead of the cheesy croûtons if they prefer.",
+    "ingredients": [
+      "1.2kg brown onions, thinly sliced into half-moons",
+      "4 tbsp butter",
+      "1 tbsp sunflower oil",
+      "1 tsp sugar",
+      "4 garlic cloves, minced",
+      "3 tbsp brandy or dry sherry",
+      "1.2 litres good beef or vegetable stock",
+      "2 sprigs fresh thyme",
+      "1 bay leaf",
+      "salt and black pepper",
+      "4 thick slices sourdough",
+      "120g Gruyère, grated"
+    ],
+    "steps": [
+      "Melt the butter with the oil in a large, wide saucepan over medium heat. Add the onions and sugar, season with salt, and stir to coat. Cover and cook for 10 min to soften.",
+      "Uncover and continue cooking over medium-low heat for 30–35 min, stirring every 5 min, until the onions are a deep, rich amber — they should look caramelised, not just soft.",
+      "Add the garlic and cook for 2 min. Pour in the brandy and let it bubble and reduce for 1 min.",
+      "Add the stock, thyme, and bay leaf. Simmer uncovered for 15 min. Taste and adjust seasoning.",
+      "Preheat the grill to high. Ladle the soup into four ovenproof bowls. Top each with a slice of sourdough, then pile on the Gruyère.",
+      "Slide under the hot grill for 3–4 min until the cheese is molten and bubbling. Serve immediately — the bowls will be very hot."
+    ],
+    "tip": "The colour of your caramelised onions dictates the final flavour — pale gold gives a sweet, mild soup; deep amber gives depth and complexity. Aim for deep amber, even if it takes longer than expected.",
+    "nutrition": {
+      "calories": 480,
+      "protein": 18,
+      "carbs": 52,
+      "fat": 22
+    },
+    "photo": null
+  },
+  {
+    "name": "Ratatouille Provençale with Herbed Goat's Cheese & Bread",
+    "time": "50 min",
+    "minutes": 50,
+    "protein": "veggie",
+    "cuisine": "french",
+    "seasons": [
+      "summer",
+      "autumn"
+    ],
+    "carb": "bread",
+    "serves": 4,
+    "description": "A vibrant Provençal vegetable stew of courgette, aubergine, peppers, and ripe tomatoes simmered slowly with olive oil, garlic, and herbes de Provence until each vegetable retains its character but melds into a unified whole. Scattered with creamy herbed goat's cheese and served with plenty of crusty bread, this sun-drenched dish is summer in a pan.",
+    "kidNote": "Ratatouille is naturally mild and colourful — serve with pasta or rice instead of bread if preferred, and grated cheddar instead of goat's cheese for younger eaters.",
+    "ingredients": [
+      "1 large aubergine, cut into 2cm cubes",
+      "2 courgettes, sliced into 1cm rounds",
+      "1 red pepper, cut into 2cm pieces",
+      "1 yellow pepper, cut into 2cm pieces",
+      "1 large onion, sliced",
+      "4 garlic cloves, minced",
+      "1 x 400g tin chopped tomatoes",
+      "4 tbsp extra virgin olive oil",
+      "1 tsp herbes de Provence",
+      "1 tsp sugar",
+      "salt and black pepper",
+      "150g soft herbed goat's cheese",
+      "fresh basil, to garnish",
+      "crusty bread, to serve"
+    ],
+    "steps": [
+      "Heat 2 tbsp oil in a large, wide saucepan or casserole over high heat. Add the aubergine and cook for 6–8 min, stirring occasionally, until golden and softened. Remove to a bowl.",
+      "Add another tbsp oil and cook the courgettes for 4 min until just golden. Add to the aubergine bowl.",
+      "Cook the onion and peppers in the remaining oil over medium heat for 8 min until softened. Add the garlic and herbes de Provence and cook for 2 min.",
+      "Tip in the chopped tomatoes and sugar. Stir well and simmer for 10 min.",
+      "Return the aubergine and courgette to the pan. Stir gently, cover, and simmer over low heat for 15 min until everything is meltingly tender. Season well.",
+      "Serve warm with spoonfuls of goat's cheese, fresh basil, and plenty of crusty bread."
+    ],
+    "tip": "Cooking each vegetable separately before combining prevents them from steaming into a mush — each one gets a chance to colour properly and maintain its individual texture in the final dish.",
+    "nutrition": {
+      "calories": 370,
+      "protein": 14,
+      "carbs": 30,
+      "fat": 22
+    },
+    "photo": null
+  },
+  {
+    "name": "Whole Roast Chicken with Tarragon Butter & White Wine",
+    "time": "1 hr 20 min",
+    "minutes": 80,
+    "protein": "chicken",
+    "cuisine": "french",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "none",
+    "serves": 4,
+    "description": "A whole chicken roasted over a bed of shallots and white wine, the skin rubbed with tarragon butter that bastes the bird from within as it cooks, turning the skin lacquered and the breast astonishingly moist. The pan juices — wine, chicken fat, and tarragon — reduce into a light, aromatic sauce that you'll want to pour over everything. Sunday evenings were made for this.",
+    "kidNote": "Plain roast chicken is universally loved. Carve the breast for smaller eaters and offer the tarragon butter sauce on the side for cautious tasters.",
+    "ingredients": [
+      "1 whole chicken, about 1.6kg",
+      "60g softened butter",
+      "2 tbsp fresh tarragon leaves, chopped",
+      "zest of 1 lemon",
+      "2 garlic cloves, minced",
+      "salt and black pepper",
+      "4 shallots, halved",
+      "1 whole lemon, halved",
+      "200ml dry white wine",
+      "200ml chicken stock",
+      "roasted vegetables or salad, to serve"
+    ],
+    "steps": [
+      "Preheat the oven to 200°C/180°C fan. Mix together the butter, tarragon, lemon zest, garlic, salt, and pepper until well combined.",
+      "Carefully separate the skin from the chicken breast using your fingers, without tearing it. Push half the tarragon butter under the skin directly onto the breast meat. Rub the remaining butter all over the outside of the chicken and season well all over.",
+      "Stuff the lemon halves into the cavity. Tie the legs together with kitchen string.",
+      "Scatter the shallots in the base of a roasting tin. Place the chicken on top, breast-side up. Pour the wine and stock around the base.",
+      "Roast for 1 hr 10–20 min, basting with the pan juices every 30 min, until the juices run clear when the thigh is pierced and the skin is deeply golden.",
+      "Rest the chicken for 15 min. Pour the pan juices into a small saucepan, skim off excess fat, and reduce briefly over high heat before serving as a light sauce."
+    ],
+    "tip": "Pushing the tarragon butter directly under the skin — in contact with the breast meat — ensures the flavour penetrates and the meat stays moist even if the oven runs hot.",
+    "nutrition": {
+      "calories": 480,
+      "protein": 44,
+      "carbs": 4,
+      "fat": 28
+    },
+    "photo": null
+  },
+  {
+    "name": "Greek Moussaka with Spiced Lamb & Creamy Béchamel",
+    "time": "1 hr 20 min",
+    "minutes": 80,
+    "protein": "lamb",
+    "cuisine": "other",
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "carb": "none",
+    "serves": 4,
+    "description": "Layers of silky roasted aubergine, cinnamon-spiced lamb mince, and a thick, nutmeg-scented béchamel baked into a golden, set casserole that slices cleanly and steams with warmth. Moussaka is the great occasion dish of Greek home cooking — patient to make but extraordinary to eat, with a depth of flavour that rewards every careful layer.",
+    "kidNote": "The cinnamon in the lamb sauce is fragrant rather than spicy — children usually enjoy moussaka. Cut into generous squares and let the béchamel cool slightly before serving.",
+    "ingredients": [
+      "2 large aubergines, sliced into 1cm rounds",
+      "3 tbsp olive oil",
+      "600g lamb mince",
+      "1 large onion, finely chopped",
+      "3 garlic cloves, minced",
+      "1 tsp ground cinnamon",
+      "1 tsp ground allspice",
+      "1 tbsp tomato purée",
+      "1 x 400g tin chopped tomatoes",
+      "100ml red wine",
+      "salt and black pepper",
+      "60g butter",
+      "60g plain flour",
+      "600ml whole milk",
+      "½ tsp freshly grated nutmeg",
+      "2 egg yolks",
+      "40g Parmesan or kefalotyri, grated"
+    ],
+    "steps": [
+      "Preheat the oven to 200°C/180°C fan. Brush the aubergine slices with olive oil, season, and roast on two lined trays for 25 min, flipping halfway, until golden and tender. Reduce oven to 180°C/160°C fan.",
+      "Cook the onion in 1 tbsp oil over medium heat for 7 min until softened. Add the garlic, cinnamon, and allspice and cook for 2 min. Add the lamb mince, breaking it up, and brown for 6 min. Stir in the tomato purée, chopped tomatoes, and wine. Simmer for 15 min until thick.",
+      "Make the béchamel: melt the butter in a saucepan, whisk in the flour and cook for 1 min. Gradually whisk in the milk and cook, stirring, for 5–6 min until thick and smooth. Season with salt, nutmeg, and pepper. Cool slightly, then whisk in the egg yolks.",
+      "Layer half the aubergine slices in the base of a deep baking dish (about 25x20cm). Spoon over all the lamb sauce and spread level. Add the remaining aubergine.",
+      "Pour the béchamel over the top and spread to cover completely. Scatter with grated cheese.",
+      "Bake for 35–40 min until the top is golden and set. Rest for 10 min before slicing."
+    ],
+    "tip": "Letting the moussaka rest for at least 10 minutes — ideally 20 — before cutting allows the béchamel to firm up so you get clean, structured slices rather than a delicious but shapeless puddle.",
+    "nutrition": {
+      "calories": 620,
+      "protein": 38,
+      "carbs": 28,
+      "fat": 38
+    },
+    "photo": null
+  },
+  {
+    "name": "Spanakopita — Greek Spinach & Feta Filo Pie",
+    "time": "50 min",
+    "minutes": 50,
+    "protein": "veggie",
+    "cuisine": "other",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "none",
+    "serves": 4,
+    "description": "Crisp, shattering layers of buttered filo pastry encasing a filling of spinach, crumbled feta, spring onions, dill, and egg — fragrant and savoury, arriving with a satisfying crunch that yields to something creamy and herb-rich. Spanakopita is the Greek family table at its best: vegetarian, warming, and impossible to stop at one slice.",
+    "kidNote": "The buttery filo and mild filling make this a naturally child-friendly dish. Cut into smaller squares for younger eaters and serve with a simple tomato salad.",
+    "ingredients": [
+      "500g fresh spinach, or 300g frozen spinach, thawed and squeezed dry",
+      "200g feta, crumbled",
+      "3 eggs, beaten",
+      "4 spring onions, finely sliced",
+      "small bunch of fresh dill, chopped",
+      "small bunch of fresh parsley, chopped",
+      "½ tsp freshly grated nutmeg",
+      "black pepper",
+      "8 sheets filo pastry",
+      "80g butter, melted",
+      "1 tbsp sesame seeds (optional)"
+    ],
+    "steps": [
+      "Preheat the oven to 190°C/170°C fan. If using fresh spinach, wilt in a dry pan over high heat for 2 min, then squeeze out all liquid and roughly chop.",
+      "Mix together the spinach, feta, eggs, spring onions, dill, parsley, nutmeg, and a generous grinding of black pepper in a large bowl. Taste — it should be very well seasoned.",
+      "Brush a 25x20cm baking tin with melted butter. Lay one sheet of filo in the base, brush with butter, and repeat with three more sheets, letting the edges overhang the tin.",
+      "Spoon the spinach filling in evenly and press gently. Fold the overhanging filo back over the filling, then layer the remaining four sheets on top, brushing each with butter. Tuck the edges down the sides of the tin.",
+      "Score the top (not all the way through) into portions with a sharp knife. Brush with remaining butter and scatter with sesame seeds if using.",
+      "Bake for 35–40 min until the top is a deep, crackling golden brown. Cool for 10 min before slicing."
+    ],
+    "tip": "Squeezing every last drop of liquid from the spinach is critical — any residual moisture will turn the filling watery and steam the filo from the inside, destroying the crunch.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 18,
+      "carbs": 30,
+      "fat": 26
+    },
+    "photo": null
+  },
+  {
+    "name": "Slow-Baked Lamb Kleftiko with Lemon, Oregano & Potatoes",
+    "time": "1 hr 30 min",
+    "minutes": 90,
+    "protein": "lamb",
+    "cuisine": "other",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "potato",
+    "serves": 4,
+    "description": "Lamb shoulder marinated in lemon, garlic, and oregano, sealed in parchment parcels with waxy potatoes and black olives to steam-roast in their own aromatic juices. When you open the parcel at the table — steam billowing, the scent of herbs and lemon rising — the lamb inside is absurdly tender and the potatoes have absorbed everything. A Greek legend, and rightly so.",
+    "kidNote": "The lamb is so tender it falls apart easily — no knife required for younger children. Keep their portion simple with just potato and lamb, leaving the olives out.",
+    "ingredients": [
+      "1kg lamb shoulder, cut into large chunks",
+      "800g waxy potatoes such as Charlotte, halved",
+      "6 garlic cloves, roughly chopped",
+      "zest and juice of 2 lemons",
+      "4 tbsp extra virgin olive oil",
+      "2 tsp dried oregano",
+      "1 tsp ground cumin",
+      "1 tsp sweet paprika",
+      "100ml dry white wine",
+      "100g Kalamata olives",
+      "salt and black pepper",
+      "fresh parsley, to serve"
+    ],
+    "steps": [
+      "Preheat the oven to 180°C/160°C fan. Mix together the lemon zest, lemon juice, olive oil, garlic, oregano, cumin, and paprika in a large bowl. Season generously.",
+      "Add the lamb and potatoes to the marinade and toss to coat everything thoroughly.",
+      "Tear off two large sheets of baking parchment and lay them overlapping in a large roasting tin to form a cross. Tip the lamb and potatoes into the centre. Scatter over the olives and pour over the white wine.",
+      "Bring the parchment up around the filling and scrunch and fold the edges together tightly to form a sealed parcel — ensure there are no gaps for steam to escape.",
+      "Roast in the oven for 1 hr 20 min. The lamb should be completely tender and falling from the bone. Rest in the closed parcel for 10 min.",
+      "Carry the roasting tin to the table and open the parcel there — the steam and aroma are half the experience. Scatter with parsley and serve."
+    ],
+    "tip": "Sealing the parchment parcel completely is the secret to kleftiko — the steam trapped inside creates an intense pressure that makes the meat incredibly tender without a slow cooker or heavy casserole.",
+    "nutrition": {
+      "calories": 580,
+      "protein": 42,
+      "carbs": 36,
+      "fat": 28
+    },
+    "photo": null
+  },
+  {
+    "name": "Lemon Herb Chicken Souvlaki with Tzatziki & Pitta",
+    "time": "30 min",
+    "minutes": 30,
+    "protein": "chicken",
+    "cuisine": "other",
+    "seasons": [
+      "spring",
+      "summer"
+    ],
+    "carb": "bread",
+    "serves": 4,
+    "description": "Chunks of oregano-marinated chicken thigh threaded onto skewers and grilled until the edges char and the lemon-soaked flesh turns golden and juicy. Wrapped in warm pitta with cool tzatziki, tomato, and shredded lettuce, this is the kind of food you want to eat outside with your hands — bright, clean, and completely satisfying.",
+    "kidNote": "Souvlaki is a natural winner with children — mild, protein-rich, and fun to assemble. Pull the chicken off the skewers for smaller eaters and let them build their own pittas.",
+    "ingredients": [
+      "700g boneless chicken thighs, cut into 4cm chunks",
+      "4 tbsp extra virgin olive oil",
+      "juice of 1 lemon",
+      "3 garlic cloves, minced",
+      "2 tsp dried oregano",
+      "1 tsp smoked paprika",
+      "salt and black pepper",
+      "4 pitta breads, warmed",
+      "shredded iceberg lettuce and sliced tomatoes, to serve",
+      "200g full-fat Greek yoghurt",
+      "¼ cucumber, grated and squeezed dry",
+      "1 garlic clove, minced",
+      "1 tbsp fresh dill or mint, chopped",
+      "1 tbsp extra virgin olive oil",
+      "juice of ½ lemon"
+    ],
+    "steps": [
+      "Combine the olive oil, lemon juice, garlic, oregano, paprika, salt, and pepper in a bowl. Add the chicken and toss well. Marinate for at least 20 min.",
+      "Make the tzatziki by mixing together the yoghurt, grated cucumber, garlic, dill, olive oil, and lemon juice. Season well and refrigerate until needed.",
+      "Thread the marinated chicken onto metal or pre-soaked wooden skewers, four to five pieces per skewer.",
+      "Heat a griddle pan or barbecue to high. Cook the skewers for 4–5 min per side until the chicken is cooked through with charred edges.",
+      "Rest the skewers for 3 min, then warm the pittas in a dry pan or oven.",
+      "Slide the chicken from the skewers and serve in warm pittas with tzatziki, lettuce, and tomato."
+    ],
+    "tip": "Marinating overnight in the fridge transforms these from good to extraordinary — the lemon and olive oil tenderise the chicken significantly and the oregano becomes more fragrant after a long rest.",
+    "nutrition": {
+      "calories": 480,
+      "protein": 36,
+      "carbs": 38,
+      "fat": 20
+    },
+    "photo": null
+  },
+  {
+    "name": "Roasted Red Pepper & Tomato Frittata with Manchego",
+    "time": "30 min",
+    "minutes": 30,
+    "protein": "eggs",
+    "cuisine": "other",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "none",
+    "serves": 4,
+    "description": "A golden, set frittata billowing with sweet roasted peppers, blistered cherry tomatoes, and melted Manchego — finished under the grill until the top is just set and lightly bronzed. Light enough for a spring lunch, substantial enough for a weeknight supper, and infinitely adaptable. The kind of dish that proves eggs are anything but boring.",
+    "kidNote": "Slice into wedges like pizza — children invariably love frittata. Swap Manchego for mild cheddar if preferred.",
+    "ingredients": [
+      "8 large eggs",
+      "2 roasted red peppers from a jar, sliced",
+      "200g cherry tomatoes, halved",
+      "80g Manchego or mature cheddar, grated",
+      "1 tbsp olive oil",
+      "1 shallot, finely sliced",
+      "2 garlic cloves, minced",
+      "small bunch of fresh basil",
+      "salt and black pepper",
+      "green salad, to serve"
+    ],
+    "steps": [
+      "Preheat the grill to high. Beat the eggs in a large bowl, season well with salt and pepper, and set aside.",
+      "Heat the olive oil in a 26cm ovenproof frying pan over medium heat. Cook the shallot for 3–4 min until softened, then add the garlic and cook for 1 min.",
+      "Add the roasted peppers and cherry tomatoes and cook for 2–3 min until the tomatoes begin to collapse.",
+      "Pour the beaten eggs over the vegetables and gently shake the pan to distribute. Cook over medium-low heat for 6–8 min, pulling the edges in with a spatula so uncooked egg flows to the sides, until the base is set but the top is still slightly wobbly.",
+      "Scatter over the Manchego and slide the pan under the hot grill for 3–4 min until the top is just set and lightly golden.",
+      "Leave to cool in the pan for 5 min before slicing. Scatter with basil leaves and serve with a green salad."
+    ],
+    "tip": "Low-and-slow on the hob before the grill finish is key to a silky rather than rubbery frittata. If the base is setting too fast, reduce the heat — patience here pays off.",
+    "nutrition": {
+      "calories": 310,
+      "protein": 22,
+      "carbs": 6,
+      "fat": 22
+    },
+    "photo": null
+  },
+  {
+    "name": "Turkish Eggs with Whipped Yoghurt & Chilli Butter",
+    "time": "20 min",
+    "minutes": 20,
+    "protein": "eggs",
+    "cuisine": "middleeastern",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "bread",
+    "serves": 4,
+    "description": "Silky whipped garlic yoghurt spread into wide bowls, topped with softly poached eggs that break at the touch and flood the yoghurt with golden yolk. A sizzling pour of chilli butter — fragrant with Aleppo pepper and dried mint — streaks across the top, turning a handful of ingredients into something extraordinary. Sourdough toast for dragging through it all is non-negotiable.",
+    "kidNote": "Reduce the chilli butter to plain melted butter with just a pinch of paprika for children. Younger eaters enjoy the creamy yoghurt base with the egg yolk stirred through.",
+    "ingredients": [
+      "8 eggs",
+      "500g full-fat Greek yoghurt",
+      "2 garlic cloves, minced",
+      "juice of ½ lemon",
+      "3 tbsp butter",
+      "1 tsp Aleppo pepper flakes or ½ tsp regular chilli flakes",
+      "1 tsp dried mint",
+      "½ tsp smoked paprika",
+      "1 tbsp white wine vinegar",
+      "salt to taste",
+      "toasted sourdough, to serve",
+      "fresh dill, to garnish"
+    ],
+    "steps": [
+      "Whisk together the yoghurt, garlic, lemon juice, and a generous pinch of salt until smooth. Divide between four wide, shallow bowls and spread out with the back of a spoon.",
+      "Bring a wide pan of water to a gentle simmer. Add the vinegar. Swirl the water, crack in two eggs at a time, and poach for 3 min until the whites are set and the yolks are runny. Keep warm.",
+      "While the eggs poach, melt the butter in a small saucepan over medium heat. Once foaming, add the Aleppo pepper, dried mint, and paprika. Swirl for 30 seconds until fragrant — watch it doesn't burn.",
+      "Place two poached eggs on top of the yoghurt in each bowl.",
+      "Spoon the sizzling chilli butter over the eggs, making sure some streaks across the yoghurt.",
+      "Garnish with fresh dill and serve immediately with plenty of toasted sourdough."
+    ],
+    "tip": "The yoghurt must be at room temperature before serving — cold yoghurt straight from the fridge will chill the eggs immediately and the dish loses its magic. Take it out 30 min before.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 24,
+      "carbs": 22,
+      "fat": 24
+    },
+    "photo": null
+  },
+  {
+    "name": "Baked Eggs in Spiced Butternut & Tomato Sauce",
+    "time": "40 min",
+    "minutes": 40,
+    "protein": "eggs",
+    "cuisine": "middleeastern",
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "carb": "bread",
+    "serves": 4,
+    "description": "Eggs cracked directly into a bubbling, sweet-savoury sauce of butternut squash and spiced tomatoes — baked until the whites are just set and the yolks quiver. The sauce is lush, deeply coloured, and carries warmth from cumin and harissa. Tear crusty bread through the whole thing and this becomes one of those meals that stops people in their tracks.",
+    "kidNote": "Reduce the harissa to ½ tsp and the eggs sitting in the sauce are naturally appealing to children. Serve with plenty of bread for scooping.",
+    "ingredients": [
+      "8 eggs",
+      "500g butternut squash, peeled and cut into 2cm cubes",
+      "1 x 400g tin chopped tomatoes",
+      "1 large onion, diced",
+      "3 garlic cloves, minced",
+      "1–2 tbsp harissa paste",
+      "1 tsp ground cumin",
+      "1 tsp smoked paprika",
+      "2 tbsp olive oil",
+      "200ml vegetable stock",
+      "salt and pepper",
+      "fresh coriander, to garnish",
+      "crusty bread, to serve"
+    ],
+    "steps": [
+      "Preheat the oven to 200°C/180°C fan. Heat the olive oil in a large, ovenproof frying pan or skillet over medium heat. Cook the onion for 6 min until softened, then add the garlic, cumin, paprika, and harissa. Cook for 2 min.",
+      "Add the butternut squash, chopped tomatoes, and stock. Stir well and simmer for 15 min until the squash is just tender and the sauce has thickened slightly.",
+      "Taste the sauce and season well. Use a spoon to create eight small wells in the sauce.",
+      "Crack an egg into each well. Transfer the pan to the oven and bake for 8–10 min until the whites are just set but the yolks are still runny.",
+      "Remove from the oven and rest for 2 min — the residual heat continues to cook the eggs, so pull them out slightly before you think they're done.",
+      "Scatter with fresh coriander and serve directly from the pan with crusty bread."
+    ],
+    "tip": "Oven temperatures vary considerably — start checking at 8 minutes. You want whites that are opaque but yolks that wobble freely. Once set, the yolk firms fast.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 18,
+      "carbs": 30,
+      "fat": 16
+    },
+    "photo": null
+  },
+  {
+    "name": "Harissa Roasted Cauliflower with Chickpeas & Tahini",
+    "time": "40 min",
+    "minutes": 40,
+    "protein": "veggie",
+    "cuisine": "middleeastern",
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "carb": "none",
+    "serves": 4,
+    "description": "Cauliflower florets roasted at high heat until the edges blacken and caramelise, tossed in rose harissa alongside golden chickpeas. Draped with a silky, lemony tahini dressing and finished with pomegranate seeds and mint, this is vegetarian food with serious presence — bold, colourful, and anything but an afterthought.",
+    "kidNote": "Reduce the harissa to a mild version or just ½ tsp for children. Roasted cauliflower with tahini dressing is frequently a surprising hit even without the heat.",
+    "ingredients": [
+      "1 large cauliflower, broken into florets",
+      "1 x 400g tin chickpeas, drained",
+      "3 tbsp rose harissa paste",
+      "3 tbsp olive oil",
+      "salt and black pepper",
+      "3 tbsp tahini",
+      "juice of 1 lemon",
+      "1 garlic clove, minced",
+      "3–4 tbsp cold water",
+      "seeds of ½ pomegranate",
+      "small bunch of fresh mint",
+      "flatbreads or rice, to serve"
+    ],
+    "steps": [
+      "Preheat the oven to 220°C/200°C fan. Toss the cauliflower florets with 2 tbsp harissa and 2 tbsp olive oil. Season and spread on a large roasting tray in a single layer.",
+      "Toss the chickpeas with the remaining harissa and olive oil on a separate small tray.",
+      "Roast for 25–30 min, turning halfway, until the cauliflower is deeply caramelised and charred at the edges and the chickpeas are crisp.",
+      "Make the tahini dressing: whisk together the tahini, lemon juice, garlic, and enough cold water to make a smooth, pourable sauce. Season with salt.",
+      "Spread the tahini dressing across a large serving platter. Pile the roasted cauliflower and chickpeas on top.",
+      "Scatter with pomegranate seeds and mint, and serve with flatbreads or rice."
+    ],
+    "tip": "Give the cauliflower room — overcrowding the tray causes steaming rather than roasting. Use two trays if necessary, and rotate them halfway through cooking.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 16,
+      "carbs": 36,
+      "fat": 20
+    },
+    "photo": null
+  },
+  {
+    "name": "Creamy Mushroom, Thyme & Taleggio Risotto",
+    "time": "45 min",
+    "minutes": 45,
+    "protein": "veggie",
+    "cuisine": "italian",
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "carb": "rice",
+    "serves": 4,
+    "description": "Slow-stirred Arborio rice swelling into a rich, ivory risotto perfumed with earthy mushrooms, fresh thyme, and the famous funk of melted Taleggio — a cheese that turns unctuous and runny when it hits the heat, coating every grain. This is patience rewarded: 25 minutes of stirring that results in something deeply, uncommonly good.",
+    "kidNote": "Taleggio has a strong flavour — swap for mild fontina or a simple grating of cheddar for younger eaters. The risotto itself is mild and creamy.",
+    "ingredients": [
+      "350g Arborio risotto rice",
+      "400g mixed mushrooms (chestnut, shiitake, oyster), sliced",
+      "30g dried porcini mushrooms",
+      "150ml dry white wine",
+      "1.2 litres hot vegetable stock",
+      "1 large onion, finely diced",
+      "3 garlic cloves, minced",
+      "4 sprigs fresh thyme, leaves only",
+      "3 tbsp butter",
+      "2 tbsp olive oil",
+      "200g Taleggio, rind removed and torn into pieces",
+      "40g Parmesan, grated",
+      "salt and black pepper"
+    ],
+    "steps": [
+      "Soak the dried porcini in 200ml of boiling water for 15 min. Strain through a fine sieve, reserving the soaking liquid, and roughly chop the porcini. Add the strained soaking liquid to the hot stock.",
+      "Heat 1 tbsp butter and the olive oil in a large, wide saucepan over high heat. Cook the fresh mushrooms and porcini for 5–6 min until golden. Season and set aside.",
+      "Add 1 tbsp butter to the same pan over medium heat and cook the onion for 6–7 min until softened. Add the garlic and thyme and cook for 1 min.",
+      "Add the rice and stir for 2 min until the grains are coated and toasted. Pour in the wine and stir until fully absorbed.",
+      "Add the hot stock a ladleful at a time, stirring continuously and waiting for each addition to be absorbed before adding the next. This process takes 18–22 min — the rice should be creamy and just al dente.",
+      "Remove from heat, fold in the cooked mushrooms, Taleggio, remaining butter, and Parmesan. Cover and rest for 2 min before serving."
+    ],
+    "tip": "The porcini soaking liquid is liquid gold — strained and added to the stock, it doubles the mushroom depth in the risotto without any extra effort.",
+    "nutrition": {
+      "calories": 560,
+      "protein": 20,
+      "carbs": 70,
+      "fat": 22
+    },
+    "photo": null
+  },
+  {
+    "name": "Aubergine Parmigiana with Fresh Basil & Mozzarella",
+    "time": "55 min",
+    "minutes": 55,
+    "protein": "veggie",
+    "cuisine": "italian",
+    "seasons": [
+      "summer",
+      "autumn"
+    ],
+    "carb": "none",
+    "serves": 4,
+    "description": "Layers of golden-fried aubergine interleaved with a rich tomato sauce, torn mozzarella, and fresh basil — baked until bubbling, bronzed on top, and fragrant with olive oil and garlic. This Southern Italian classic is vegetarian comfort food at its most generous: built for sharing, made for lingering over, and even better the following day.",
+    "kidNote": "Aubergine parmigiana is naturally mild and very appealing to children who like pizza flavours. Cut into smaller portions and serve with garlic bread.",
+    "ingredients": [
+      "3 large aubergines, cut into 1cm rounds",
+      "120ml olive oil, approximately",
+      "2 x 400g tins chopped tomatoes",
+      "4 garlic cloves, minced",
+      "1 tsp sugar",
+      "2 x 125g balls mozzarella, drained and torn",
+      "60g Parmesan, finely grated",
+      "large bunch of fresh basil",
+      "salt and black pepper",
+      "crusty bread or green salad, to serve"
+    ],
+    "steps": [
+      "Preheat the oven to 190°C/170°C fan. Salt the aubergine slices and leave in a colander for 15 min, then pat dry with kitchen paper.",
+      "Heat a good slug of olive oil in a large frying pan over medium-high heat. Fry the aubergine slices in batches for 2–3 min per side until golden brown, adding more oil as needed. Drain on kitchen paper.",
+      "Make the tomato sauce: fry the garlic in 1 tbsp olive oil for 1 min, then add the chopped tomatoes and sugar. Season well and simmer for 15 min until thick.",
+      "Spread a thin layer of tomato sauce in the base of a 25x20cm baking dish. Layer over a third of the aubergine, then spoon over more sauce, scatter with basil, and add some torn mozzarella and Parmesan. Repeat two more times, finishing with sauce, mozzarella, and Parmesan.",
+      "Bake for 25–30 min until the top is deep golden and bubbling.",
+      "Rest for 10 min before serving — this helps the layers hold together when cut."
+    ],
+    "tip": "Salting and drying the aubergine removes bitter moisture but also means it absorbs far less oil when frying. The difference in the finished dish — less greasy, more savoury — is significant.",
+    "nutrition": {
+      "calories": 440,
+      "protein": 20,
+      "carbs": 22,
+      "fat": 30
+    },
+    "photo": null
+  },
+  {
+    "name": "Tuscan White Bean & Cavolo Nero Soup with Rosemary Oil",
+    "time": "40 min",
+    "minutes": 40,
+    "protein": "veggie",
+    "cuisine": "italian",
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "carb": "bread",
+    "serves": 4,
+    "description": "A deeply satisfying Italian ribollita-inspired soup — cannellini beans simmered with cavolo nero, tomato, and Parmesan rind until thick and silky, with a fragrant drizzle of rosemary-infused oil to finish. This is peasant cooking elevated by time and patience: unassuming to look at, extraordinary to eat, and better the next day.",
+    "kidNote": "Blend the soup fully for younger eaters who balk at leafy greens. Serve with plenty of torn bread for dunking — the rosemary oil can be left out for children.",
+    "ingredients": [
+      "2 x 400g tins cannellini beans, drained",
+      "200g cavolo nero or kale, stalks removed and roughly chopped",
+      "1 x 400g tin chopped tomatoes",
+      "1 large onion, diced",
+      "3 garlic cloves, minced",
+      "2 celery sticks, diced",
+      "1 large carrot, diced",
+      "1 Parmesan rind (optional but recommended)",
+      "1.2 litres vegetable stock",
+      "3 tbsp extra virgin olive oil",
+      "salt and black pepper",
+      "4 tbsp extra virgin olive oil",
+      "2 sprigs fresh rosemary",
+      "1 garlic clove, crushed",
+      "crusty bread, to serve"
+    ],
+    "steps": [
+      "Heat 2 tbsp olive oil in a large saucepan over medium heat. Cook the onion, carrot, and celery for 8–10 min until very soft. Add the garlic and cook for 2 min.",
+      "Add the chopped tomatoes, cannellini beans, stock, and Parmesan rind if using. Bring to a simmer and cook for 15 min.",
+      "Remove about a third of the beans with a ladle, mash roughly, and stir back into the soup — this gives the broth a silky, thickened body.",
+      "Add the cavolo nero, push it down into the liquid, and cook for a further 10 min until wilted and tender. Discard the Parmesan rind. Season well.",
+      "Meanwhile, gently warm 4 tbsp olive oil in a small pan with the rosemary sprigs and crushed garlic for 5 min — do not let it boil. Strain into a small jug.",
+      "Ladle the soup into bowls, drizzle generously with rosemary oil, and serve with crusty bread."
+    ],
+    "tip": "Simmering a Parmesan rind in the soup costs nothing and adds weeks of flavour — the glutamates leach out slowly, giving the broth an umami depth that's difficult to achieve otherwise.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 16,
+      "carbs": 48,
+      "fat": 16
+    },
+    "photo": null
+  },
+  {
+    "name": "Butternut Squash, Sage & Ricotta Stuffed Pasta Shells",
+    "time": "50 min",
+    "minutes": 50,
+    "protein": "veggie",
+    "cuisine": "italian",
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "carb": "pasta",
+    "serves": 4,
+    "description": "Jumbo pasta shells packed with a pillowy mixture of roasted butternut squash, ricotta, Parmesan, and nutmeg, baked in a browned-butter sage sauce until the edges of the pasta blister and the filling turns molten and golden. This is cold-weather vegetarian cooking at its most elegant — rich, aromatic, and deeply comforting.",
+    "kidNote": "Sweet squash and mild ricotta make this a reliable crowd-pleaser for children. Top individual portions with extra grated cheese before baking.",
+    "ingredients": [
+      "350g jumbo pasta shells (conchiglioni)",
+      "600g butternut squash, peeled and cut into 3cm cubes",
+      "250g ricotta",
+      "50g Parmesan, grated, plus extra to top",
+      "½ tsp freshly grated nutmeg",
+      "salt and black pepper",
+      "3 tbsp olive oil",
+      "60g butter",
+      "12 fresh sage leaves",
+      "2 garlic cloves, minced",
+      "200ml single cream",
+      "green salad, to serve"
+    ],
+    "steps": [
+      "Preheat the oven to 200°C/180°C fan. Toss the squash in 2 tbsp olive oil, season, and roast for 25–30 min until very tender and caramelised. Cool slightly, then mash until smooth.",
+      "Cook the pasta shells in well-salted boiling water for 2 min less than the packet instructions — they'll finish in the oven. Drain carefully and spread on an oiled tray.",
+      "Mix the mashed squash with the ricotta, Parmesan, nutmeg, and plenty of seasoning. Taste — it should be well seasoned and subtly sweet.",
+      "Melt the butter in a wide saucepan over medium heat until foamy. Add the sage leaves and fry for 1 min until crisp. Add the garlic, cook for 30 seconds, then pour in the cream. Simmer for 2 min and season.",
+      "Pour the cream sauce into a large baking dish. Stuff each pasta shell generously with the squash filling and nestle them into the sauce, open-side up. Scatter with extra Parmesan.",
+      "Bake for 20–25 min until bubbling and golden. Serve with a green salad."
+    ],
+    "tip": "Under-cooking the pasta shells slightly before filling is essential — they continue to cook in the oven and will turn mushy if started fully cooked. Two minutes less than the packet is the rule.",
+    "nutrition": {
+      "calories": 580,
+      "protein": 20,
+      "carbs": 68,
+      "fat": 26
+    },
+    "photo": null
+  },
+  {
+    "name": "Black Bean, Sweet Potato & Chipotle Chilli with Rice",
+    "time": "40 min",
+    "minutes": 40,
+    "protein": "veggie",
+    "cuisine": "mexican",
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "carb": "rice",
+    "serves": 4,
+    "description": "Smoky chipotle paste threads through a rich, dark sauce of black beans and sweet potato — earthy, warming, and carrying just enough heat to make you reach for more. This is vegetarian chilli that doesn't feel like a compromise: thick, filling, and deeply flavoured, finished with lime and sour cream for freshness and cool.",
+    "kidNote": "Use just ½ tsp chipotle paste for children and increase the tomato purée for a milder, sweeter sauce. Grated cheese on top usually seals the deal.",
+    "ingredients": [
+      "2 x 400g tins black beans, drained",
+      "2 medium sweet potatoes, peeled and cut into 2cm cubes",
+      "1 tbsp sunflower oil",
+      "1 large onion, diced",
+      "3 garlic cloves, minced",
+      "1 red pepper, diced",
+      "1–2 tbsp chipotle paste",
+      "1 tsp ground cumin",
+      "1 tsp smoked paprika",
+      "1 x 400g tin chopped tomatoes",
+      "1 tbsp tomato purée",
+      "200ml vegetable stock",
+      "juice of 1 lime",
+      "salt to taste",
+      "sour cream, grated cheddar, fresh coriander, to serve",
+      "300g long-grain rice, cooked to serve"
+    ],
+    "steps": [
+      "Heat the oil in a large saucepan over medium heat. Cook the onion and red pepper for 7 min until softened. Add the garlic, cumin, paprika, and chipotle paste. Cook for 2 min.",
+      "Add the sweet potato cubes and stir to coat in the spices. Cook for 3 min.",
+      "Pour in the chopped tomatoes, tomato purée, and stock. Bring to a simmer and cook for 15 min until the sweet potato is tender.",
+      "Add the black beans and cook for a further 8–10 min until the sauce has thickened. Mash a few beans against the side of the pot to help bind the sauce.",
+      "Squeeze in the lime juice and season well with salt.",
+      "Serve over rice with sour cream, grated cheddar, and fresh coriander."
+    ],
+    "tip": "Adding chipotle paste at the beginning and a final teaspoon at the end of cooking gives both depth and freshness. Taste before serving and adjust — the paste varies considerably in heat between brands.",
+    "nutrition": {
+      "calories": 450,
+      "protein": 16,
+      "carbs": 72,
+      "fat": 10
+    },
+    "photo": null
+  },
+  {
+    "name": "Shakshuka Verde with Kale, Courgette & Feta",
+    "time": "30 min",
+    "minutes": 30,
+    "protein": "eggs",
+    "cuisine": "middleeastern",
+    "seasons": [
+      "spring",
+      "summer"
+    ],
+    "carb": "bread",
+    "serves": 4,
+    "description": "A vivid green twist on the shakshuka family — eggs baked in a herb-scented, garlicky sauce of wilted kale, courgette, and spring onion, scattered with crumbled feta and finished with a drizzle of bright herb oil. Lighter than the tomato-based original but no less satisfying, and a brilliant way to make a pan of vegetables into something genuinely special.",
+    "kidNote": "Skip the chilli for children. The eggs nestled in the green sauce are fun to discover — serve with pitta or toast for scooping.",
+    "ingredients": [
+      "8 eggs",
+      "200g kale, stalks removed and shredded",
+      "2 courgettes, coarsely grated",
+      "4 spring onions, sliced",
+      "3 garlic cloves, minced",
+      "1 green chilli, finely sliced",
+      "100g feta, crumbled",
+      "3 tbsp olive oil",
+      "1 tsp ground cumin",
+      "½ tsp ground coriander",
+      "juice of ½ lemon",
+      "salt and black pepper",
+      "small bunch of fresh parsley and mint",
+      "crusty bread or pitta, to serve"
+    ],
+    "steps": [
+      "Squeeze the grated courgette firmly in a clean tea towel to remove excess moisture — this prevents the sauce from becoming watery.",
+      "Heat the olive oil in a wide, lidded frying pan over medium heat. Cook the spring onions for 3 min, then add the garlic, chilli, cumin, and coriander. Cook for 1 min.",
+      "Add the courgette and kale in large handfuls, turning with tongs until wilted — about 4–5 min. Season well with salt, pepper, and lemon juice.",
+      "Use the back of a spoon to create eight wells in the green sauce. Crack an egg into each well.",
+      "Cover the pan and cook over medium-low heat for 6–8 min until the whites are just set and the yolks are still runny.",
+      "Scatter over the crumbled feta and fresh herbs, and serve directly from the pan with crusty bread or warm pitta."
+    ],
+    "tip": "Covering the pan is the key to shakshuka — the trapped steam cooks the egg whites from above while the heat from below sets the base. Check at 6 minutes: the whites should be opaque but the yolks should wobble.",
+    "nutrition": {
+      "calories": 340,
+      "protein": 22,
+      "carbs": 14,
+      "fat": 24
+    },
+    "photo": null
+  },
+  {
+    "name": "Smoked Salmon & Dill Frittata with Crème Fraîche",
+    "time": "25 min",
+    "minutes": 25,
+    "protein": "eggs",
+    "cuisine": "other",
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "carb": "none",
+    "serves": 4,
+    "description": "Delicate ribbons of smoked salmon woven through a softly set frittata scented with fresh dill and a squeeze of lemon — elegant enough for a weekend brunch but simple enough for a quick weeknight supper. A spoonful of crème fraîche on each wedge adds a cool, luxurious note that marries beautifully with the smoked fish.",
+    "kidNote": "Smoked salmon is usually a hit with adventurous young eaters. Cut into small fingers for easy handling and serve the crème fraîche as a dipping sauce.",
+    "ingredients": [
+      "8 large eggs",
+      "150g smoked salmon, torn into pieces",
+      "4 tbsp crème fraîche, plus extra to serve",
+      "small bunch of fresh dill, fronds picked",
+      "2 spring onions, finely sliced",
+      "zest and juice of ½ lemon",
+      "1 tbsp butter",
+      "1 tbsp olive oil",
+      "salt and black pepper",
+      "dressed green salad, to serve"
+    ],
+    "steps": [
+      "Preheat the grill to high. Beat the eggs in a large bowl, season with a little salt and plenty of black pepper. Stir in the crème fraîche, lemon zest, and half the dill.",
+      "Heat the butter and olive oil in a 26cm ovenproof frying pan over medium heat. Add the spring onions and cook for 2 min until softened.",
+      "Pour in the egg mixture and cook gently over low-medium heat, pulling the edges with a spatula and tilting the pan so uncooked egg flows to the edges, for 5–6 min until the base is set.",
+      "Scatter the smoked salmon pieces over the top, pressing them gently into the egg.",
+      "Slide under the grill for 3–4 min until the top is just set and lightly golden.",
+      "Leave to cool for 3 min. Scatter with remaining dill, a squeeze of lemon juice, and serve with extra crème fraîche and a green salad."
+    ],
+    "tip": "Add the smoked salmon right at the end of hob cooking — putting it in too early toughens it. The residual heat from the egg and a brief grill is all it needs.",
+    "nutrition": {
+      "calories": 290,
+      "protein": 24,
+      "carbs": 2,
+      "fat": 22
+    },
+    "photo": null
+  },
+  {
+    "name": "Slow-Braised Beef Short Ribs with Red Wine & Gremolata",
+    "time": "1 hr 30 min",
+    "minutes": 90,
+    "protein": "beef",
+    "cuisine": "other",
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "carb": "none",
+    "serves": 4,
+    "description": "Bone-in beef short ribs braised slowly in red wine and aromatic vegetables until the meat retreats from the bone in loose, molten chunks and the sauce reduces to a lacquered, deeply savoury glaze. A bright gremolata of lemon, parsley, and garlic cuts through the richness at the table — the contrast is electric. Weekend cooking that delivers extraordinary results.",
+    "kidNote": "The alcohol fully cooks off during the long braise and the resulting sauce is rich and mild. Serve children with creamy mash and a small portion of the very tender beef, leaving the gremolata on the side.",
+    "ingredients": [
+      "1.2kg bone-in beef short ribs",
+      "2 tbsp sunflower oil",
+      "1 large onion, roughly chopped",
+      "2 carrots, roughly chopped",
+      "3 celery sticks, roughly chopped",
+      "6 garlic cloves, smashed",
+      "2 tbsp tomato purée",
+      "400ml red wine",
+      "400ml beef stock",
+      "2 sprigs thyme",
+      "2 bay leaves",
+      "salt and black pepper",
+      "zest of 1 lemon",
+      "1 garlic clove, minced",
+      "small bunch flat-leaf parsley, finely chopped",
+      "creamy mashed potato or polenta, to serve"
+    ],
+    "steps": [
+      "Preheat the oven to 160°C/140°C fan. Pat the short ribs dry and season very generously with salt and pepper.",
+      "Heat the oil in a large, heavy casserole over high heat. Brown the ribs in a single layer for 4–5 min per side — all four sides — until deeply seared. Remove and set aside.",
+      "Reduce heat to medium and cook the onion, carrots, and celery in the same casserole for 6 min until softened. Add the garlic and tomato purée and cook for 2 min.",
+      "Pour in the red wine and let it bubble for 3 min, scraping up all the caramelised bits from the bottom. Add the stock, thyme, and bay leaves. Return the ribs — they should be roughly half submerged.",
+      "Bring to a simmer, then cover tightly and transfer to the oven. Braise for 1 hr 15 min until the meat is completely tender and yielding.",
+      "Mix together the lemon zest, minced garlic, and parsley to make the gremolata. Skim any fat from the braising liquid and season the sauce. Serve the ribs with creamy mash or polenta, sauce spooned over, and gremolata scattered on top."
+    ],
+    "tip": "Thorough browning of the ribs before braising is non-negotiable — it creates the Maillard crust that enriches the entire braising liquid and gives the finished sauce its dark, complex depth.",
+    "nutrition": {
+      "calories": 640,
+      "protein": 46,
+      "carbs": 10,
+      "fat": 38
+    },
+    "photo": null
+  },
+  {
+    "name": "Slow-Roasted Pork Shoulder with Apple, Sage & Crackling",
+    "time": "1 hr 30 min",
+    "minutes": 90,
+    "protein": "pork",
+    "cuisine": "british",
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "carb": "potato",
+    "serves": 4,
+    "description": "Bone-in pork shoulder roasted low and slow until the meat pulls apart with a fork, the fat rendered and crisped into proper crackling, and the pan juices mingling with cider and apple into a natural, subtly sweet sauce. This is the kind of weekend cooking that fills the house with warmth for over an hour before you sit down — effortless once it's in the oven, and spectacular when it emerges.",
+    "kidNote": "Pulled pork is easy for children to eat and the apple notes bring a sweetness they love. Serve in soft rolls or with mashed potato for younger eaters.",
+    "ingredients": [
+      "1.2kg bone-in pork shoulder, skin scored",
+      "2 tbsp olive oil",
+      "2 tsp sea salt flakes",
+      "1 tsp fennel seeds, lightly crushed",
+      "1 tsp smoked paprika",
+      "6 garlic cloves, skin on",
+      "2 eating apples, quartered",
+      "4 sprigs fresh sage",
+      "200ml dry cider",
+      "1 tbsp Dijon mustard",
+      "800g Maris Piper potatoes, cut into large chunks",
+      "green vegetables, to serve"
+    ],
+    "steps": [
+      "Preheat the oven to 220°C/200°C fan. Rub the pork skin with olive oil, sea salt flakes, fennel seeds, and smoked paprika, working it well into the scores.",
+      "Place the pork skin-side up in a large roasting tin. Roast at high heat for 20 min until the skin starts to blister and crackle.",
+      "Reduce the oven to 160°C/140°C fan. Scatter the garlic, apple quarters, and sage around the pork. Pour in the cider and 100ml water. Cover loosely with foil and return to the oven for 1 hour.",
+      "Meanwhile, parboil the potatoes for 8 min, drain, and shake in the colander to roughen the edges. Season well.",
+      "Remove the foil and add the potatoes around the pork. Return to the oven uncovered for the final 30 min until the crackling is crisp and the potatoes are golden.",
+      "Rest the pork for 15 min before pulling apart. Whisk the mustard into the pan juices and serve as a sauce alongside."
+    ],
+    "tip": "Scoring the pork skin deeply — through the fat but not into the meat — and rubbing it with plenty of salt well in advance (even overnight) ensures crackling that shatters rather than bends.",
+    "nutrition": {
+      "calories": 590,
+      "protein": 44,
+      "carbs": 32,
+      "fat": 30
+    },
+    "photo": null
+  },
+  {
+    "name": "Slow-Cooked Lamb Shoulder with Anchovies & Rosemary",
+    "time": "1 hr 30 min",
+    "minutes": 90,
+    "protein": "lamb",
+    "cuisine": "british",
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "carb": "potato",
+    "serves": 4,
+    "description": "A whole lamb shoulder studded with rosemary and anchovies — the fillets dissolving invisibly during the long roast, leaving behind a deep, savoury intensity that amplifies the lamb without ever tasting of fish. Roasted low and slow until the meat collapses at the touch of a spoon, this is the kind of weekend showpiece that turns a quiet Sunday into a celebration.",
+    "kidNote": "The anchovies are completely undetectable in the finished dish — don't mention them. Serve children with mashed potato or roasted carrots alongside the very tender lamb.",
+    "ingredients": [
+      "1.2–1.4kg bone-in lamb shoulder",
+      "6 anchovy fillets in oil",
+      "4 garlic cloves, sliced into slivers",
+      "3 sprigs fresh rosemary, broken into small sprigs",
+      "3 tbsp olive oil",
+      "juice of 1 lemon",
+      "200ml dry white wine",
+      "200ml lamb or chicken stock",
+      "800g Maris Piper potatoes, cut into chunks",
+      "salt and black pepper",
+      "fresh mint sauce or redcurrant jelly, to serve"
+    ],
+    "steps": [
+      "Preheat the oven to 170°C/150°C fan. With a sharp knife, make about 20 small incisions all over the lamb shoulder. Insert a sliver of garlic, a small sprig of rosemary, and half an anchovy fillet into each incision.",
+      "Rub the lamb all over with olive oil and season generously with black pepper. Place in a large roasting tin.",
+      "Pour the wine, stock, and lemon juice around the base of the lamb. Cover the tin tightly with foil.",
+      "Roast for 1 hour, then remove the foil, add the potato chunks around the lamb, and season them well.",
+      "Return to the oven uncovered for 45 min–1 hour until the lamb is falling from the bone and the potatoes are golden.",
+      "Rest the lamb for 20 min before pulling the meat apart. Spoon the pan juices over everything and serve with mint sauce."
+    ],
+    "tip": "The anchovies are not a flavour — they are a technique. Cooking them into the meat for over an hour leaves nothing fishy behind, only an amplified, meaty depth you can't quite name.",
+    "nutrition": {
+      "calories": 560,
+      "protein": 44,
+      "carbs": 36,
+      "fat": 26
+    },
+    "photo": null
   }
 ]
