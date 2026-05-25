@@ -9,37 +9,30 @@ const client = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY')! });
 
 const SYSTEM = `You are an expert chef planning a dinner party cooking schedule for a home cook with a standard kitchen: one oven, one hob with 4 rings, standard equipment.
 
-You will receive a list of dishes with their ingredients, total cooking time, and optional steps. Your job is to produce a practical, interleaved cooking timeline.
+You will receive a list of dishes with their total cooking time and a brief description. Produce a practical, interleaved cooking timeline.
 
-STEP 1 — Analyse each dish:
-- Break its total time into realistic phases: active prep (chopping, mixing, marinating), active cooking (frying, stirring, reducing), and passive cooking (oven, long simmer, resting)
-- Infer phase durations from the ingredient list and dish type. Examples:
-  • A 1.5kg whole chicken with root vegetables → ~15 min prep, ~80 min passive oven, 10 min rest
-  • Risotto with arborio rice and stock → ~10 min prep, ~30 min active stirring
-  • Pasta bake with béchamel → ~20 min active sauce, ~25 min passive oven
-- Passive phases are opportunities to do active work on other dishes
-
-STEP 2 — Build an interleaved schedule working backwards from serve time:
+Rules:
+- Break each dish into phases: active prep, active cooking, passive cooking (oven/simmer/rest)
 - Fill passive windows with active tasks from other dishes
-- Group logically related prep (e.g. all vegetable chopping in one block)
-- Flag oven temperature conflicts when simultaneous dishes need different temps
-- Note resting time for large proteins
-- Every action should be specific and actionable — not "cook the dish"
+- Group related prep into single blocks where sensible
+- Flag oven temperature conflicts; note resting time for large proteins
+- Keep every action concise and specific (8–15 words max)
+- Aim for the minimum number of blocks that covers all tasks clearly
 
-Return ONLY valid JSON, no markdown:
+Return ONLY valid JSON, no markdown fences:
 {
   "schedule": [
     {
       "startTime": "HH:MM",
       "endTime": "HH:MM",
       "mealName": "dish name exactly as given, or 'Serve' for the final block",
-      "action": "concise action description, 10-25 words",
-      "note": "oven temp, parallel task note, or null"
+      "action": "concise action, 8-15 words",
+      "note": "oven temp / parallel task / null"
     }
   ]
 }
 
-All times in 24h format. Sort by startTime. End with a final block: mealName "Serve", startTime and endTime both equal to serveTime, action "Plate up and serve".`;
+All times 24h. Sort by startTime. End with mealName "Serve", startTime and endTime both equal to serveTime, action "Plate up and serve".`;
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -62,22 +55,30 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: 'dishes and serveTime required' }), { status: 400, headers: corsHeaders });
     }
 
+    // Send only the essentials — full steps/ingredients balloon the token count
     const dishSummary = dishes.map(d => {
-      const lines = [`## ${d.name} (${d.category}, ${d.minutes} min total)`];
-      if (d.description) lines.push(`Description: ${d.description}`);
-      if (d.ingredients?.length) lines.push(`Ingredients (scaled for ${guestCount} guests):\n${d.ingredients.map(i => `- ${i}`).join('\n')}`);
-      if (d.steps?.length) lines.push(`Steps:\n${d.steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}`);
+      const lines = [`## ${d.name} (${d.category}, ${d.minutes} min)`];
+      if (d.description) lines.push(d.description);
       return lines.join('\n');
     }).join('\n\n');
 
-    const prompt = `Serve time: ${serveTime}\nGuests: ${guestCount}\n\n${dishSummary}`;
+    const prompt = `Serve time: ${serveTime}\nGuests: ${guestCount}\nDishes: ${dishes.length}\n\n${dishSummary}`;
 
     const message = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 4096,
+      max_tokens: 8192,
       system: SYSTEM,
       messages: [{ role: 'user', content: prompt }],
     });
+
+    // Detect truncation before attempting JSON parse
+    const stopReason = (message as any).stop_reason;
+    if (stopReason === 'max_tokens') {
+      return new Response(
+        JSON.stringify({ error: 'Schedule too long to generate. Try removing a dish or two.' }),
+        { status: 422, headers: corsHeaders },
+      );
+    }
 
     const text = message.content[0].type === 'text' ? message.content[0].text : '';
     const jsonMatch = text.match(/\{[\s\S]+\}/);
