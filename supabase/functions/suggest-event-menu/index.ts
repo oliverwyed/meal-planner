@@ -1,3 +1,4 @@
+// @version 2
 import Anthropic from 'npm:@anthropic-ai/sdk';
 
 const corsHeaders = {
