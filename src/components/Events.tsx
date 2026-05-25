@@ -721,37 +721,27 @@ function EventDetail({ event, allMeals, pantry, onUpdate, onDelete, onBack }: {
 
                                 {/* Expanded step detail */}
                                 {isExpanded && dish && (() => {
-                                  const indices = block.stepIndices ?? [];
-                                  const relevantSteps = indices.length > 0
-                                    ? indices.map(idx => ({ idx, text: dish.meal.steps?.[idx] })).filter(s => s.text)
-                                    : (dish.meal.steps ?? []).map((text, idx) => ({ idx, text })).slice(0, 2);
-
-                                  const stepText = relevantSteps.map(s => s.text!).join(' ').toLowerCase();
                                   const allIngredients = scaledIngredients(dish.meal.ingredients ?? [], dish.servings / (dish.meal.serves ?? 4));
-                                  const relevantIngredients = stepText
-                                    ? allIngredients.filter(ing =>
-                                        ing.label.toLowerCase().split(/\s+/).some(w => w.length > 3 && stepText.includes(w))
-                                      )
+                                  const names = block.blockIngredients ?? [];
+                                  const chips = names.length > 0
+                                    ? names.flatMap(name => {
+                                        const n = name.toLowerCase();
+                                        return allIngredients.filter(ing =>
+                                          ing.label.toLowerCase().includes(n) || n.includes(ing.label.toLowerCase())
+                                        );
+                                      })
                                     : [];
 
+                                  if (!block.detail && chips.length === 0) return null;
+
                                   return (
-                                    <div style={{ marginTop: '12px', borderTop: `1px solid ${P.border}`, paddingTop: '10px' }}>
-                                      {relevantSteps.length > 0 && (
-                                        <>
-                                          <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Steps</div>
-                                          {relevantSteps.map(({ idx, text }) => (
-                                            <div key={idx} style={{ display: 'flex', gap: '8px', marginBottom: '7px', alignItems: 'flex-start' }}>
-                                              <div style={{ flexShrink: 0, width: '18px', height: '18px', borderRadius: '50%', background: color, color: '#fff', fontSize: '10px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '2px' }}>
-                                                {idx + 1}
-                                              </div>
-                                              <div style={{ fontSize: '13px', color: P.text, lineHeight: 1.5 }}>{text}</div>
-                                            </div>
-                                          ))}
-                                        </>
+                                    <div style={{ marginTop: '10px', borderTop: `1px solid ${P.border}`, paddingTop: '10px' }}>
+                                      {block.detail && (
+                                        <div style={{ fontSize: '13px', color: P.text, lineHeight: 1.55 }}>{block.detail}</div>
                                       )}
-                                      {relevantIngredients.length > 0 && (
+                                      {chips.length > 0 && (
                                         <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                                          {relevantIngredients.map(ing => (
+                                          {chips.map(ing => (
                                             <span key={ing.label} style={{ background: P.accentLight, color: P.accentDark, borderRadius: '6px', padding: '3px 8px', fontSize: '12px', fontWeight: 600 }}>
                                               {ing.display}
                                             </span>

@@ -9,15 +9,19 @@ const client = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY')! });
 
 const SYSTEM = `You are an expert chef planning a dinner party cooking schedule for a home cook with a standard kitchen: one oven, one hob with 4 rings, standard equipment.
 
-You will receive a list of dishes with their total cooking time, description, and numbered steps. Produce a practical, interleaved cooking timeline.
+You will receive a list of dishes with their total cooking time, description, and ingredients. Produce a practical, interleaved cooking timeline.
 
 Rules:
 - Break each dish into phases: active prep, active cooking, passive cooking (oven/simmer/rest)
 - Fill passive windows with active tasks from other dishes
 - Group related prep into single blocks where sensible
 - Flag oven temperature conflicts; note resting time for large proteins
-- Keep every action concise and specific (8–15 words max)
-- For each block include stepIndices: the 0-based indices of the recipe steps that correspond to this block. Use [] if no steps map to it (e.g. a rest or generic prep block)
+- Keep the action field concise and specific (8–15 words)
+- Each block represents ONE focused task. Do not combine unrelated tasks into one block.
+
+For each block include:
+- "detail": 1–3 sentences of specific, actionable instructions for exactly what the cook does during this block — not the whole recipe, just this moment
+- "blockIngredients": array of ingredient name strings (name only, no quantities) that are specifically needed for this block, taken from the dish's ingredient list. Empty array [] if none or if it's a passive block.
 
 Return ONLY valid JSON, no markdown fences:
 {
@@ -28,12 +32,13 @@ Return ONLY valid JSON, no markdown fences:
       "mealName": "dish name exactly as given, or 'Serve' for the final block",
       "action": "concise action, 8-15 words",
       "note": "oven temp / parallel task / null",
-      "stepIndices": [0, 1]
+      "detail": "1-3 sentences of specific instructions for this exact moment",
+      "blockIngredients": ["ingredient name", "another ingredient"]
     }
   ]
 }
 
-All times 24h. Sort by startTime. End with mealName "Serve", startTime and endTime both equal to serveTime, action "Plate up and serve", stepIndices [].`;
+All times 24h. Sort by startTime. End with mealName "Serve", startTime and endTime both equal to serveTime, action "Plate up and serve", detail "Bring all dishes to the table and serve.", blockIngredients [].`;
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -59,10 +64,7 @@ Deno.serve(async (req: Request) => {
     const dishSummary = dishes.map(d => {
       const lines = [`## ${d.name} (${d.category}, ${d.minutes} min)`];
       if (d.description) lines.push(d.description);
-      if (d.steps?.length) {
-        lines.push('Steps:');
-        d.steps.forEach((s, i) => lines.push(`  [${i}] ${s}`));
-      }
+      if (d.ingredients?.length) lines.push(`Ingredients: ${d.ingredients.join(', ')}`);
       return lines.join('\n');
     }).join('\n\n');
 
