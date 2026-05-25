@@ -405,10 +405,17 @@ function EventDetail({ event, allMeals, pantry, onUpdate, onDelete, onBack }: {
   const [editServeTime, setEditServeTime] = useState(false);
   const [serveTimeDraft, setServeTimeDraft] = useState(event.serveTime);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [expandedBlock, setExpandedBlock] = useState<number | null>(null);
 
   const dishColorMap = useMemo(() => {
     const m = new Map<string, string>();
     event.dishes.forEach((d, i) => m.set(d.meal.name, DISH_COLORS[i % DISH_COLORS.length]));
+    return m;
+  }, [event.dishes]);
+
+  const dishByName = useMemo(() => {
+    const m = new Map<string, EventDish>();
+    event.dishes.forEach(d => m.set(d.meal.name, d));
     return m;
   }, [event.dishes]);
 
@@ -683,6 +690,9 @@ function EventDetail({ event, allMeals, pantry, onUpdate, onDelete, onBack }: {
                           const isServe = block.mealName === 'Serve';
                           const color = isServe ? P.green : (dishColorMap.get(block.mealName) ?? P.accent);
                           const duration = minsBetween(block.startTime, block.endTime);
+                          const dish = dishByName.get(block.mealName);
+                          const isExpanded = expandedBlock === i;
+                          const expandable = !isServe && !!dish;
                           return (
                             <div key={i} style={{ display: 'flex', gap: '12px', marginBottom: '16px', position: 'relative', zIndex: 1 }}>
                               {/* Dot */}
@@ -690,16 +700,47 @@ function EventDetail({ event, allMeals, pantry, onUpdate, onDelete, onBack }: {
                                 <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: color, border: `3px solid ${P.bg}`, boxShadow: `0 0 0 2px ${color}`, marginTop: '4px' }} />
                               </div>
                               {/* Content */}
-                              <div style={{ flex: 1, background: isServe ? P.greenLight : P.card, borderRadius: '12px', padding: '10px 12px', boxShadow: P.shadow, borderLeft: `3px solid ${color}` }}>
+                              <div
+                                onClick={() => expandable && setExpandedBlock(isExpanded ? null : i)}
+                                style={{ flex: 1, background: isServe ? P.greenLight : P.card, borderRadius: '12px', padding: '10px 12px', boxShadow: P.shadow, borderLeft: `3px solid ${color}`, cursor: expandable ? 'pointer' : 'default' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
                                   <div style={{ fontWeight: 700, fontSize: '13px', color }}>{isServe ? '🎉 Serve' : block.mealName}</div>
-                                  <div style={{ fontSize: '12px', fontWeight: 700, color: P.muted, whiteSpace: 'nowrap', marginLeft: '8px' }}>
-                                    {fmt12(block.startTime)}{duration > 0 ? ` · ${fmtDuration(duration)}` : ''}
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0, marginLeft: '8px' }}>
+                                    <div style={{ fontSize: '12px', fontWeight: 700, color: P.muted, whiteSpace: 'nowrap' }}>
+                                      {fmt12(block.startTime)}{duration > 0 ? ` · ${fmtDuration(duration)}` : ''}
+                                    </div>
+                                    {expandable && (
+                                      <div style={{ fontSize: '10px', color: P.muted, lineHeight: 1 }}>{isExpanded ? '▲' : '▼'}</div>
+                                    )}
                                   </div>
                                 </div>
                                 <div style={{ fontSize: '13px', color: P.text, lineHeight: 1.4 }}>{block.action}</div>
                                 {block.note && (
                                   <div style={{ fontSize: '12px', color: P.muted, marginTop: '5px', fontStyle: 'italic' }}>📌 {block.note}</div>
+                                )}
+
+                                {/* Expanded recipe detail */}
+                                {isExpanded && dish && (
+                                  <div style={{ marginTop: '12px', borderTop: `1px solid ${P.border}`, paddingTop: '10px' }}>
+                                    {dish.meal.steps?.length > 0 && (
+                                      <>
+                                        <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Recipe steps</div>
+                                        {dish.meal.steps.map((step, j) => (
+                                          <div key={j} style={{ display: 'flex', gap: '8px', marginBottom: '7px', alignItems: 'flex-start' }}>
+                                            <div style={{ flexShrink: 0, width: '18px', height: '18px', borderRadius: '50%', background: color, color: '#fff', fontSize: '10px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '2px' }}>
+                                              {j + 1}
+                                            </div>
+                                            <div style={{ fontSize: '13px', color: P.text, lineHeight: 1.5 }}>{step}</div>
+                                          </div>
+                                        ))}
+                                      </>
+                                    )}
+                                    {dish.meal.tip && (
+                                      <div style={{ marginTop: '8px', background: P.accentLight, borderRadius: '8px', padding: '8px 10px', fontSize: '12px', color: P.accentDark, lineHeight: 1.4 }}>
+                                        💡 {dish.meal.tip}
+                                      </div>
+                                    )}
+                                  </div>
                                 )}
                               </div>
                             </div>
