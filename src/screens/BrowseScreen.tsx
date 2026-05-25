@@ -202,7 +202,7 @@ export function BrowseScreen({
   );
 
   return (
-    <div style={{ background: P.bg, minHeight: '100vh', paddingBottom: '80px' }}>
+    <div style={{ background: P.bg, minHeight: '100vh', paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))' }}>
       {/* Sticky header */}
       <div style={{ position: 'sticky', top: 0, zIndex: 100, background: P.card, borderBottom: `1px solid ${P.border}`, padding: '12px 16px 0' }}>
         <div style={{ maxWidth: '480px', margin: '0 auto' }}>

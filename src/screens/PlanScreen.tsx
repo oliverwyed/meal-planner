@@ -160,7 +160,7 @@ export function PlanScreen({
           </div>
         </div>
       )}
-      <div style={{ flex: 1, maxWidth: isDesktop ? 'none' : '480px', margin: isDesktop ? '0' : '0 auto', padding: '0 16px', paddingBottom: isDesktop ? '40px' : '80px', overflowX: 'hidden' }}>
+      <div style={{ flex: 1, maxWidth: isDesktop ? 'none' : '480px', margin: isDesktop ? '0' : '0 auto', padding: '0 16px', paddingBottom: isDesktop ? '40px' : 'calc(80px + env(safe-area-inset-bottom, 0px))', overflowX: 'hidden' }}>
       <div style={{ padding: '24px 0 16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
