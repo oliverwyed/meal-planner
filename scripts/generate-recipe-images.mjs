@@ -21,11 +21,10 @@ const RECIPES_PATH = join(__dir, '../src/data/recipes.json');
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-const OPENAI_KEY = process.env.OPENAI_API_KEY;
 const DELAY_MS = parseInt(process.env.DELAY_MS ?? '13000', 10);
 const SKIP_EXISTING = process.env.SKIP_EXISTING === '1';
 
-// Load Supabase credentials from .env
+// Load credentials from .env
 const envRaw = readFileSync(join(__dir, '../.env'), 'utf8');
 const envVars = Object.fromEntries(
   envRaw.split('\n')
@@ -33,7 +32,8 @@ const envVars = Object.fromEntries(
     .filter(l => l && !l.startsWith('#') && l.includes('='))
     .map(l => { const i = l.indexOf('='); return [l.slice(0, i).trim(), l.slice(i + 1).trim()]; })
 );
-const SUPABASE_URL = envVars.VITE_SUPABASE_URL;
+const OPENAI_KEY = process.env.OPENAI_API_KEY || envVars.OPENAI_API_KEY;
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || envVars.VITE_SUPABASE_URL;
 const SUPABASE_KEY = envVars.VITE_SUPABASE_ANON_KEY;
 const LOCAL_MODE = !SUPABASE_URL || SUPABASE_URL.includes('placeholder');
 const LOCAL_DIR = join(__dir, '../public/recipe-images');
@@ -79,12 +79,11 @@ async function generateImage(recipe) {
       'Authorization': `Bearer ${OPENAI_KEY}`,
     },
     body: JSON.stringify({
-      model: 'dall-e-3',
+      model: 'gpt-image-1',
       prompt: buildPrompt(recipe),
       n: 1,
       size: '1024x1024',
-      quality: 'standard',
-      response_format: 'b64_json',
+      quality: 'medium',
     }),
   });
   if (!res.ok) {
@@ -92,7 +91,7 @@ async function generateImage(recipe) {
     throw new Error(`OpenAI ${res.status}: ${body.slice(0, 200)}`);
   }
   const { data } = await res.json();
-  return data[0].b64_json; // base64-encoded PNG
+  return data[0].b64_json;
 }
 
 async function storeImage(b64, filename) {
@@ -156,7 +155,7 @@ async function main() {
 
   for (let i = 0; i < recipes.length; i++) {
     const recipe = recipes[i];
-    if (SKIP_EXISTING && isSupabaseUrl(recipe.photo)) {
+    if (SKIP_EXISTING && isGeneratedUrl(recipe.photo)) {
       process.stdout.write(`  skip  ${recipe.name}\n`);
       continue;
     }
