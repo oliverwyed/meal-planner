@@ -6729,5 +6729,665 @@
       "fat": 42
     },
     "photo": "/recipe-images/ai-double-smash-burgers-with-american-cheese-pickles.jpg"
+  },
+  {
+    "name": "Thai Green Vegetable Curry with Jasmine Rice",
+    "time": "30 min",
+    "minutes": 30,
+    "protein": "veggie",
+    "cuisine": "asian",
+    "carb": "rice",
+    "serves": 4,
+    "seasons": [
+      "spring",
+      "summer"
+    ],
+    "description": "Fragrant coconut milk curry with courgette, aubergine and spinach in a vivid green paste sauce. The trick is adding spinach off the heat so it wilts gently without dulling the colour.",
+    "kidNote": "Use less curry paste for a milder version — start with 1 tbsp and taste before adding more",
+    "tip": "Don't simmer the coconut milk for too long once the vegetables are added — it can split. Keep the heat at a gentle bubble.",
+    "ingredients": [
+      "400ml tin coconut milk",
+      "2–3 tbsp green curry paste",
+      "1 courgette, sliced into half-moons",
+      "1 small aubergine, cut into chunks",
+      "150g fine green beans, trimmed",
+      "100g baby spinach",
+      "1 tbsp vegetable oil",
+      "1 tbsp soy sauce",
+      "1 tsp brown sugar",
+      "juice of 1 lime",
+      "small bunch of basil or coriander",
+      "300g jasmine rice"
+    ],
+    "steps": [
+      "Cook the jasmine rice per packet instructions. Heat the oil in a wok or large deep pan over medium-high heat, add the curry paste and fry for 1 minute until fragrant.",
+      "Pour in half the coconut milk, stir well to loosen the paste, then add the aubergine. Cook for 5 minutes until starting to soften.",
+      "Add the remaining coconut milk, courgette and green beans. Simmer for 8–10 minutes until all the vegetables are just tender but still have a little bite.",
+      "Season with soy sauce, brown sugar and lime juice. Taste and adjust — it should be creamy, a little spicy, balanced with a hint of sweetness.",
+      "Remove from the heat, fold in the spinach and leave for 1 minute to wilt gently. Scatter over fresh basil or coriander and serve with the jasmine rice."
+    ],
+    "nutrition": {
+      "calories": 420,
+      "protein": 9,
+      "carbs": 58,
+      "fat": 17
+    },
+    "photo": "/recipe-images/ai-thai-green-vegetable-curry-with-jasmine-rice.jpg",
+    "course": "main"
+  },
+  {
+    "name": "Mapo Tofu with Steamed Rice",
+    "time": "25 min",
+    "minutes": 25,
+    "protein": "veggie",
+    "cuisine": "asian",
+    "carb": "rice",
+    "serves": 4,
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "description": "Silken tofu trembling in a deeply savoury, lip-tingling Sichuan sauce of fermented black beans, doubanjiang and chilli oil. One of the most addictive vegetarian dishes in the world.",
+    "kidNote": "This is genuinely spicy — make a small batch of plain silken tofu with soy sauce and sesame oil for younger children",
+    "tip": "Doubanjiang (spicy broad bean paste) is the soul of this dish — find it in any Asian supermarket. Without it you'll have a nice tofu dish, but not mapo tofu.",
+    "ingredients": [
+      "600g silken or soft tofu, cut into 2cm cubes",
+      "2 tbsp doubanjiang (spicy bean paste)",
+      "1 tbsp fermented black beans, roughly chopped",
+      "4 garlic cloves, finely chopped",
+      "2cm piece ginger, finely grated",
+      "300ml vegetable stock",
+      "2 tbsp soy sauce",
+      "1 tsp Sichuan peppercorns, toasted and ground",
+      "1 tsp sesame oil",
+      "2 tsp cornflour mixed with 2 tbsp water",
+      "2 tbsp vegetable oil",
+      "4 spring onions, sliced",
+      "300g steamed white rice"
+    ],
+    "steps": [
+      "Cook the rice. Gently lower the tofu cubes into a pan of simmering salted water for 3 minutes to firm slightly. Drain carefully.",
+      "Heat the oil in a wok over high heat. Add the doubanjiang and fry for 1 minute until the oil turns red and fragrant. Add the garlic, ginger and black beans, stir-fry for another minute.",
+      "Pour in the stock, add the soy sauce and bring to a boil. Carefully slide in the tofu and simmer gently for 5 minutes, stirring occasionally.",
+      "Stir in the cornflour slurry and cook for 1–2 minutes until the sauce thickens enough to coat the tofu. Taste and adjust seasoning.",
+      "Drizzle with sesame oil, scatter over the ground Sichuan pepper and spring onions. Serve immediately over steamed rice."
+    ],
+    "nutrition": {
+      "calories": 350,
+      "protein": 15,
+      "carbs": 42,
+      "fat": 13
+    },
+    "photo": "/recipe-images/ai-mapo-tofu-with-steamed-rice.jpg",
+    "course": "main"
+  },
+  {
+    "name": "Korean Vegetable Bibimbap with Gochujang",
+    "time": "40 min",
+    "minutes": 40,
+    "protein": "eggs",
+    "cuisine": "asian",
+    "carb": "rice",
+    "serves": 4,
+    "description": "A Korean rice bowl with individually seasoned vegetables and a fried egg, everything brought together with a spoonful of fiery, sticky gochujang sauce. Mix everything at the table.",
+    "kidNote": "Serve the gochujang sauce on the side — the vegetables and egg over rice are mild and delicious without the heat",
+    "tip": "Sauté each vegetable separately and season each one individually — this is what gives bibimbap its distinctive character over a simple stir-fry.",
+    "ingredients": [
+      "300g short-grain or sushi rice",
+      "4 eggs",
+      "200g spinach, wilted and squeezed dry",
+      "2 carrots, julienned",
+      "200g beansprouts",
+      "150g shiitake or chestnut mushrooms, sliced",
+      "1 courgette, julienned",
+      "4 tbsp gochujang paste",
+      "2 tbsp sesame oil",
+      "2 tbsp soy sauce",
+      "1 tbsp rice vinegar",
+      "1 tbsp sesame seeds",
+      "2 tbsp vegetable oil",
+      "4 garlic cloves, minced"
+    ],
+    "steps": [
+      "Cook the rice. Make the sauce: mix gochujang, 1 tbsp sesame oil, 1 tbsp soy sauce and rice vinegar with 1 tbsp warm water until smooth.",
+      "Sauté each vegetable separately in a little oil and garlic, seasoning each with a dash of soy sauce and sesame oil. Keep them separate — the individual preparation is key to bibimbap.",
+      "Divide the hot cooked rice into 4 bowls. Arrange the vegetables in sections over the rice, keeping each type distinct.",
+      "Fry the eggs sunny-side up in the same pan, keeping the yolks runny. Place one egg on top of each bowl.",
+      "Drizzle with the gochujang sauce and sesame seeds. Bring to the table and let everyone mix everything together vigorously — the bowl should be stirred to combine all the flavours."
+    ],
+    "nutrition": {
+      "calories": 510,
+      "protein": 19,
+      "carbs": 72,
+      "fat": 16
+    },
+    "photo": "/recipe-images/ai-korean-vegetable-bibimbap-with-gochujang.jpg",
+    "course": "main"
+  },
+  {
+    "name": "Vegetarian Pad Thai",
+    "time": "25 min",
+    "minutes": 25,
+    "protein": "eggs",
+    "cuisine": "asian",
+    "carb": "noodles",
+    "serves": 4,
+    "seasons": [
+      "spring",
+      "summer"
+    ],
+    "description": "Flat rice noodles tangled with egg, crispy tofu, crunchy beansprouts and spring onions, everything coated in a sweet-sour tamarind sauce. Finished with roasted peanuts and lime.",
+    "kidNote": "Leave out the chilli flakes and they'll love the mild peanut-noodle flavour — serve the lime and peanuts on the side for customising",
+    "tip": "Work in batches if needed — an overcrowded wok steams instead of fries, and you'll lose the smoky wok flavour that makes pad thai so distinctive.",
+    "ingredients": [
+      "250g flat rice noodles",
+      "200g firm tofu, pressed and cubed",
+      "3 eggs, lightly beaten",
+      "200g beansprouts",
+      "4 spring onions, sliced",
+      "3 tbsp tamarind paste",
+      "3 tbsp soy sauce",
+      "2 tbsp brown sugar",
+      "1 tbsp lime juice",
+      "3 tbsp vegetable oil",
+      "3 garlic cloves, sliced",
+      "50g roasted peanuts, roughly chopped",
+      "1 lime, cut into wedges",
+      "1 tsp dried chilli flakes",
+      "small bunch of coriander"
+    ],
+    "steps": [
+      "Soak rice noodles in cold water for 20 minutes then drain. Mix together tamarind paste, soy sauce, brown sugar and lime juice to make the sauce.",
+      "Heat 2 tbsp oil in a wok over very high heat. Fry the tofu until golden on all sides, about 4 minutes. Remove and set aside.",
+      "Add remaining oil and fry garlic for 30 seconds. Push to the side, scramble the beaten eggs until just set, then break up and mix through.",
+      "Add the drained noodles and sauce. Toss constantly for 2–3 minutes until the noodles absorb the sauce and start to caramelise at the edges.",
+      "Return the tofu, add the beansprouts and most of the spring onions, toss for 1 minute. Plate up and top with peanuts, remaining spring onions, chilli flakes and coriander. Serve with lime wedges."
+    ],
+    "nutrition": {
+      "calories": 520,
+      "protein": 22,
+      "carbs": 64,
+      "fat": 18
+    },
+    "photo": "/recipe-images/ai-vegetarian-pad-thai.jpg",
+    "course": "main"
+  },
+  {
+    "name": "Sichuan Aubergine with Garlic & Ginger",
+    "time": "25 min",
+    "minutes": 25,
+    "protein": "veggie",
+    "cuisine": "asian",
+    "carb": "rice",
+    "serves": 4,
+    "seasons": [
+      "summer",
+      "autumn"
+    ],
+    "description": "Silky, almost-melting aubergine in a deeply savoury, garlicky sauce with a Sichuan kick. The aubergine soaks up the glossy sauce completely — this tastes far more complex than it is to make.",
+    "kidNote": "Reduce or omit the chilli bean paste for a milder, sweeter version that's just as delicious",
+    "tip": "Salt the aubergine and leave for 15 minutes to draw out moisture — it collapses faster during cooking and absorbs the sauce more readily.",
+    "ingredients": [
+      "2 large aubergines, cut into 3cm chunks",
+      "1 tsp salt",
+      "4 garlic cloves, finely sliced",
+      "3cm piece ginger, finely grated",
+      "2 tbsp soy sauce",
+      "1 tbsp rice vinegar",
+      "1 tsp sugar",
+      "1 tbsp doubanjiang or chilli bean paste",
+      "2 tsp cornflour mixed with 100ml water",
+      "3 tbsp vegetable oil",
+      "3 spring onions, sliced",
+      "1 tsp sesame oil",
+      "300g steamed rice"
+    ],
+    "steps": [
+      "Toss the aubergine with salt and leave in a colander for 15 minutes. Pat dry. Cook the rice.",
+      "Heat 2 tbsp oil in a wok over high heat until smoking. Fry the aubergine in batches for 5–6 minutes until golden and collapsing. Set aside.",
+      "Add remaining oil to the wok, fry garlic and ginger for 1 minute. Add the chilli bean paste and cook for another minute until fragrant and the oil turns red.",
+      "Return the aubergine to the wok. Add soy sauce, vinegar and sugar, toss to coat everything.",
+      "Pour in the cornflour mixture, stir for 1–2 minutes until the sauce thickens and glossily coats the aubergine. Finish with sesame oil and spring onions. Serve over rice."
+    ],
+    "nutrition": {
+      "calories": 340,
+      "protein": 7,
+      "carbs": 52,
+      "fat": 11
+    },
+    "photo": "/recipe-images/ai-sichuan-aubergine-with-garlic-ginger.jpg",
+    "course": "main"
+  },
+  {
+    "name": "Black Bean & Cheese Enchiladas",
+    "time": "45 min",
+    "minutes": 45,
+    "protein": "veggie",
+    "cuisine": "mexican",
+    "carb": "bread",
+    "serves": 4,
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "description": "Corn tortillas rolled around spiced black beans and melted cheese, baked under a blanketing chipotle tomato sauce until bubbling and golden. Proper Mexican comfort food.",
+    "kidNote": "Use plain passata instead of chipotle and reduce chilli for a milder version that kids will happily eat",
+    "tip": "Warm the tortillas before rolling — either 30 seconds in a dry pan or wrapped in damp kitchen paper in the microwave. Cold tortillas crack when rolled.",
+    "ingredients": [
+      "8 corn or flour tortillas",
+      "2 x 400g tins black beans, drained",
+      "150g cheddar or Monterey Jack, grated",
+      "1 tsp cumin",
+      "1 tsp smoked paprika",
+      "400g tin chopped tomatoes",
+      "2 tbsp chipotle paste",
+      "1 onion, finely diced",
+      "3 garlic cloves, sliced",
+      "1 tbsp vegetable oil",
+      "soured cream and coriander, to serve"
+    ],
+    "steps": [
+      "Heat oven to 200°C/180°C fan. Make the sauce: fry the onion in oil for 5 minutes, add garlic for 1 minute, then add tomatoes and chipotle paste. Simmer for 10 minutes until thickened. Season well.",
+      "Roughly mash the black beans with a fork, mixing in cumin, smoked paprika and a pinch of salt — leave some beans whole for texture.",
+      "Warm the tortillas briefly. Spoon beans down the centre of each, scatter over half the cheese, then roll tightly and pack seam-side down into an ovenproof dish.",
+      "Pour the tomato sauce over the top, scatter over the remaining cheese. Bake for 20 minutes until golden and bubbling.",
+      "Serve with a generous dollop of soured cream and scattered fresh coriander."
+    ],
+    "nutrition": {
+      "calories": 540,
+      "protein": 23,
+      "carbs": 72,
+      "fat": 16
+    },
+    "photo": "/recipe-images/ai-black-bean-cheese-enchiladas.jpg",
+    "course": "main"
+  },
+  {
+    "name": "Roasted Sweet Potato & Black Bean Tacos",
+    "time": "35 min",
+    "minutes": 35,
+    "protein": "veggie",
+    "cuisine": "mexican",
+    "carb": "bread",
+    "serves": 4,
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "description": "Smoky, cumin-roasted sweet potato with black beans piled into warm corn tortillas with avocado, pickled red onion and soured cream. Bright and satisfying with every bite.",
+    "kidNote": "Kids love the sweet potato filling — serve in smaller tortillas and let them build their own tacos",
+    "tip": "Cut the sweet potato into even 1cm cubes so they roast evenly — too large and the middles stay hard, too small and they turn to mush.",
+    "ingredients": [
+      "2 large sweet potatoes, peeled and cubed",
+      "400g tin black beans, drained",
+      "8 small corn tortillas",
+      "2 avocados",
+      "1 red onion, thinly sliced",
+      "3 tbsp lime juice",
+      "2 tsp cumin",
+      "1 tsp smoked paprika",
+      "½ tsp chilli flakes",
+      "2 tbsp olive oil",
+      "soured cream, to serve",
+      "small bunch of coriander",
+      "1 tsp salt"
+    ],
+    "steps": [
+      "Heat oven to 220°C/200°C fan. Toss sweet potato with olive oil, cumin, smoked paprika, chilli flakes and salt. Spread on a baking tray and roast for 25 minutes until caramelised at the edges.",
+      "Quick-pickle the red onion: toss sliced onion with 2 tbsp lime juice and a pinch of salt. Leave for at least 20 minutes — it will turn bright pink.",
+      "Warm the black beans in a pan with a pinch of cumin. Mash the avocado roughly with remaining lime juice and a pinch of salt.",
+      "Char the tortillas directly over a gas flame for 30 seconds per side, or in a dry pan, until slightly blistered.",
+      "Pile sweet potato and black beans into the tortillas. Top with smashed avocado, pickled onion, soured cream and coriander."
+    ],
+    "nutrition": {
+      "calories": 480,
+      "protein": 14,
+      "carbs": 73,
+      "fat": 16
+    },
+    "photo": "/recipe-images/ai-roasted-sweet-potato-black-bean-tacos.jpg",
+    "course": "main"
+  },
+  {
+    "name": "Sizzling Veggie Fajitas with Guacamole",
+    "time": "20 min",
+    "minutes": 20,
+    "protein": "veggie",
+    "cuisine": "mexican",
+    "carb": "bread",
+    "serves": 4,
+    "seasons": [
+      "spring",
+      "summer"
+    ],
+    "description": "Charred strips of pepper and onion with smoky spices, brought to the table still sizzling with warm flour tortillas, fresh guacamole and soured cream. A hands-on dinner everyone builds themselves.",
+    "kidNote": "Let children fill their own tortillas — they're always more excited to eat something they've assembled themselves",
+    "tip": "Get the pan screaming hot before the vegetables go in — you want charring and colour, not steaming. Cook in batches if needed.",
+    "ingredients": [
+      "3 peppers (mixed colours), deseeded and sliced",
+      "2 large red onions, sliced into wedges",
+      "2 tsp cumin",
+      "2 tsp smoked paprika",
+      "1 tsp oregano",
+      "2 tbsp olive oil",
+      "8 flour tortillas",
+      "2 avocados",
+      "1 lime",
+      "1 small red onion, finely diced",
+      "2 tbsp fresh coriander, chopped",
+      "soured cream, to serve",
+      "1 red chilli, sliced (optional)"
+    ],
+    "steps": [
+      "Make guacamole: mash avocados with lime juice, diced red onion, coriander and a pinch of salt. Keep chunky.",
+      "Toss the sliced peppers and onion wedges with olive oil, cumin, smoked paprika and oregano. Season generously.",
+      "Heat a large cast iron or heavy frying pan until very hot. Cook the vegetables in batches for 8–10 minutes until charred in spots and softened. Don't stir too often — you want colour.",
+      "Warm the tortillas wrapped in foil in a low oven, or briefly in a dry pan.",
+      "Bring the sizzling vegetables to the table in the pan along with all the accompaniments — let everyone build their own."
+    ],
+    "nutrition": {
+      "calories": 450,
+      "protein": 12,
+      "carbs": 64,
+      "fat": 17
+    },
+    "photo": "/recipe-images/ai-sizzling-veggie-fajitas-with-guacamole.jpg",
+    "course": "main"
+  },
+  {
+    "name": "Chipotle Bean Burrito Bowl",
+    "time": "25 min",
+    "minutes": 25,
+    "protein": "veggie",
+    "cuisine": "mexican",
+    "carb": "rice",
+    "serves": 4,
+    "description": "Smoky chipotle black beans and lime-spiked coriander rice, piled with avocado, sweetcorn and soured cream. Faster than queueing at the real thing and genuinely better.",
+    "kidNote": "Skip the chipotle for a milder bean bowl — the sweetcorn, rice and avocado combination is a universal kids' hit",
+    "tip": "Season the rice while hot with lime juice and fresh coriander — plain rice under the beans makes the whole bowl feel flat.",
+    "ingredients": [
+      "300g long grain or basmati rice",
+      "2 x 400g tins black beans, drained",
+      "2 tbsp chipotle paste",
+      "1 tsp cumin",
+      "1 tsp garlic powder",
+      "400g tin chopped tomatoes",
+      "2 avocados, sliced",
+      "200g tinned sweetcorn, drained",
+      "juice of 1 lime",
+      "1 tbsp olive oil",
+      "soured cream, to serve",
+      "small bunch of coriander",
+      "1 little gem lettuce, shredded"
+    ],
+    "steps": [
+      "Cook the rice. Fluff with a fork and stir through lime juice and chopped coriander while still hot.",
+      "Heat oil in a pan, add cumin and garlic powder, fry for 30 seconds. Add the tomatoes and chipotle paste, simmer for 5 minutes until thickened.",
+      "Add the black beans, stir to coat, simmer for another 5 minutes until the sauce is absorbed and the beans are deeply flavourful. Season well.",
+      "Warm the sweetcorn in the same pan or briefly in the microwave.",
+      "Build the bowls: rice first, then chipotle beans, sweetcorn, shredded lettuce and avocado. Add a generous dollop of soured cream and a scattering of coriander."
+    ],
+    "nutrition": {
+      "calories": 530,
+      "protein": 19,
+      "carbs": 82,
+      "fat": 14
+    },
+    "photo": "/recipe-images/ai-chipotle-bean-burrito-bowl.jpg",
+    "course": "main"
+  },
+  {
+    "name": "Cacio e Pepe",
+    "time": "20 min",
+    "minutes": 20,
+    "protein": "veggie",
+    "cuisine": "italian",
+    "carb": "pasta",
+    "serves": 4,
+    "description": "Rome's most perfect pasta — just spaghetti, pecorino romano, parmesan and a serious amount of cracked black pepper. The technique is everything: starchy pasta water turns the cheese into a silky, clinging sauce.",
+    "kidNote": "The pepper is pronounced — reduce to 1 tsp for children and they'll still get the full cheese pull",
+    "tip": "Never add the cheese over direct heat — it will seize and clump. Always add it off the heat with pasta water, building the sauce from the steam alone.",
+    "ingredients": [
+      "400g spaghetti or tonnarelli",
+      "100g pecorino romano, very finely grated",
+      "50g parmesan, very finely grated",
+      "2 tsp black peppercorns, coarsely cracked",
+      "salt for pasta water"
+    ],
+    "steps": [
+      "Cook spaghetti in well-salted boiling water per pack instructions. While it cooks, toast the cracked pepper in a large dry frying pan for 1–2 minutes until fragrant.",
+      "Mix the pecorino and parmesan together. Add 4–5 tbsp of the hot pasta water to the cheese and stir vigorously until you have a smooth, paste-like consistency.",
+      "Reserve a large cup of pasta water before draining. Add the drained spaghetti to the pepper pan over low heat with a large splash of pasta water, tossing constantly.",
+      "Remove from heat. Add the cheese paste and toss vigorously — the steam and starchy water will melt the cheese into a silky, glossy sauce. Add more pasta water splash by splash until perfectly coated.",
+      "Serve immediately with extra cracked pepper and a dusting of pecorino."
+    ],
+    "nutrition": {
+      "calories": 530,
+      "protein": 22,
+      "carbs": 74,
+      "fat": 16
+    },
+    "photo": "/recipe-images/ai-cacio-e-pepe.jpg",
+    "course": "main"
+  },
+  {
+    "name": "Pasta alla Norma",
+    "time": "40 min",
+    "minutes": 40,
+    "protein": "veggie",
+    "cuisine": "italian",
+    "carb": "pasta",
+    "serves": 4,
+    "seasons": [
+      "summer",
+      "autumn"
+    ],
+    "description": "Sicily's greatest pasta — rigatoni with sweet-sour tomato sauce, crispy fried aubergine and a shower of salty ricotta salata. Named after Bellini's opera Norma, because it's perfect.",
+    "kidNote": "Children tend to love the soft fried aubergine in tomato sauce — ricotta salata can be swapped for mild grated mozzarella",
+    "tip": "The aubergine must be fried properly in oil until golden and collapsed — not steamed or baked. This is what gives alla Norma its characteristic richness.",
+    "ingredients": [
+      "400g rigatoni",
+      "2 medium aubergines, cut into 2cm cubes",
+      "400g tin chopped tomatoes",
+      "3 garlic cloves, sliced",
+      "100ml olive oil (for frying)",
+      "2 tbsp extra-virgin olive oil",
+      "1 tsp dried oregano",
+      "pinch of chilli flakes",
+      "80g ricotta salata or firm feta, crumbled",
+      "handful of fresh basil",
+      "salt and black pepper"
+    ],
+    "steps": [
+      "Heat the olive oil in a large frying pan over medium-high heat. Fry the aubergine in batches for 8–10 minutes until deeply golden and soft. Drain on kitchen paper and season.",
+      "In the same pan, reduce oil to 2 tbsp, fry garlic for 1 minute. Add tomatoes, oregano and chilli flakes, season, and simmer for 15 minutes until the sauce is rich and thick.",
+      "Cook the rigatoni in well-salted boiling water per pack instructions. Reserve a cup of pasta water.",
+      "Add the fried aubergine to the tomato sauce and stir through. Add the drained pasta and toss together, adding pasta water if needed to loosen.",
+      "Serve in warm bowls with ricotta salata crumbled generously over the top and a handful of torn basil."
+    ],
+    "nutrition": {
+      "calories": 570,
+      "protein": 18,
+      "carbs": 73,
+      "fat": 22
+    },
+    "photo": "/recipe-images/ai-pasta-alla-norma.jpg",
+    "course": "main"
+  },
+  {
+    "name": "Wild Mushroom Tagliatelle",
+    "time": "25 min",
+    "minutes": 25,
+    "protein": "veggie",
+    "cuisine": "italian",
+    "carb": "pasta",
+    "serves": 4,
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "description": "Silky tagliatelle wound through a deeply savoury mushroom cream sauce, built with dried porcini for that forest-floor intensity that fresh mushrooms alone can never achieve.",
+    "kidNote": "A mild, creamy pasta that kids generally adore — use regular chestnut mushrooms throughout for the most accessible version",
+    "tip": "Don't skip the porcini soaking liquid — strained and added to the sauce, it delivers more concentrated mushroom flavour than any stock.",
+    "ingredients": [
+      "400g tagliatelle",
+      "300g mixed mushrooms (chestnut, shiitake, oyster), sliced",
+      "20g dried porcini mushrooms",
+      "200ml double cream",
+      "150ml dry white wine",
+      "3 garlic cloves, finely sliced",
+      "1 shallot, finely diced",
+      "2 tbsp butter",
+      "1 tbsp olive oil",
+      "small bunch of flat-leaf parsley, chopped",
+      "50g parmesan, grated",
+      "salt and black pepper"
+    ],
+    "steps": [
+      "Soak dried porcini in 150ml boiling water for 15 minutes. Drain, reserving the soaking liquid strained through a sieve. Roughly chop the rehydrated porcini.",
+      "Cook pasta per pack instructions. Meanwhile heat butter and oil, fry shallot for 3 minutes until soft, then add garlic for 1 minute.",
+      "Add all the fresh mushrooms and chopped porcini. Cook over high heat for 6–8 minutes until golden and any liquid has evaporated.",
+      "Add wine and the strained porcini water, boil for 2 minutes. Add cream and simmer for 3 minutes until the sauce coats a spoon. Season well.",
+      "Drain pasta, reserving a cup of water. Toss pasta through the sauce, adding pasta water to loosen. Serve scattered with parsley and parmesan."
+    ],
+    "nutrition": {
+      "calories": 610,
+      "protein": 19,
+      "carbs": 71,
+      "fat": 26
+    },
+    "photo": "/recipe-images/ai-wild-mushroom-tagliatelle.jpg",
+    "course": "main"
+  },
+  {
+    "name": "Spaghetti Aglio, Olio e Peperoncino",
+    "time": "15 min",
+    "minutes": 15,
+    "protein": "veggie",
+    "cuisine": "italian",
+    "carb": "pasta",
+    "serves": 4,
+    "description": "Naples' midnight pasta — spaghetti with slowly golden-fried garlic, fruity olive oil and chilli, emulsified into a light sauce with pasta water. Five ingredients, fifteen minutes, genuinely brilliant.",
+    "kidNote": "Omit the chilli and reduce garlic to 2 cloves for a gentle, fragrant pasta that children tend to love",
+    "tip": "Low and slow is the rule for the garlic — the moment it truly colours, remove from the heat. Golden is perfect; brown is bitter.",
+    "ingredients": [
+      "400g spaghetti",
+      "6 garlic cloves, very thinly sliced",
+      "80ml extra-virgin olive oil",
+      "1 tsp dried chilli flakes",
+      "large handful of flat-leaf parsley, finely chopped",
+      "salt for pasta water",
+      "parmesan to serve (optional)"
+    ],
+    "steps": [
+      "Cook spaghetti in generously salted boiling water until al dente. Reserve a large mug of pasta water before draining.",
+      "While the pasta cooks, gently warm the olive oil in a large pan over low-medium heat. Add the sliced garlic and fry very slowly for 4–5 minutes until pale golden and fragrant. Do not rush or brown it.",
+      "Add the chilli flakes, fry for 30 seconds. Remove from heat immediately.",
+      "Add the drained spaghetti to the pan, return to low heat. Add pasta water splash by splash, tossing constantly for 2 minutes until the oil and water emulsify into a light, glossy sauce.",
+      "Remove from heat, toss through most of the parsley and check seasoning. Serve immediately with remaining parsley scattered over."
+    ],
+    "nutrition": {
+      "calories": 490,
+      "protein": 14,
+      "carbs": 71,
+      "fat": 19
+    },
+    "photo": "/recipe-images/ai-spaghetti-aglio-olio-e-peperoncino.jpg",
+    "course": "main"
+  },
+  {
+    "name": "Dan Dan Noodles",
+    "time": "20 min",
+    "minutes": 20,
+    "protein": "veggie",
+    "cuisine": "asian",
+    "carb": "noodles",
+    "serves": 4,
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "description": "Sichuan street noodles in a breathtakingly good sauce of sesame paste, peanut butter, chilli oil and soy — numbing, spicy, rich and completely addictive. No meat required.",
+    "kidNote": "This is properly spicy — make a mild version omitting chilli oil and Sichuan pepper and they will still love the sesame peanut noodles",
+    "tip": "Toast and grind the Sichuan peppercorns yourself — pre-ground loses the distinctive floral numbing quality that makes dan dan noodles so singular.",
+    "ingredients": [
+      "350g fresh or dried Chinese wheat noodles",
+      "200g pak choi or spinach",
+      "4 spring onions, finely sliced",
+      "3 tbsp Chinese sesame paste or tahini",
+      "2 tbsp peanut butter",
+      "3 tbsp soy sauce",
+      "2 tbsp chilli oil (plus extra to serve)",
+      "1 tbsp rice vinegar",
+      "1 tbsp sesame oil",
+      "1 tsp Sichuan peppercorns, toasted and ground",
+      "2 garlic cloves, grated",
+      "1cm ginger, grated",
+      "1 tsp sugar",
+      "4 tbsp warm water"
+    ],
+    "steps": [
+      "Whisk together sesame paste, peanut butter, soy sauce, chilli oil, rice vinegar, sesame oil, Sichuan pepper, garlic, ginger and sugar. Add warm water gradually until the sauce is smooth and pourable.",
+      "Cook noodles per pack instructions. In the last minute, add pak choi to the noodle water until just wilted.",
+      "Drain noodles and pak choi, rinse briefly under cold water to stop cooking.",
+      "Divide the sauce between 4 bowls. Add the noodles on top and toss each bowl to coat the noodles thoroughly.",
+      "Top with pak choi, spring onions and an extra drizzle of chilli oil. Serve immediately while warm."
+    ],
+    "nutrition": {
+      "calories": 510,
+      "protein": 17,
+      "carbs": 62,
+      "fat": 22
+    },
+    "photo": "/recipe-images/ai-dan-dan-noodles.jpg",
+    "course": "main"
+  },
+  {
+    "name": "Miso Ramen with Crispy Tofu",
+    "time": "35 min",
+    "minutes": 35,
+    "protein": "eggs",
+    "cuisine": "asian",
+    "carb": "noodles",
+    "serves": 4,
+    "seasons": [
+      "autumn",
+      "winter"
+    ],
+    "description": "A deeply savoury miso broth loaded with ramen noodles, crispy pan-fried tofu, soft-boiled egg, sweetcorn and spring onions. Restaurant-quality ramen you can actually make at home.",
+    "kidNote": "Reduce the miso to 2 tbsp and skip the chilli oil for a mild, warming bowl that most children will happily eat",
+    "tip": "Don't boil the broth after adding miso — it kills the complex fermented flavour. Stir it in at the end, off the boil.",
+    "ingredients": [
+      "400g ramen or udon noodles",
+      "400g firm tofu, pressed and cut into cubes",
+      "4 eggs",
+      "1.5 litres good vegetable stock",
+      "4 tbsp white miso paste",
+      "2 tbsp soy sauce",
+      "1 tbsp sesame oil",
+      "1 tbsp mirin",
+      "200g sweetcorn (tinned or frozen)",
+      "100g beansprouts",
+      "4 spring onions, sliced",
+      "2 sheets nori, cut into strips",
+      "2 tbsp vegetable oil",
+      "chilli oil to serve",
+      "1 tsp sesame seeds"
+    ],
+    "steps": [
+      "Soft-boil the eggs: lower into simmering water for exactly 6½ minutes, then plunge into ice-cold water. Peel carefully and halve just before serving.",
+      "Press tofu dry between kitchen paper, then fry in vegetable oil in a non-stick pan for 8–10 minutes, turning, until golden and crispy on all sides. Season with a little soy sauce at the end.",
+      "Bring stock to a gentle simmer. Whisk in miso paste (do not boil after this point), soy sauce, mirin and sesame oil. Taste and adjust.",
+      "Cook noodles per pack instructions. Drain and divide between 4 deep bowls.",
+      "Pour over the hot miso broth. Top each bowl with crispy tofu, a soft-boiled egg half, sweetcorn, beansprouts, spring onions, nori and sesame seeds. Drizzle with chilli oil."
+    ],
+    "nutrition": {
+      "calories": 560,
+      "protein": 28,
+      "carbs": 65,
+      "fat": 20
+    },
+    "photo": "/recipe-images/ai-miso-ramen-with-crispy-tofu.jpg",
+    "course": "main"
   }
 ]
