@@ -5,8 +5,10 @@ import { EventsScreen } from './components/Events';
 import { Primary, Secondary, Spinner, Section, TimeSlider, BottomNav } from './components/ui';
 import { Screen, Header, Row, Stepper, Chip, DayToggle } from './components/AppUI';
 import { useHousehold } from './hooks/useHousehold';
+import { useCommunityMeals } from './hooks/useCommunityMeals';
 import { DAYS, HOUSEHOLD_ID_KEY, P, DESKTOP_BREAKPOINT } from './lib/constants';
-import type { DayMode, Meal, CommunityMeal } from './lib/types';
+import type { DayMode, Meal } from './lib/types';
+import { clearHouseholdCache } from './lib/localCache';
 import { playBeep } from './lib/timers';
 import { log, logFetch, recordCost } from './lib/logger';
 import { publishMeal, unpublishMeal, authSignOut } from './lib/supabase';
@@ -26,7 +28,7 @@ export default function App() {
   if (!householdId) {
     return <HouseholdGate onReady={id => { localStorage.setItem(HOUSEHOLD_ID_KEY, id); setHouseholdId(id); }} />;
   }
-  return <AppInner householdId={householdId} onLeave={() => { localStorage.removeItem(HOUSEHOLD_ID_KEY); setHouseholdId(null); authSignOut(); }} />;
+  return <AppInner householdId={householdId} onLeave={() => { localStorage.removeItem(HOUSEHOLD_ID_KEY); clearHouseholdCache(householdId); setHouseholdId(null); authSignOut(); }} />;
 }
 
 function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () => void }) {
@@ -43,9 +45,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   const [cookingMeal, setCookingMeal] = useState<{ meal: Meal; familySize: number } | null>(null);
   const [nutritionLoading, setNutritionLoading] = useState<Set<string>>(new Set());
 
-  // Community meals
-  const [communityMeals, setCommunityMeals] = useState<CommunityMeal[]>([]);
-  const [communityLoading, setCommunityLoading] = useState(false);
+  // Community meals (pre-seeded from localStorage cache; network-refreshed on Browse tab open)
+  const { communityMeals, communityLoading, setCommunityMeals, setCommunityLoading } = useCommunityMeals();
   const [publishingId, setPublishingId] = useState<string | null>(null);
   // map custom meal id → communityId (if published)
   const [publishedMap, setPublishedMap] = useState<Record<string, string>>({});
@@ -58,7 +59,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     setToast(msg);
     toastUndoRef.current = undo ?? null;
     clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => { setToast(null); toastUndoRef.current = null; }, 2500);
+    toastTimer.current = setTimeout(() => { setToast(null); toastUndoRef.current = null; }, 4000);
   }, []);
 
   const addTimer = useCallback((label: string, seconds: number) => {
@@ -173,8 +174,21 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   useEffect(() => {
     if (step === 'plan' && !state.plan && !state.nextWeekPlan && !loading) setStep('setup');
     if (step === 'shopping' && !state.shopList && !state.nextWeekShopList && !loading) setStep('plan');
-    if (step === 'setup' && !isFirstRun) setStep('prefs');
+    // Guard against overriding plan auto-nav when cache hit causes loading=false immediately
+    if (step === 'setup' && !isFirstRun && !didAutoNav.current) setStep('prefs');
   }, [step, state.plan, state.nextWeekPlan, state.shopList, loading, isFirstRun]);
+
+  useEffect(() => {
+    const titles: Record<Step, string> = {
+      setup: 'Meal Planner',
+      plan: 'Your plan — Meal Planner',
+      shopping: 'Shopping list — Meal Planner',
+      browse: 'Recipes — Meal Planner',
+      prefs: 'Account — Meal Planner',
+      events: 'Events — Meal Planner',
+    };
+    document.title = titles[step] ?? 'Meal Planner';
+  }, [step]);
 
   if (loading) return <Spinner />;
 

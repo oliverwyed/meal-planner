@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import type { Meal, DinnerEvent, EventDish, EventCategory } from '../lib/types';
 import { P } from '../lib/constants';
 import { Primary, Secondary } from './ui';
-import { buildEventShop, CATEGORY_ORDER, CAT_EMOJI } from '../lib/shopping';
+import { buildEventShop, CATEGORY_ORDER, CAT_EMOJI, scaledIngredients } from '../lib/shopping';
 import { log, logFetch, recordCost } from '../lib/logger';
 
 interface Props {
@@ -269,6 +269,8 @@ function EventDetail({ event, allMeals, pantry, onUpdate, onDelete, onBack }: {
             minutes: d.meal.minutes,
             category: d.category,
             steps: d.meal.steps ?? [],
+            ingredients: scaledIngredients(d.meal.ingredients ?? [], d.servings / (d.meal.serves ?? 4)).map(i => i.display),
+            description: d.meal.description,
           })),
           serveTime: event.serveTime,
           guestCount: event.guestCount,

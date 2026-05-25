@@ -21,7 +21,7 @@ export const SEASON_INFO: Record<string, { label: string }> = {
 
 export function Screen({ children, padBottom }: { children: React.ReactNode; padBottom?: string }) {
   return (
-    <div style={{ minHeight: '100vh', background: P.bg, padding: `0 0 ${padBottom ?? '80px'}` }}>
+    <div style={{ minHeight: '100vh', background: P.bg, padding: `0 0 ${padBottom ?? 'calc(80px + env(safe-area-inset-bottom, 0px))'}` }}>
       <div style={{ maxWidth: '480px', margin: '0 auto', padding: '0 16px' }}>{children}</div>
     </div>
   );
