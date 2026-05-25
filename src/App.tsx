@@ -178,6 +178,8 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     if (step === 'setup' && !isFirstRun && !didAutoNav.current) setStep('prefs');
   }, [step, state.plan, state.nextWeekPlan, state.shopList, loading, isFirstRun]);
 
+  useEffect(() => { window.scrollTo(0, 0); }, [step]);
+
   useEffect(() => {
     const titles: Record<Step, string> = {
       setup: 'Meal Planner',
