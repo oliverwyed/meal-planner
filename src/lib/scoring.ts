@@ -16,6 +16,7 @@ export function getPool(
   const excl = DIETARY_EXCLUDE[dietaryMode] ?? [];
   const limit = timeFilter === 'any' ? Infinity : (parseInt(timeFilter) || Infinity);
   return allMeals.filter(m =>
+    (!m.course || m.course === 'main') &&
     m.minutes <= limit &&
     (kids !== 'kids' || !m.adult) &&
     !excl.includes(m.protein)

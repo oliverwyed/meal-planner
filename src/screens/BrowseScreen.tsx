@@ -53,6 +53,7 @@ export function BrowseScreen({
   const [browseProtein, setBrowseProtein] = useState('');
   const [browseCuisine, setBrowseCuisine] = useState('');
   const [browseTime, setBrowseTime] = useState('');
+  const [browseCourse, setBrowseCourse] = useState('');
   const [browseAddDay, setBrowseAddDay] = useState<Meal | null>(null);
   const [browseDetailMeal, setBrowseDetailMeal] = useState<Meal | null>(null);
   const [browseAIOpen, setBrowseAIOpen] = useState(false);
@@ -151,6 +152,7 @@ export function BrowseScreen({
   const allMeals = ALL_RECIPES.concat(state.customMeals);
   const q = browseQuery.trim().toLowerCase();
   const filterMeals = (meals: Meal[]) => meals.filter(m => {
+    if (browseCourse && (m.course ?? 'main') !== browseCourse) return false;
     if (browseProtein && m.protein !== browseProtein) return false;
     if (browseCuisine && m.cuisine !== browseCuisine) return false;
     if (browseTime === '30' && m.minutes > 30) return false;
@@ -163,8 +165,8 @@ export function BrowseScreen({
   });
   const browsed = filterMeals(allMeals);
   const browsedCommunity = filterMeals(communityMeals);
-  const seasonal = allMeals.filter(m => m.seasons?.includes(state.season as any));
-  const hasFilters = !!(browseQuery || browseProtein || browseCuisine || browseTime);
+  const seasonal = allMeals.filter(m => m.seasons?.includes(state.season as any) && (!m.course || m.course === 'main'));
+  const hasFilters = !!(browseQuery || browseProtein || browseCuisine || browseTime || browseCourse);
 
   const addDayModal = browseAddDay && (
     <div style={{ position: 'fixed', inset: 0, zIndex: 600, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
@@ -209,7 +211,7 @@ export function BrowseScreen({
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
             <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', flex: 1 }}>Recipes</div>
             {hasFilters && (
-              <button onClick={() => { setBrowseQuery(''); setBrowseProtein(''); setBrowseCuisine(''); setBrowseTime(''); }}
+              <button onClick={() => { setBrowseQuery(''); setBrowseProtein(''); setBrowseCuisine(''); setBrowseTime(''); setBrowseCourse(''); }}
                 style={{ background: 'none', border: 'none', color: P.accent, fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
                 Clear
               </button>
@@ -238,6 +240,15 @@ export function BrowseScreen({
           {/* Filter chips — only on All tab */}
           {browseTab === 'all' && <>
             <div style={{ overflowX: 'auto', whiteSpace: 'nowrap', marginBottom: '6px', scrollbarWidth: 'none' }}>
+              {([['', 'All courses'], ['main', '🍽️ Mains'], ['starter', '🥗 Starters'], ['side', '🥦 Sides'], ['dessert', '🍰 Desserts']] as [string, string][]).map(([v, l]) => (
+                <button key={v} onClick={() => setBrowseCourse(browseCourse === v ? '' : v)}
+                  style={{ display: 'inline-block', marginRight: '6px', padding: '5px 12px', borderRadius: '20px', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
+                    background: browseCourse === v ? P.accent : P.accentLight, color: browseCourse === v ? '#fff' : P.accentDark }}>
+                  {l}
+                </button>
+              ))}
+            </div>
+            <div style={{ overflowX: 'auto', whiteSpace: 'nowrap', marginBottom: '6px', scrollbarWidth: 'none' }}>
               {([['', 'Any time'], ['30', '≤ 30 min'], ['45', '≤ 45 min']] as [string, string][]).map(([v, l]) => (
                 <button key={v} onClick={() => setBrowseTime(browseTime === v ? '' : v)}
                   style={{ display: 'inline-block', marginRight: '6px', padding: '5px 12px', borderRadius: '20px', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
@@ -256,7 +267,7 @@ export function BrowseScreen({
               ))}
             </div>
             <div style={{ overflowX: 'auto', whiteSpace: 'nowrap', marginBottom: '10px', scrollbarWidth: 'none' }}>
-              {([['', 'All cuisines'], ['british', '🇬🇧 British'], ['italian', '🇮🇹 Italian'], ['asian', '🥢 Asian'], ['mexican', '🌮 Mexican'], ['indian', '🍛 Indian'], ['american', '🍔 American'], ['middleeastern', '🧆 Middle Eastern'], ['other', '🌍 Other']] as [string, string][]).map(([v, l]) => (
+              {([['', 'All cuisines'], ['british', '🇬🇧 British'], ['italian', '🇮🇹 Italian'], ['french', '🥐 French'], ['asian', '🥢 Asian'], ['mexican', '🌮 Mexican'], ['indian', '🍛 Indian'], ['american', '🍔 American'], ['middleeastern', '🧆 Middle Eastern'], ['other', '🌍 Other']] as [string, string][]).map(([v, l]) => (
                 <button key={v} onClick={() => setBrowseCuisine(browseCuisine === v ? '' : v)}
                   style={{ display: 'inline-block', marginRight: '6px', padding: '5px 12px', borderRadius: '20px', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
                     background: browseCuisine === v ? P.accent : P.accentLight, color: browseCuisine === v ? '#fff' : P.accentDark }}>
