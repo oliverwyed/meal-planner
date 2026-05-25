@@ -46,3 +46,6 @@ jobs:
           supabase functions deploy generate-event-schedule \
             --project-ref ejinmxvbeaolypwmkuhh \
             --no-verify-jwt
+          supabase functions deploy suggest-event-menu \
+            --project-ref ejinmxvbeaolypwmkuhh \
+            --no-verify-jwt
