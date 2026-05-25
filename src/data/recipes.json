@@ -35,7 +35,7 @@
       "carbs": 68,
       "fat": 14
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta1.jpg",
+    "photo": "/recipe-images/ai-herby-beef-meatballs-in-tomato-passata-with-penne.jpg",
     "course": "main"
   },
   {
@@ -74,7 +74,7 @@
       "carbs": 38,
       "fat": 9
     },
-    "photo": "https://foodish-api.com/images/rice/rice1.jpg",
+    "photo": "/recipe-images/ai-soy-glazed-chicken-sweetcorn-pea-rice-bowl.jpg",
     "course": "main"
   },
   {
@@ -112,7 +112,7 @@
       "carbs": 32,
       "fat": 28
     },
-    "photo": "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-crispy-fish-finger-cucumber-wraps-with-cheddar.jpg",
     "course": "main"
   },
   {
@@ -151,7 +151,7 @@
       "carbs": 62,
       "fat": 22
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta2.jpg",
+    "photo": "/recipe-images/ai-creamy-ham-sweetcorn-fusilli.jpg",
     "course": "main"
   },
   {
@@ -185,7 +185,7 @@
       "carbs": 32,
       "fat": 22
     },
-    "photo": "https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-smoky-chicken-cheddar-quesadillas-with-red-pepper.jpg",
     "course": "main"
   },
   {
@@ -225,7 +225,7 @@
       "carbs": 42,
       "fat": 18
     },
-    "photo": "https://images.pexels.com/photos/1640775/pexels-photo-1640775.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-teriyaki-salmon-udon-noodle-stir-fry.jpg",
     "course": "main"
   },
   {
@@ -259,7 +259,7 @@
       "carbs": 38,
       "fat": 15
     },
-    "photo": "https://foodish-api.com/images/pizza/pizza1.jpg",
+    "photo": "/recipe-images/ai-ham-mozzarella-pitta-pizzas-with-oregano.jpg",
     "course": "main"
   },
   {
@@ -297,7 +297,7 @@
       "carbs": 68,
       "fat": 13
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta3.jpg",
+    "photo": "/recipe-images/ai-green-pesto-pasta-shells-with-parmesan-peas.jpg",
     "course": "main"
   },
   {
@@ -332,7 +332,7 @@
       "carbs": 42,
       "fat": 9
     },
-    "photo": "https://foodish-api.com/images/rice/rice2.jpg",
+    "photo": "/recipe-images/ai-egg-fried-rice-with-peas-sweetcorn-soy.jpg",
     "course": "main"
   },
   {
@@ -371,7 +371,7 @@
       "carbs": 52,
       "fat": 18
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta4.jpg",
+    "photo": "/recipe-images/ai-creamy-tuna-sweetcorn-pasta-bake.jpg",
     "course": "main"
   },
   {
@@ -409,7 +409,7 @@
       "carbs": 42,
       "fat": 24
     },
-    "photo": "https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-sausage-baked-bean-one-pot-on-buttered-toast.jpg",
     "course": "main"
   },
   {
@@ -446,7 +446,7 @@
       "carbs": 42,
       "fat": 12
     },
-    "photo": "https://images.pexels.com/photos/1640773/pexels-photo-1640773.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-golden-chicken-goujons-with-oven-chips-peas.jpg",
     "course": "main"
   },
   {
@@ -485,7 +485,7 @@
       "carbs": 32,
       "fat": 21
     },
-    "photo": "https://images.pexels.com/photos/1640770/pexels-photo-1640770.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-courgette-tomato-melted-cheddar-omelette-with-toast.jpg",
     "course": "main"
   },
   {
@@ -525,7 +525,7 @@
       "carbs": 68,
       "fat": 12
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta5.jpg",
+    "photo": "/recipe-images/ai-quick-beef-bolognese-rag-with-spaghetti.jpg",
     "course": "main"
   },
   {
@@ -564,7 +564,7 @@
       "carbs": 42,
       "fat": 6
     },
-    "photo": "https://images.pexels.com/photos/1640771/pexels-photo-1640771.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-sweet-chilli-king-prawn-udon-noodle-stir-fry.jpg",
     "course": "main"
   },
   {
@@ -597,7 +597,7 @@
       "carbs": 52,
       "fat": 21
     },
-    "photo": "https://images.pexels.com/photos/1640776/pexels-photo-1640776.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-cheddar-topped-baked-beans-on-thick-buttered-toast.jpg",
     "course": "main"
   },
   {
@@ -636,7 +636,7 @@
       "carbs": 18,
       "fat": 18
     },
-    "photo": "https://images.pexels.com/photos/2092906/pexels-photo-2092906.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-golden-chicken-lettuce-mayo-wraps.jpg",
     "course": "main"
   },
   {
@@ -676,7 +676,7 @@
       "carbs": 72,
       "fat": 26
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta18.jpg",
+    "photo": "/recipe-images/ai-stovetop-cheddar-mustard-mac-cheese.jpg",
     "course": "main"
   },
   {
@@ -715,7 +715,7 @@
       "carbs": 57,
       "fat": 31
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta6.jpg",
+    "photo": "/recipe-images/ai-crispy-bacon-pea-cream-penne.jpg",
     "course": "main"
   },
   {
@@ -750,7 +750,7 @@
       "carbs": 52,
       "fat": 8
     },
-    "photo": "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-sweet-sour-chicken-with-pineapple-steamed-rice.jpg",
     "course": "main"
   },
   {
@@ -784,7 +784,7 @@
       "carbs": 42,
       "fat": 16
     },
-    "photo": "https://images.pexels.com/photos/3184181/pexels-photo-3184181.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-smoky-black-bean-cheddar-quesadillas.jpg",
     "course": "main"
   },
   {
@@ -824,7 +824,7 @@
       "carbs": 68,
       "fat": 9
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta7.jpg",
+    "photo": "/recipe-images/ai-herby-turkey-rag-with-rigatoni.jpg",
     "course": "main"
   },
   {
@@ -860,7 +860,7 @@
       "carbs": 52,
       "fat": 16
     },
-    "photo": "https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-sesame-egg-vegetable-udon-noodle-stir-fry.jpg",
     "course": "main"
   },
   {
@@ -902,7 +902,7 @@
       "carbs": 48,
       "fat": 16
     },
-    "photo": "https://images.pexels.com/photos/3255197/pexels-photo-3255197.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-gochujang-beef-udon-noodles.jpg",
     "course": "main"
   },
   {
@@ -943,7 +943,7 @@
       "carbs": 48,
       "fat": 16
     },
-    "photo": "https://foodish-api.com/images/biryani/biryani2.jpg",
+    "photo": "/recipe-images/ai-miso-butter-salmon-with-edamame-rice.jpg",
     "course": "main"
   },
   {
@@ -984,7 +984,7 @@
       "carbs": 28,
       "fat": 12
     },
-    "photo": "https://foodish-api.com/images/butter-chicken/butter-chicken4.jpg",
+    "photo": "/recipe-images/ai-smoky-paprika-chicken-butter-bean-stew.jpg",
     "course": "main"
   },
   {
@@ -1026,7 +1026,7 @@
       "carbs": 2,
       "fat": 32
     },
-    "photo": "https://images.pexels.com/photos/2149542/pexels-photo-2149542.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-pan-seared-sirloin-steak-with-garlic-butter-watercress.jpg",
     "course": "main"
   },
   {
@@ -1068,7 +1068,7 @@
       "carbs": 18,
       "fat": 18
     },
-    "photo": "https://images.pexels.com/photos/3735228/pexels-photo-3735228.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-seared-king-scallops-with-crushed-peas-crispy-pancetta.jpg",
     "course": "main"
   },
   {
@@ -1110,7 +1110,7 @@
       "carbs": 65,
       "fat": 32
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta8.jpg",
+    "photo": "/recipe-images/ai-nduja-cherry-tomato-burrata-tagliatelle.jpg",
     "course": "main"
   },
   {
@@ -1152,7 +1152,7 @@
       "carbs": 42,
       "fat": 32
     },
-    "photo": "https://images.pexels.com/photos/1640779/pexels-photo-1640779.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-pork-herb-bangers-with-creamy-mash-onion-gravy.jpg",
     "course": "main"
   },
   {
@@ -1191,7 +1191,7 @@
       "carbs": 28,
       "fat": 38
     },
-    "photo": "https://images.pexels.com/photos/1640778/pexels-photo-1640778.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-crispy-southern-fried-chicken-caesar-salad.jpg",
     "course": "main"
   },
   {
@@ -1233,7 +1233,7 @@
       "carbs": 68,
       "fat": 35
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta9.jpg",
+    "photo": "/recipe-images/ai-chorizo-cherry-tomato-mascarpone-pasta.jpg",
     "course": "main"
   },
   {
@@ -1270,7 +1270,7 @@
       "carbs": 38,
       "fat": 26
     },
-    "photo": "https://foodish-api.com/images/rice/rice3.jpg",
+    "photo": "/recipe-images/ai-crispy-chorizo-spinach-fried-egg-rice-bowl.jpg",
     "course": "main"
   },
   {
@@ -1313,7 +1313,7 @@
       "carbs": 35,
       "fat": 19
     },
-    "photo": "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-white-bean-leek-bacon-soup-with-crusty-bread.jpg",
     "course": "main"
   },
   {
@@ -1354,7 +1354,7 @@
       "carbs": 38,
       "fat": 28
     },
-    "photo": "https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-halloumi-roasted-pepper-flatbreads.jpg",
     "course": "main"
   },
   {
@@ -1396,7 +1396,7 @@
       "carbs": 52,
       "fat": 22
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta10.jpg",
+    "photo": "/recipe-images/ai-garlic-chilli-king-prawn-linguine.jpg",
     "course": "main"
   },
   {
@@ -1438,7 +1438,7 @@
       "carbs": 32,
       "fat": 12
     },
-    "photo": "https://images.pexels.com/photos/1640775/pexels-photo-1640775.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-roasted-tomato-butter-bean-soup.jpg",
     "course": "main"
   },
   {
@@ -1477,7 +1477,7 @@
       "carbs": 58,
       "fat": 16
     },
-    "photo": "https://foodish-api.com/images/rice/rice4.jpg",
+    "photo": "/recipe-images/ai-pork-black-bean-stir-fry-with-rice.jpg",
     "course": "main"
   },
   {
@@ -1518,7 +1518,7 @@
       "carbs": 72,
       "fat": 19
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta11.jpg",
+    "photo": "/recipe-images/ai-chorizo-tomato-tenderstem-spaghetti.jpg",
     "course": "main"
   },
   {
@@ -1562,7 +1562,7 @@
       "carbs": 32,
       "fat": 16
     },
-    "photo": "https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-prawn-saganaki-with-feta-crusty-bread.jpg",
     "course": "main"
   },
   {
@@ -1602,7 +1602,7 @@
       "carbs": 18,
       "fat": 35
     },
-    "photo": "https://images.pexels.com/photos/1640773/pexels-photo-1640773.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-nduja-shakshuka-with-sourdough.jpg",
     "course": "main"
   },
   {
@@ -1646,7 +1646,7 @@
       "carbs": 52,
       "fat": 31
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta12.jpg",
+    "photo": "/recipe-images/ai-smoked-salmon-caper-lemon-tagliatelle.jpg",
     "course": "main"
   },
   {
@@ -1690,7 +1690,7 @@
       "carbs": 72,
       "fat": 41
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta13.jpg",
+    "photo": "/recipe-images/ai-gorgonzola-walnut-pear-rigatoni.jpg",
     "course": "main"
   },
   {
@@ -1732,7 +1732,7 @@
       "carbs": 58,
       "fat": 18
     },
-    "photo": "https://foodish-api.com/images/biryani/biryani1.jpg",
+    "photo": "/recipe-images/ai-thai-green-prawn-curry-with-jasmine-rice.jpg",
     "course": "main"
   },
   {
@@ -1772,7 +1772,7 @@
       "carbs": 48,
       "fat": 16
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta14.jpg",
+    "photo": "/recipe-images/ai-crispy-chicken-thigh-roasted-tomato-orzo.jpg",
     "course": "main"
   },
   {
@@ -1813,7 +1813,7 @@
       "carbs": 38,
       "fat": 18
     },
-    "photo": "https://images.pexels.com/photos/1640770/pexels-photo-1640770.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-smoky-chicken-fajitas-with-charred-peppers-sour-cream.jpg",
     "course": "main"
   },
   {
@@ -1848,7 +1848,7 @@
       "carbs": 52,
       "fat": 18
     },
-    "photo": "https://foodish-api.com/images/pizza/pizza2.jpg",
+    "photo": "/recipe-images/ai-build-your-own-mozzarella-ham-pizzas.jpg",
     "course": "main"
   },
   {
@@ -1888,7 +1888,7 @@
       "carbs": 38,
       "fat": 14
     },
-    "photo": "https://images.pexels.com/photos/1640771/pexels-photo-1640771.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-creamy-fish-pie-with-cheesy-mash-topping.jpg",
     "course": "main"
   },
   {
@@ -1929,7 +1929,7 @@
       "carbs": 58,
       "fat": 26
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta15.jpg",
+    "photo": "/recipe-images/ai-sausage-meatball-tomato-sauce-pasta-bake.jpg",
     "course": "main"
   },
   {
@@ -1969,7 +1969,7 @@
       "carbs": 48,
       "fat": 22
     },
-    "photo": "https://images.pexels.com/photos/1640776/pexels-photo-1640776.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-spiced-lamb-kofta-pittas-with-cucumber-yoghurt.jpg",
     "course": "main"
   },
   {
@@ -2008,7 +2008,7 @@
       "carbs": 52,
       "fat": 16
     },
-    "photo": "https://images.pexels.com/photos/2092906/pexels-photo-2092906.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-crispy-skin-jacket-potatoes-with-tuna-mayo-or-baked-beans.jpg",
     "course": "main"
   },
   {
@@ -2048,7 +2048,7 @@
       "carbs": 32,
       "fat": 15
     },
-    "photo": "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-paprika-chicken-drumstick-baby-potato-traybake.jpg",
     "course": "main"
   },
   {
@@ -2088,7 +2088,7 @@
       "carbs": 32,
       "fat": 28
     },
-    "photo": "https://images.pexels.com/photos/3184181/pexels-photo-3184181.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-smoky-beef-taco-night-with-cheese-salsa-sour-cream.jpg",
     "course": "main"
   },
   {
@@ -2128,7 +2128,7 @@
       "carbs": 108,
       "fat": 18
     },
-    "photo": "https://foodish-api.com/images/butter-chicken/butter-chicken1.jpg",
+    "photo": "/recipe-images/ai-mild-chickpea-sweet-potato-coconut-curry-with-naan.jpg",
     "course": "main"
   },
   {
@@ -2169,7 +2169,7 @@
       "carbs": 71,
       "fat": 18
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta16.jpg",
+    "photo": "/recipe-images/ai-baked-beef-rag-rigatoni-with-mozzarella.jpg",
     "course": "main"
   },
   {
@@ -2208,7 +2208,7 @@
       "carbs": 68,
       "fat": 9
     },
-    "photo": "https://foodish-api.com/images/rice/rice5.jpg",
+    "photo": "/recipe-images/ai-honey-soy-sticky-chicken-drumsticks-with-rice.jpg",
     "course": "main"
   },
   {
@@ -2248,7 +2248,7 @@
       "carbs": 58,
       "fat": 17
     },
-    "photo": "https://foodish-api.com/images/butter-chicken/butter-chicken2.jpg",
+    "photo": "/recipe-images/ai-thai-green-coconut-chicken-curry-with-jasmine-rice.jpg",
     "course": "main"
   },
   {
@@ -2288,7 +2288,7 @@
       "carbs": 28,
       "fat": 18
     },
-    "photo": "https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-lemon-roasted-salmon-with-new-potatoes-courgette.jpg",
     "course": "main"
   },
   {
@@ -2329,7 +2329,7 @@
       "carbs": 24,
       "fat": 15
     },
-    "photo": "https://images.pexels.com/photos/3255197/pexels-photo-3255197.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-smoky-tomato-pepper-shakshuka-with-crusty-bread.jpg",
     "course": "main"
   },
   {
@@ -2370,7 +2370,7 @@
       "carbs": 38,
       "fat": 28
     },
-    "photo": "https://images.pexels.com/photos/2149542/pexels-photo-2149542.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-pulled-spiced-chicken-tacos-with-lime-slaw.jpg",
     "course": "main"
   },
   {
@@ -2410,7 +2410,7 @@
       "carbs": 18,
       "fat": 16
     },
-    "photo": "https://images.pexels.com/photos/3735228/pexels-photo-3735228.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-vivid-green-pea-ham-soup-with-crusty-bread.jpg",
     "course": "main"
   },
   {
@@ -2452,7 +2452,7 @@
       "carbs": 62,
       "fat": 14
     },
-    "photo": "https://foodish-api.com/images/rice/rice6.jpg",
+    "photo": "/recipe-images/ai-creamy-chicken-mushroom-stroganoff-with-rice.jpg",
     "course": "main"
   },
   {
@@ -2494,7 +2494,7 @@
       "carbs": 35,
       "fat": 26
     },
-    "photo": "https://images.pexels.com/photos/1640779/pexels-photo-1640779.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-saucy-onion-gravy-beef-meatballs-with-crushed-potatoes.jpg",
     "course": "main"
   },
   {
@@ -2536,7 +2536,7 @@
       "carbs": 58,
       "fat": 18
     },
-    "photo": "https://foodish-api.com/images/pasta/pasta17.jpg",
+    "photo": "/recipe-images/ai-herby-pork-gnocchi-bolognese.jpg",
     "course": "main"
   },
   {
@@ -2575,7 +2575,7 @@
       "carbs": 58,
       "fat": 16
     },
-    "photo": "https://images.pexels.com/photos/1640778/pexels-photo-1640778.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-sticky-tamarind-pork-udon-noodle-bowl.jpg",
     "course": "main"
   },
   {
@@ -2618,7 +2618,7 @@
       "carbs": 42,
       "fat": 18
     },
-    "photo": "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-steamed-mussels-in-white-wine-garlic-cream-with-sourdough.jpg",
     "course": "main"
   },
   {
@@ -2662,7 +2662,7 @@
       "carbs": 8,
       "fat": 35
     },
-    "photo": "https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-lamb-cutlets-with-herby-salsa-verde-roasted-cherry-tomatoes.jpg",
     "course": "main"
   },
   {
@@ -2701,7 +2701,7 @@
       "carbs": 6,
       "fat": 32
     },
-    "photo": "https://images.pexels.com/photos/1640775/pexels-photo-1640775.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-roast-pork-tenderloin-with-wholegrain-mustard-cream-wilted-s.jpg",
     "course": "main"
   },
   {
@@ -2744,7 +2744,7 @@
       "carbs": 24,
       "fat": 42
     },
-    "photo": "https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-sausage-squash-taleggio-traybake.jpg",
     "course": "main"
   },
   {
@@ -2787,7 +2787,7 @@
       "carbs": 68,
       "fat": 52
     },
-    "photo": "https://foodish-api.com/images/burger/burger1.jpg",
+    "photo": "/recipe-images/ai-smash-burgers-with-special-sauce-crispy-fries.jpg",
     "course": "main"
   },
   {
@@ -2832,7 +2832,7 @@
       "carbs": 42,
       "fat": 34
     },
-    "photo": "https://images.pexels.com/photos/1640773/pexels-photo-1640773.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-harissa-lamb-flatbreads-with-cucumber-tzatziki.jpg",
     "course": "main"
   },
   {
@@ -2877,7 +2877,7 @@
       "carbs": 62,
       "fat": 28
     },
-    "photo": "https://foodish-api.com/images/butter-chicken/butter-chicken3.jpg",
+    "photo": "/recipe-images/ai-creamy-butter-chicken-with-pilau-rice.jpg",
     "course": "main"
   },
   {
@@ -2922,7 +2922,7 @@
       "carbs": 68,
       "fat": 22
     },
-    "photo": "https://foodish-api.com/images/biryani/biryani4.jpg",
+    "photo": "/recipe-images/ai-pea-pancetta-lemon-risotto.jpg",
     "course": "main"
   },
   {
@@ -2964,7 +2964,7 @@
       "carbs": 28,
       "fat": 24
     },
-    "photo": "https://images.pexels.com/photos/1640770/pexels-photo-1640770.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-lemon-herb-chicken-thigh-traybake-with-new-potatoes.jpg",
     "course": "main"
   },
   {
@@ -3008,7 +3008,7 @@
       "carbs": 18,
       "fat": 28
     },
-    "photo": "https://images.pexels.com/photos/1640771/pexels-photo-1640771.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-duck-breast-with-port-cherry-sauce.jpg",
     "course": "main"
   },
   {
@@ -3052,7 +3052,7 @@
       "carbs": 8,
       "fat": 18
     },
-    "photo": "https://images.pexels.com/photos/1640776/pexels-photo-1640776.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-whole-sea-bream-baked-with-fennel-lemon-white-wine.jpg",
     "course": "main"
   },
   {
@@ -3091,7 +3091,7 @@
       "carbs": 32,
       "fat": 82
     },
-    "photo": "https://images.pexels.com/photos/2092906/pexels-photo-2092906.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-ribeye-steak-with-b-arnaise-sauce-oven-chips.jpg",
     "course": "main"
   },
   {
@@ -3136,7 +3136,7 @@
       "carbs": 8,
       "fat": 28
     },
-    "photo": "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=400&h=260&dpr=1",
+    "photo": "/recipe-images/ai-chicken-thighs-with-preserved-lemon-olives-white-wine.jpg",
     "course": "main"
   },
   {
@@ -3183,7 +3183,7 @@
       "carbs": 68,
       "fat": 18
     },
-    "photo": "https://foodish-api.com/images/biryani/biryani3.jpg",
+    "photo": "/recipe-images/ai-saffron-prawn-chorizo-risotto.jpg",
     "course": "main"
   },
   {
@@ -3236,7 +3236,7 @@
       "carbs": 68,
       "fat": 18
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-silky-dal-makhani-with-warm-butter-naan.jpg",
     "course": "main"
   },
   {
@@ -3287,7 +3287,7 @@
       "carbs": 48,
       "fat": 22
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-palak-paneer-with-spiced-wilted-spinach-rice.jpg",
     "course": "main"
   },
   {
@@ -3342,7 +3342,7 @@
       "carbs": 58,
       "fat": 12
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-chana-masala-with-tomatoes-cumin-flatbreads.jpg",
     "course": "main"
   },
   {
@@ -3393,7 +3393,7 @@
       "carbs": 44,
       "fat": 24
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-lamb-rogan-josh-with-fragrant-basmati-rice.jpg",
     "course": "main"
   },
   {
@@ -3443,7 +3443,7 @@
       "carbs": 48,
       "fat": 12
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-saag-aloo-with-crispy-spiced-potatoes-spinach.jpg",
     "course": "main"
   },
   {
@@ -3497,7 +3497,7 @@
       "carbs": 50,
       "fat": 16
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-keema-matar-with-spiced-mince-peas-on-rice.jpg",
     "course": "main"
   },
   {
@@ -3551,7 +3551,7 @@
       "carbs": 72,
       "fat": 14
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-red-lentil-dhal-with-coconut-milk-crispy-shallot-tarka.jpg",
     "course": "main"
   },
   {
@@ -3604,7 +3604,7 @@
       "carbs": 62,
       "fat": 16
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-crispy-chicken-katsu-with-golden-curry-sauce-rice.jpg",
     "course": "main"
   },
   {
@@ -3654,7 +3654,7 @@
       "carbs": 38,
       "fat": 16
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-crispy-pork-cabbage-gyoza-with-dipping-sauce.jpg",
     "course": "main"
   },
   {
@@ -3705,7 +3705,7 @@
       "carbs": 50,
       "fat": 16
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-beef-bulgogi-bowl-with-sesame-rice-pickled-cucumber.jpg",
     "course": "main"
   },
   {
@@ -3758,7 +3758,7 @@
       "carbs": 58,
       "fat": 18
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-korean-bibimbap-with-beef-vegetables-fried-egg.jpg",
     "course": "main"
   },
   {
@@ -3806,7 +3806,7 @@
       "carbs": 52,
       "fat": 18
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-spicy-gochujang-chicken-thighs-with-spring-onion-rice.jpg",
     "course": "main"
   },
   {
@@ -3855,7 +3855,7 @@
       "carbs": 54,
       "fat": 22
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-japanese-pork-miso-ramen-with-soft-boiled-egg.jpg",
     "course": "main"
   },
   {
@@ -3904,7 +3904,7 @@
       "carbs": 58,
       "fat": 18
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-japchae-korean-glass-noodles-with-beef-vegetables.jpg",
     "course": "main"
   },
   {
@@ -3954,7 +3954,7 @@
       "carbs": 22,
       "fat": 28
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-coq-au-vin-with-mushrooms-lardons-crusty-bread.jpg",
     "course": "main"
   },
   {
@@ -4005,7 +4005,7 @@
       "carbs": 52,
       "fat": 24
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-classic-beef-bourguignon-with-buttered-egg-noodles.jpg",
     "course": "main"
   },
   {
@@ -4051,7 +4051,7 @@
       "carbs": 52,
       "fat": 22
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-silky-french-onion-soup-with-gruy-re-cro-tons.jpg",
     "course": "main"
   },
   {
@@ -4099,7 +4099,7 @@
       "carbs": 30,
       "fat": 22
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-ratatouille-proven-ale-with-herbed-goat-s-cheese-bread.jpg",
     "course": "main"
   },
   {
@@ -4146,7 +4146,7 @@
       "carbs": 4,
       "fat": 28
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-whole-roast-chicken-with-tarragon-butter-white-wine.jpg",
     "course": "main"
   },
   {
@@ -4197,7 +4197,7 @@
       "carbs": 28,
       "fat": 38
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-greek-moussaka-with-spiced-lamb-creamy-b-chamel.jpg",
     "course": "main"
   },
   {
@@ -4244,7 +4244,7 @@
       "carbs": 30,
       "fat": 26
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-spanakopita-greek-spinach-feta-filo-pie.jpg",
     "course": "main"
   },
   {
@@ -4292,7 +4292,7 @@
       "carbs": 36,
       "fat": 28
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-slow-baked-lamb-kleftiko-with-lemon-oregano-potatoes.jpg",
     "course": "main"
   },
   {
@@ -4341,7 +4341,7 @@
       "carbs": 38,
       "fat": 20
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-lemon-herb-chicken-souvlaki-with-tzatziki-pitta.jpg",
     "course": "main"
   },
   {
@@ -4387,7 +4387,7 @@
       "carbs": 6,
       "fat": 22
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-roasted-red-pepper-tomato-frittata-with-manchego.jpg",
     "course": "main"
   },
   {
@@ -4435,7 +4435,7 @@
       "carbs": 22,
       "fat": 24
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-turkish-eggs-with-whipped-yoghurt-chilli-butter.jpg",
     "course": "main"
   },
   {
@@ -4482,7 +4482,7 @@
       "carbs": 30,
       "fat": 16
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-baked-eggs-in-spiced-butternut-tomato-sauce.jpg",
     "course": "main"
   },
   {
@@ -4528,7 +4528,7 @@
       "carbs": 36,
       "fat": 20
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-harissa-roasted-cauliflower-with-chickpeas-tahini.jpg",
     "course": "main"
   },
   {
@@ -4575,7 +4575,7 @@
       "carbs": 70,
       "fat": 22
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-creamy-mushroom-thyme-taleggio-risotto.jpg",
     "course": "main"
   },
   {
@@ -4619,7 +4619,7 @@
       "carbs": 22,
       "fat": 30
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-aubergine-parmigiana-with-fresh-basil-mozzarella.jpg",
     "course": "main"
   },
   {
@@ -4668,7 +4668,7 @@
       "carbs": 48,
       "fat": 16
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-tuscan-white-bean-cavolo-nero-soup-with-rosemary-oil.jpg",
     "course": "main"
   },
   {
@@ -4714,7 +4714,7 @@
       "carbs": 68,
       "fat": 26
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-butternut-squash-sage-ricotta-stuffed-pasta-shells.jpg",
     "course": "main"
   },
   {
@@ -4764,7 +4764,7 @@
       "carbs": 72,
       "fat": 10
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-black-bean-sweet-potato-chipotle-chilli-with-rice.jpg",
     "course": "main"
   },
   {
@@ -4812,7 +4812,7 @@
       "carbs": 14,
       "fat": 24
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-shakshuka-verde-with-kale-courgette-feta.jpg",
     "course": "main"
   },
   {
@@ -4858,7 +4858,7 @@
       "carbs": 2,
       "fat": 22
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-smoked-salmon-dill-frittata-with-cr-me-fra-che.jpg",
     "course": "main"
   },
   {
@@ -4908,7 +4908,7 @@
       "carbs": 10,
       "fat": 38
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-slow-braised-beef-short-ribs-with-red-wine-gremolata.jpg",
     "course": "main"
   },
   {
@@ -4954,7 +4954,7 @@
       "carbs": 32,
       "fat": 30
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-slow-roasted-pork-shoulder-with-apple-sage-crackling.jpg",
     "course": "main"
   },
   {
@@ -4999,7 +4999,7 @@
       "carbs": 36,
       "fat": 26
     },
-    "photo": null,
+    "photo": "/recipe-images/ai-slow-cooked-lamb-shoulder-with-anchovies-rosemary.jpg",
     "course": "main"
   },
   {
@@ -5045,7 +5045,7 @@
       "carbs": 8,
       "fat": 9
     },
-    "photo": null
+    "photo": "/recipe-images/ai-classic-prawn-cocktail-with-marie-rose-sauce.jpg"
   },
   {
     "name": "Bruschetta with Vine Tomatoes, Garlic & Basil",
@@ -5088,7 +5088,7 @@
       "carbs": 34,
       "fat": 9
     },
-    "photo": null
+    "photo": "/recipe-images/ai-bruschetta-with-vine-tomatoes-garlic-basil.jpg"
   },
   {
     "name": "Burrata with Roasted Cherry Tomatoes & Pesto",
@@ -5131,7 +5131,7 @@
       "carbs": 8,
       "fat": 24
     },
-    "photo": null
+    "photo": "/recipe-images/ai-burrata-with-roasted-cherry-tomatoes-pesto.jpg"
   },
   {
     "name": "Smooth Chicken Liver Pâté with Toasted Brioche",
@@ -5177,7 +5177,7 @@
       "carbs": 14,
       "fat": 28
     },
-    "photo": null
+    "photo": "/recipe-images/ai-smooth-chicken-liver-p-t-with-toasted-brioche.jpg"
   },
   {
     "name": "Smoked Salmon Blinis with Crème Fraîche & Dill",
@@ -5224,7 +5224,7 @@
       "carbs": 28,
       "fat": 14
     },
-    "photo": null
+    "photo": "/recipe-images/ai-smoked-salmon-blinis-with-cr-me-fra-che-dill.jpg"
   },
   {
     "name": "Baked Camembert with Honey, Rosemary & Walnuts",
@@ -5265,7 +5265,7 @@
       "carbs": 12,
       "fat": 26
     },
-    "photo": null
+    "photo": "/recipe-images/ai-baked-camembert-with-honey-rosemary-walnuts.jpg"
   },
   {
     "name": "Beetroot & Goat's Cheese Salad with Walnuts",
@@ -5309,7 +5309,7 @@
       "carbs": 16,
       "fat": 20
     },
-    "photo": null
+    "photo": "/recipe-images/ai-beetroot-goat-s-cheese-salad-with-walnuts.jpg"
   },
   {
     "name": "Crispy Arancini with Mozzarella & Tomato Sauce",
@@ -5357,7 +5357,7 @@
       "carbs": 52,
       "fat": 17
     },
-    "photo": null
+    "photo": "/recipe-images/ai-crispy-arancini-with-mozzarella-tomato-sauce.jpg"
   },
   {
     "name": "Melon, Prosciutto & Burrata with Mint Oil",
@@ -5397,7 +5397,7 @@
       "carbs": 14,
       "fat": 14
     },
-    "photo": null
+    "photo": "/recipe-images/ai-melon-prosciutto-burrata-with-mint-oil.jpg"
   },
   {
     "name": "Crab on Toast with Lemon, Chilli & Avocado",
@@ -5439,7 +5439,7 @@
       "carbs": 26,
       "fat": 18
     },
-    "photo": null
+    "photo": "/recipe-images/ai-crab-on-toast-with-lemon-chilli-avocado.jpg"
   },
   {
     "name": "Potato Dauphinoise with Gruyère & Thyme",
@@ -5482,7 +5482,7 @@
       "carbs": 32,
       "fat": 29
     },
-    "photo": null
+    "photo": "/recipe-images/ai-potato-dauphinoise-with-gruy-re-thyme.jpg"
   },
   {
     "name": "Crispy Smashed Potatoes with Garlic Herb Butter",
@@ -5524,7 +5524,7 @@
       "carbs": 36,
       "fat": 15
     },
-    "photo": null
+    "photo": "/recipe-images/ai-crispy-smashed-potatoes-with-garlic-herb-butter.jpg"
   },
   {
     "name": "Hasselback Potatoes with Soured Cream & Chives",
@@ -5565,7 +5565,7 @@
       "carbs": 40,
       "fat": 14
     },
-    "photo": null
+    "photo": "/recipe-images/ai-hasselback-potatoes-with-soured-cream-chives.jpg"
   },
   {
     "name": "Roasted Tenderstem Broccoli with Chilli & Parmesan",
@@ -5607,7 +5607,7 @@
       "carbs": 5,
       "fat": 10
     },
-    "photo": null
+    "photo": "/recipe-images/ai-roasted-tenderstem-broccoli-with-chilli-parmesan.jpg"
   },
   {
     "name": "Honey-Roasted Carrots with Cumin & Fresh Herbs",
@@ -5649,7 +5649,7 @@
       "carbs": 22,
       "fat": 7
     },
-    "photo": null
+    "photo": "/recipe-images/ai-honey-roasted-carrots-with-cumin-fresh-herbs.jpg"
   },
   {
     "name": "Classic Caesar Salad with Soft-Boiled Egg",
@@ -5696,7 +5696,7 @@
       "carbs": 22,
       "fat": 26
     },
-    "photo": null
+    "photo": "/recipe-images/ai-classic-caesar-salad-with-soft-boiled-egg.jpg"
   },
   {
     "name": "Creamy Cauliflower Cheese with Mature Cheddar",
@@ -5738,7 +5738,7 @@
       "carbs": 20,
       "fat": 21
     },
-    "photo": null
+    "photo": "/recipe-images/ai-creamy-cauliflower-cheese-with-mature-cheddar.jpg"
   },
   {
     "name": "Creamed Spinach with Nutmeg & Garlic",
@@ -5780,7 +5780,7 @@
       "carbs": 5,
       "fat": 18
     },
-    "photo": null
+    "photo": "/recipe-images/ai-creamed-spinach-with-nutmeg-garlic.jpg"
   },
   {
     "name": "Honey-Glazed Roasted Parsnips with Sage",
@@ -5820,7 +5820,7 @@
       "carbs": 28,
       "fat": 9
     },
-    "photo": null
+    "photo": "/recipe-images/ai-honey-glazed-roasted-parsnips-with-sage.jpg"
   },
   {
     "name": "Roasted Garlic & Herb Flatbreads",
@@ -5863,7 +5863,7 @@
       "carbs": 52,
       "fat": 16
     },
-    "photo": null
+    "photo": "/recipe-images/ai-roasted-garlic-herb-flatbreads.jpg"
   },
   {
     "name": "Roasted Asparagus with Lemon & Almonds",
@@ -5902,7 +5902,7 @@
       "carbs": 6,
       "fat": 14
     },
-    "photo": null
+    "photo": "/recipe-images/ai-roasted-asparagus-with-lemon-almonds.jpg"
   },
   {
     "name": "Classic Coleslaw with Apple & Poppy Seeds",
@@ -5947,7 +5947,7 @@
       "carbs": 15,
       "fat": 11
     },
-    "photo": null
+    "photo": "/recipe-images/ai-classic-coleslaw-with-apple-poppy-seeds.jpg"
   },
   {
     "name": "Sticky Toffee Pudding with Hot Butterscotch Sauce",
@@ -5993,7 +5993,7 @@
       "carbs": 84,
       "fat": 29
     },
-    "photo": null
+    "photo": "/recipe-images/ai-sticky-toffee-pudding-with-hot-butterscotch-sauce.jpg"
   },
   {
     "name": "Individual Chocolate Fondants with Vanilla Ice Cream",
@@ -6035,7 +6035,7 @@
       "carbs": 54,
       "fat": 38
     },
-    "photo": null
+    "photo": "/recipe-images/ai-individual-chocolate-fondants-with-vanilla-ice-cream.jpg"
   },
   {
     "name": "Classic Tiramisu with Espresso & Marsala",
@@ -6077,7 +6077,7 @@
       "carbs": 46,
       "fat": 28
     },
-    "photo": null
+    "photo": "/recipe-images/ai-classic-tiramisu-with-espresso-marsala.jpg"
   },
   {
     "name": "Eton Mess with Strawberries & Whipped Cream",
@@ -6117,7 +6117,7 @@
       "carbs": 48,
       "fat": 27
     },
-    "photo": null
+    "photo": "/recipe-images/ai-eton-mess-with-strawberries-whipped-cream.jpg"
   },
   {
     "name": "Lemon Posset with Shortbread Biscuits",
@@ -6157,7 +6157,7 @@
       "carbs": 38,
       "fat": 40
     },
-    "photo": null
+    "photo": "/recipe-images/ai-lemon-posset-with-shortbread-biscuits.jpg"
   },
   {
     "name": "Classic Apple Crumble with Vanilla Custard",
@@ -6200,7 +6200,7 @@
       "carbs": 72,
       "fat": 20
     },
-    "photo": null
+    "photo": "/recipe-images/ai-classic-apple-crumble-with-vanilla-custard.jpg"
   },
   {
     "name": "Vanilla Panna Cotta with Raspberry Coulis",
@@ -6242,7 +6242,7 @@
       "carbs": 24,
       "fat": 36
     },
-    "photo": null
+    "photo": "/recipe-images/ai-vanilla-panna-cotta-with-raspberry-coulis.jpg"
   },
   {
     "name": "Banoffee Pie with Salted Toffee Sauce",
@@ -6286,7 +6286,7 @@
       "carbs": 74,
       "fat": 40
     },
-    "photo": null
+    "photo": "/recipe-images/ai-banoffee-pie-with-salted-toffee-sauce.jpg"
   },
   {
     "name": "Crème Brûlée with Vanilla & Orange Zest",
@@ -6326,7 +6326,7 @@
       "carbs": 26,
       "fat": 43
     },
-    "photo": null
+    "photo": "/recipe-images/ai-cr-me-br-l-e-with-vanilla-orange-zest.jpg"
   },
   {
     "name": "BBQ Spatchcock Chicken with Smoky Paprika Rub",
@@ -6368,7 +6368,7 @@
       "carbs": 4,
       "fat": 23
     },
-    "photo": null
+    "photo": "/recipe-images/ai-bbq-spatchcock-chicken-with-smoky-paprika-rub.jpg"
   },
   {
     "name": "Sticky BBQ Pork Ribs with Bourbon Glaze",
@@ -6413,7 +6413,7 @@
       "carbs": 22,
       "fat": 34
     },
-    "photo": null
+    "photo": "/recipe-images/ai-sticky-bbq-pork-ribs-with-bourbon-glaze.jpg"
   },
   {
     "name": "Jerk Chicken Thighs with Mango Salsa",
@@ -6464,7 +6464,7 @@
       "carbs": 20,
       "fat": 26
     },
-    "photo": null
+    "photo": "/recipe-images/ai-jerk-chicken-thighs-with-mango-salsa.jpg"
   },
   {
     "name": "BBQ Pulled Pork Burgers with Pickled Slaw",
@@ -6509,7 +6509,7 @@
       "carbs": 38,
       "fat": 30
     },
-    "photo": null
+    "photo": "/recipe-images/ai-bbq-pulled-pork-burgers-with-pickled-slaw.jpg"
   },
   {
     "name": "Grilled Sea Bass with Salsa Verde & Lemon",
@@ -6554,7 +6554,7 @@
       "carbs": 2,
       "fat": 18
     },
-    "photo": null
+    "photo": "/recipe-images/ai-grilled-sea-bass-with-salsa-verde-lemon.jpg"
   },
   {
     "name": "Chargrilled Lamb Chops with Herbed Yoghurt",
@@ -6599,7 +6599,7 @@
       "carbs": 8,
       "fat": 33
     },
-    "photo": null
+    "photo": "/recipe-images/ai-chargrilled-lamb-chops-with-herbed-yoghurt.jpg"
   },
   {
     "name": "Chermoula Prawn Skewers with Flatbread",
@@ -6642,7 +6642,7 @@
       "carbs": 16,
       "fat": 11
     },
-    "photo": null
+    "photo": "/recipe-images/ai-chermoula-prawn-skewers-with-flatbread.jpg"
   },
   {
     "name": "Grilled Halloumi Skewers with Harissa & Pomegranate",
@@ -6684,7 +6684,7 @@
       "carbs": 18,
       "fat": 30
     },
-    "photo": null
+    "photo": "/recipe-images/ai-grilled-halloumi-skewers-with-harissa-pomegranate.jpg"
   },
   {
     "name": "Double Smash Burgers with American Cheese & Pickles",
@@ -6728,6 +6728,6 @@
       "carbs": 32,
       "fat": 42
     },
-    "photo": null
+    "photo": "/recipe-images/ai-double-smash-burgers-with-american-cheese-pickles.jpg"
   }
 ]
