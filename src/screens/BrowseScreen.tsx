@@ -515,7 +515,7 @@ export function BrowseScreen({
           />
         </Modal>
       )}
-      {toast && <Toast message={toast} onUndo={toastUndoRef.current ?? undefined} bottom="80px" />}
+      {toast && <Toast message={toast} onUndo={toastUndoRef.current ?? undefined} bottom="calc(80px + env(safe-area-inset-bottom, 0px))" />}
       <BottomNav
         onPlan={() => setStep('plan')}
         onShopping={() => setStep('shopping')}

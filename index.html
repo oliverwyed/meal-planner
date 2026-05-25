@@ -18,9 +18,15 @@
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
       body { font-family: 'DM Sans', 'Helvetica Neue', sans-serif; background: #F8FAFC; color: #0F172A; -webkit-font-smoothing: antialiased; }
       input, select, textarea, button { font-family: inherit; }
+      button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
       button:focus-visible { outline: 2px solid #4F46E5; outline-offset: 2px; border-radius: 4px; }
-      button { transition: opacity 0.12s ease; }
-      button:hover:not(:disabled) { opacity: 0.82; }
+      button:active:not(:disabled) { opacity: 0.72; }
+      @media (hover: hover) {
+        button { transition: opacity 0.12s ease; }
+        button:hover:not(:disabled) { opacity: 0.82; }
+      }
+      /* Prevent iOS from zooming on input focus (font-size < 16px triggers zoom) */
+      input, select, textarea { font-size: 16px !important; }
       a:focus-visible { outline: 2px solid #4F46E5; outline-offset: 2px; }
     </style>
   </head>
