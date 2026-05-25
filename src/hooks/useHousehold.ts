@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { HouseholdState, DayName, DayMode, KidsMode, Meal, Plan, PlanMeal, DayConfig, DayOverrides, Preferences, PlanHistoryEntry, DinnerEvent } from '../lib/types';
 import { DEFAULT_DAY_CONFIG, DAYS } from '../lib/constants';
 import { loadState, saveState, saveFamilySize, addCustomMeal, updateCustomMeal, deleteCustomMeal, subscribeToState } from '../lib/supabase';
+import { readHouseholdCache, writeHouseholdCache } from '../lib/localCache';
 import { getPool, smartPick } from '../lib/scoring';
 import { buildShop } from '../lib/shopping';
 import RECIPES from '../data/recipes.json';
@@ -55,22 +56,25 @@ export type AppActions = {
   deleteEvent: (id: string) => void;
 };
 
+const DEFAULT_HS: HouseholdState = {
+  plan: null,
+  nextWeekPlan: null,
+  planHistory: [],
+  dayConfig: { ...DEFAULT_DAY_CONFIG },
+  kidsConfig: {},
+  dayOverrides: {},
+  familySize: 4,
+  preferences: { favourites: [], dislikes: [], pantry: '', dietaryMode: 'none', timeFilter: 'any' },
+  cookHistory: [],
+  customMeals: [],
+  shopChecked: {},
+  events: [],
+};
+
 export function useHousehold(householdId: string): { state: AppState; actions: AppActions; loading: boolean } {
-  const [loading, setLoading] = useState(true);
-  const [hs, setHs] = useState<HouseholdState>({
-    plan: null,
-    nextWeekPlan: null,
-    planHistory: [],
-    dayConfig: { ...DEFAULT_DAY_CONFIG },
-    kidsConfig: {},
-    dayOverrides: {},
-    familySize: 4,
-    preferences: { favourites: [], dislikes: [], pantry: '', dietaryMode: 'none', timeFilter: 'any' },
-    cookHistory: [],
-    customMeals: [],
-    shopChecked: {},
-    events: [],
-  });
+  // Seed from localStorage synchronously so the UI renders immediately on cache hit
+  const [hs, setHs] = useState<HouseholdState>(() => readHouseholdCache(householdId) ?? DEFAULT_HS);
+  const [loading, setLoading] = useState(() => readHouseholdCache(householdId) === null);
 
   const isRemoteUpdate = useRef(false);
   const pendingShopSave = useRef(false);
@@ -97,11 +101,22 @@ export function useHousehold(householdId: string): { state: AppState; actions: A
   useEffect(() => {
     const controller = new AbortController();
     loadState(householdId, controller.signal).then(state => {
-      if (state) setHs(state);
+      if (state) {
+        setHs(state);
+        writeHouseholdCache(householdId, state);
+      }
       setLoading(false);
     });
     return () => controller.abort();
   }, [householdId]);
+
+  // Keep cache current after every local edit or Realtime patch (debounced)
+  const cacheTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => {
+    clearTimeout(cacheTimer.current);
+    cacheTimer.current = setTimeout(() => writeHouseholdCache(householdId, hs), 500);
+    return () => clearTimeout(cacheTimer.current);
+  }, [householdId, hs]);
 
   // Real-time subscription
   useEffect(() => {
