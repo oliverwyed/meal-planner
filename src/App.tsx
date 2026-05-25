@@ -165,11 +165,11 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
   }, [publishedMap, showToast, state.householdId]);
 
   useEffect(() => {
-    if (!loading && state.plan && !didAutoNav.current) {
+    if (!loading && (state.plan || state.nextWeekPlan) && !didAutoNav.current) {
       didAutoNav.current = true;
       setStep('plan');
     }
-  }, [loading, state.plan]);
+  }, [loading, state.plan, state.nextWeekPlan]);
 
   useEffect(() => {
     if (step === 'plan' && !state.plan && !state.nextWeekPlan && !loading) setStep('setup');
