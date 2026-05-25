@@ -719,29 +719,48 @@ function EventDetail({ event, allMeals, pantry, onUpdate, onDelete, onBack }: {
                                   <div style={{ fontSize: '12px', color: P.muted, marginTop: '5px', fontStyle: 'italic' }}>📌 {block.note}</div>
                                 )}
 
-                                {/* Expanded recipe detail */}
-                                {isExpanded && dish && (
-                                  <div style={{ marginTop: '12px', borderTop: `1px solid ${P.border}`, paddingTop: '10px' }}>
-                                    {dish.meal.steps?.length > 0 && (
-                                      <>
-                                        <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Recipe steps</div>
-                                        {dish.meal.steps.map((step, j) => (
-                                          <div key={j} style={{ display: 'flex', gap: '8px', marginBottom: '7px', alignItems: 'flex-start' }}>
-                                            <div style={{ flexShrink: 0, width: '18px', height: '18px', borderRadius: '50%', background: color, color: '#fff', fontSize: '10px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '2px' }}>
-                                              {j + 1}
+                                {/* Expanded step detail */}
+                                {isExpanded && dish && (() => {
+                                  const indices = block.stepIndices ?? [];
+                                  const relevantSteps = indices.length > 0
+                                    ? indices.map(idx => ({ idx, text: dish.meal.steps?.[idx] })).filter(s => s.text)
+                                    : (dish.meal.steps ?? []).map((text, idx) => ({ idx, text })).slice(0, 2);
+
+                                  const stepText = relevantSteps.map(s => s.text!).join(' ').toLowerCase();
+                                  const allIngredients = scaledIngredients(dish.meal.ingredients ?? [], dish.servings / (dish.meal.serves ?? 4));
+                                  const relevantIngredients = stepText
+                                    ? allIngredients.filter(ing =>
+                                        ing.label.toLowerCase().split(/\s+/).some(w => w.length > 3 && stepText.includes(w))
+                                      )
+                                    : [];
+
+                                  return (
+                                    <div style={{ marginTop: '12px', borderTop: `1px solid ${P.border}`, paddingTop: '10px' }}>
+                                      {relevantSteps.length > 0 && (
+                                        <>
+                                          <div style={{ fontSize: '11px', fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Steps</div>
+                                          {relevantSteps.map(({ idx, text }) => (
+                                            <div key={idx} style={{ display: 'flex', gap: '8px', marginBottom: '7px', alignItems: 'flex-start' }}>
+                                              <div style={{ flexShrink: 0, width: '18px', height: '18px', borderRadius: '50%', background: color, color: '#fff', fontSize: '10px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '2px' }}>
+                                                {idx + 1}
+                                              </div>
+                                              <div style={{ fontSize: '13px', color: P.text, lineHeight: 1.5 }}>{text}</div>
                                             </div>
-                                            <div style={{ fontSize: '13px', color: P.text, lineHeight: 1.5 }}>{step}</div>
-                                          </div>
-                                        ))}
-                                      </>
-                                    )}
-                                    {dish.meal.tip && (
-                                      <div style={{ marginTop: '8px', background: P.accentLight, borderRadius: '8px', padding: '8px 10px', fontSize: '12px', color: P.accentDark, lineHeight: 1.4 }}>
-                                        💡 {dish.meal.tip}
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
+                                          ))}
+                                        </>
+                                      )}
+                                      {relevantIngredients.length > 0 && (
+                                        <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                                          {relevantIngredients.map(ing => (
+                                            <span key={ing.label} style={{ background: P.accentLight, color: P.accentDark, borderRadius: '6px', padding: '3px 8px', fontSize: '12px', fontWeight: 600 }}>
+                                              {ing.display}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
                               </div>
                             </div>
                           );

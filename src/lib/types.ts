@@ -135,6 +135,7 @@ export interface ScheduleBlock {
   mealName: string;
   action: string;
   note?: string | null;
+  stepIndices?: number[];  // 0-based indices into the dish's steps array
 }
 
 export interface DinnerEvent {

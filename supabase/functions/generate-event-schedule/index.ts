@@ -9,7 +9,7 @@ const client = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY')! });
 
 const SYSTEM = `You are an expert chef planning a dinner party cooking schedule for a home cook with a standard kitchen: one oven, one hob with 4 rings, standard equipment.
 
-You will receive a list of dishes with their total cooking time and a brief description. Produce a practical, interleaved cooking timeline.
+You will receive a list of dishes with their total cooking time, description, and numbered steps. Produce a practical, interleaved cooking timeline.
 
 Rules:
 - Break each dish into phases: active prep, active cooking, passive cooking (oven/simmer/rest)
@@ -17,7 +17,7 @@ Rules:
 - Group related prep into single blocks where sensible
 - Flag oven temperature conflicts; note resting time for large proteins
 - Keep every action concise and specific (8–15 words max)
-- Aim for the minimum number of blocks that covers all tasks clearly
+- For each block include stepIndices: the 0-based indices of the recipe steps that correspond to this block. Use [] if no steps map to it (e.g. a rest or generic prep block)
 
 Return ONLY valid JSON, no markdown fences:
 {
@@ -27,12 +27,13 @@ Return ONLY valid JSON, no markdown fences:
       "endTime": "HH:MM",
       "mealName": "dish name exactly as given, or 'Serve' for the final block",
       "action": "concise action, 8-15 words",
-      "note": "oven temp / parallel task / null"
+      "note": "oven temp / parallel task / null",
+      "stepIndices": [0, 1]
     }
   ]
 }
 
-All times 24h. Sort by startTime. End with mealName "Serve", startTime and endTime both equal to serveTime, action "Plate up and serve".`;
+All times 24h. Sort by startTime. End with mealName "Serve", startTime and endTime both equal to serveTime, action "Plate up and serve", stepIndices [].`;
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -55,10 +56,13 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: 'dishes and serveTime required' }), { status: 400, headers: corsHeaders });
     }
 
-    // Send only the essentials — full steps/ingredients balloon the token count
     const dishSummary = dishes.map(d => {
       const lines = [`## ${d.name} (${d.category}, ${d.minutes} min)`];
       if (d.description) lines.push(d.description);
+      if (d.steps?.length) {
+        lines.push('Steps:');
+        d.steps.forEach((s, i) => lines.push(`  [${i}] ${s}`));
+      }
       return lines.join('\n');
     }).join('\n\n');
 
@@ -71,7 +75,6 @@ Deno.serve(async (req: Request) => {
       messages: [{ role: 'user', content: prompt }],
     });
 
-    // Detect truncation before attempting JSON parse
     const stopReason = (message as any).stop_reason;
     if (stopReason === 'max_tokens') {
       return new Response(
