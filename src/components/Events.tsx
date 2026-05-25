@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import type { Meal, DinnerEvent, EventDish, EventCategory } from '../lib/types';
 import { P } from '../lib/constants';
 import { Primary, Secondary } from './ui';
@@ -210,6 +210,183 @@ function AddDishModal({ allMeals, guestCount, existingDishes, onAdd, onClose }: 
   );
 }
 
+// ── Course Balance Hints ──────────────────────────────────────────────────────
+
+function CourseBalanceHints({ dishes, onSuggest }: { dishes: EventDish[]; onSuggest: () => void }) {
+  if (dishes.length === 0) return null;
+  const cats = new Set(dishes.map(d => d.category));
+  const missing: string[] = [];
+  if (!cats.has('starter')) missing.push('starter');
+  if (!cats.has('main')) missing.push('main');
+  if (!cats.has('dessert')) missing.push('dessert');
+  if (!missing.length) return null;
+
+  return (
+    <div style={{ background: P.accentLight, borderRadius: '10px', padding: '10px 14px', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+      <div style={{ fontSize: '13px', color: P.accentDark, lineHeight: 1.3 }}>
+        No {missing.join(' or ')} yet
+      </div>
+      <button onClick={onSuggest}
+        style={{ background: P.accent, border: 'none', color: '#fff', borderRadius: '8px', padding: '5px 10px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+        ✨ Suggest
+      </button>
+    </div>
+  );
+}
+
+// ── Suggest Menu Panel ────────────────────────────────────────────────────────
+
+function SuggestMenuPanel({ allMeals, event, onAddDishes, onClose }: {
+  allMeals: Meal[];
+  event: DinnerEvent;
+  onAddDishes: (dishes: EventDish[]) => void;
+  onClose: () => void;
+}) {
+  const [prompt, setPrompt] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [concept, setConcept] = useState('');
+  const [suggested, setSuggested] = useState<Array<{ meal: Meal; category: EventCategory; selected: boolean }>>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const suggest = async () => {
+    if (!prompt.trim() || loading) return;
+    setLoading(true);
+    setError('');
+    setSuggested([]);
+    setConcept('');
+    try {
+      const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/suggest-event-menu`;
+      const res = await logFetch('suggest-event-menu', fnUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({
+          prompt,
+          guestCount: event.guestCount,
+          recipes: allMeals.map(m => ({
+            name: m.name,
+            course: m.course ?? 'main',
+            cuisine: m.cuisine,
+            protein: m.protein,
+            description: m.description,
+            time: m.time,
+          })),
+        }),
+      });
+      let data: any;
+      try { data = await res.json(); } catch { throw new Error(`Server error ${res.status}`); }
+      if (!res.ok) throw new Error(data?.error ?? `Server error ${res.status}`);
+      if (data._usage) recordCost('suggest-event-menu', data._usage.input_tokens, data._usage.output_tokens);
+
+      const existingNames = new Set(event.dishes.map(d => d.meal.name));
+      const mealByName = new Map(allMeals.map(m => [m.name.toLowerCase(), m]));
+
+      const matched = (data.dishes as Array<{ name: string; category: EventCategory }>)
+        .filter(s => !existingNames.has(s.name))
+        .map(s => {
+          const meal = mealByName.get(s.name.toLowerCase());
+          if (!meal) return null;
+          return { meal, category: s.category as EventCategory, selected: true };
+        })
+        .filter(Boolean) as Array<{ meal: Meal; category: EventCategory; selected: boolean }>;
+
+      setConcept(data.concept ?? '');
+      setSuggested(matched);
+      if (!matched.length) setError('No matching recipes found. Try a different description.');
+    } catch (err: any) {
+      log.error('suggest-event-menu', String(err));
+      setError(err?.message ?? 'Could not generate suggestions. Try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggle = (name: string) =>
+    setSuggested(prev => prev.map(s => s.meal.name === name ? { ...s, selected: !s.selected } : s));
+
+  const addSelected = () => {
+    const toAdd = suggested
+      .filter(s => s.selected)
+      .map(s => ({ meal: s.meal, category: s.category, servings: event.guestCount }));
+    onAddDishes(toAdd);
+  };
+
+  const selectedCount = suggested.filter(s => s.selected).length;
+
+  return (
+    <div style={{ background: P.card, borderRadius: '16px', border: `2px solid ${P.accent}`, padding: '16px', marginBottom: '16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <div style={{ fontWeight: 700, fontSize: '15px' }}>✨ AI menu suggestion</div>
+        <button onClick={onClose} style={{ background: 'none', border: 'none', color: P.muted, fontSize: '18px', cursor: 'pointer', padding: '2px 6px', lineHeight: 1 }}>✕</button>
+      </div>
+
+      {!suggested.length && (
+        <>
+          <input
+            ref={inputRef}
+            value={prompt}
+            onChange={e => setPrompt(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && suggest()}
+            placeholder={`e.g. "Summer BBQ", "Cosy Italian dinner for 6", "Veggie feast"`}
+            autoFocus
+            style={{ width: '100%', padding: '10px 12px', border: `2px solid ${P.border}`, borderRadius: '10px', fontSize: '14px', background: P.bg, marginBottom: '10px', boxSizing: 'border-box' as const, outline: 'none' }}
+          />
+          {error && <div style={{ color: '#DC2626', fontSize: '13px', marginBottom: '10px' }}>{error}</div>}
+          <Primary onClick={suggest} disabled={loading || !prompt.trim()}>
+            {loading ? '✨ Planning your menu…' : '✨ Suggest a menu'}
+          </Primary>
+        </>
+      )}
+
+      {loading && (
+        <div style={{ textAlign: 'center', padding: '24px 0', color: P.muted }}>
+          <div style={{ fontSize: '28px', marginBottom: '8px' }}>👨‍🍳</div>
+          <div style={{ fontSize: '13px' }}>Curating your menu…</div>
+        </div>
+      )}
+
+      {!loading && suggested.length > 0 && (
+        <>
+          {concept && (
+            <div style={{ fontSize: '13px', color: P.muted, fontStyle: 'italic', marginBottom: '12px', lineHeight: 1.4, borderBottom: `1px solid ${P.border}`, paddingBottom: '10px' }}>
+              {concept}
+            </div>
+          )}
+          {suggested.map(s => (
+            <div key={s.meal.name} onClick={() => toggle(s.meal.name)}
+              style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 10px', borderRadius: '10px', cursor: 'pointer', marginBottom: '6px', transition: 'background 0.15s',
+                background: s.selected ? P.accentLight : P.bg, border: `1.5px solid ${s.selected ? P.accent : P.border}` }}>
+              {s.meal.photo
+                ? <img src={s.meal.photo} alt="" style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', flexShrink: 0 }} />
+                : <div style={{ width: '40px', height: '40px', borderRadius: '6px', background: P.accentLight, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>🍽️</div>}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 600, fontSize: '13px' }}>{s.meal.name}</div>
+                <div style={{ fontSize: '12px', color: P.muted }}>{CATEGORY_LABELS[s.category]} · {s.meal.time}</div>
+              </div>
+              <div style={{ fontSize: '16px', color: s.selected ? P.accent : P.muted, fontWeight: 700, flexShrink: 0 }}>
+                {s.selected ? '✓' : '○'}
+              </div>
+            </div>
+          ))}
+          {error && <div style={{ color: '#DC2626', fontSize: '13px', marginTop: '8px', marginBottom: '4px' }}>{error}</div>}
+          <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+            <Primary onClick={addSelected} disabled={!selectedCount}>
+              Add {selectedCount} dish{selectedCount !== 1 ? 'es' : ''}
+            </Primary>
+            <Secondary onClick={() => { setSuggested([]); setConcept(''); setError(''); setTimeout(() => inputRef.current?.focus(), 50); }}>
+              Try again
+            </Secondary>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 // ── Event Detail ──────────────────────────────────────────────────────────────
 
 function EventDetail({ event, allMeals, pantry, onUpdate, onDelete, onBack }: {
@@ -222,6 +399,7 @@ function EventDetail({ event, allMeals, pantry, onUpdate, onDelete, onBack }: {
 }) {
   const [tab, setTab] = useState<'dishes' | 'shopping' | 'schedule'>('dishes');
   const [showAddDish, setShowAddDish] = useState(false);
+  const [showSuggest, setShowSuggest] = useState(false);
   const [scheduleLoading, setScheduleLoading] = useState(false);
   const [scheduleError, setScheduleError] = useState('');
   const [editServeTime, setEditServeTime] = useState(false);
@@ -237,6 +415,11 @@ function EventDetail({ event, allMeals, pantry, onUpdate, onDelete, onBack }: {
   const addDish = (dish: EventDish) => {
     onUpdate({ dishes: [...event.dishes, dish] });
     setShowAddDish(false);
+  };
+
+  const addDishes = (newDishes: EventDish[]) => {
+    onUpdate({ dishes: [...event.dishes, ...newDishes] });
+    setShowSuggest(false);
   };
 
   const removeDish = (mealName: string) => {
@@ -352,12 +535,29 @@ function EventDetail({ event, allMeals, pantry, onUpdate, onDelete, onBack }: {
           {/* ── Dishes tab ── */}
           {tab === 'dishes' && (
             <>
-              {event.dishes.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '40px 16px', color: P.muted }}>
+              {showSuggest && (
+                <SuggestMenuPanel
+                  allMeals={allMeals}
+                  event={event}
+                  onAddDishes={addDishes}
+                  onClose={() => setShowSuggest(false)}
+                />
+              )}
+
+              {event.dishes.length === 0 && !showSuggest && (
+                <div style={{ textAlign: 'center', padding: '32px 16px 16px', color: P.muted }}>
                   <div style={{ fontSize: '40px', marginBottom: '12px' }}>🍽️</div>
-                  <div style={{ fontSize: '16px', fontWeight: 700, marginBottom: '6px' }}>No dishes yet</div>
-                  <div style={{ fontSize: '13px' }}>Add starters, mains, sides and desserts from your recipe library.</div>
+                  <div style={{ fontSize: '16px', fontWeight: 700, marginBottom: '6px', color: P.text }}>No dishes yet</div>
+                  <div style={{ fontSize: '13px', marginBottom: '20px' }}>Build a menu manually or let AI suggest one.</div>
+                  <button onClick={() => setShowSuggest(true)}
+                    style={{ background: `linear-gradient(135deg, ${P.accent}, ${P.accentDark})`, border: 'none', color: '#fff', borderRadius: '12px', padding: '12px 20px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', marginBottom: '10px', width: '100%' }}>
+                    ✨ Suggest a menu
+                  </button>
                 </div>
+              )}
+
+              {!showSuggest && event.dishes.length > 0 && (
+                <CourseBalanceHints dishes={event.dishes} onSuggest={() => setShowSuggest(true)} />
               )}
 
               {CATEGORY_ORDER_EVENT.map(cat => {
@@ -391,7 +591,15 @@ function EventDetail({ event, allMeals, pantry, onUpdate, onDelete, onBack }: {
                 );
               })}
 
-              <Primary onClick={() => setShowAddDish(true)}>+ Add dish</Primary>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ flex: 1 }}><Primary onClick={() => setShowAddDish(true)}>+ Add dish</Primary></div>
+                {!showSuggest && event.dishes.length > 0 && (
+                  <button onClick={() => setShowSuggest(true)}
+                    style={{ background: P.accentLight, border: `1.5px solid ${P.accent}`, color: P.accentDark, borderRadius: '12px', padding: '0 14px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                    ✨ Suggest
+                  </button>
+                )}
+              </div>
 
               <div style={{ marginTop: '24px', borderTop: `1px solid ${P.border}`, paddingTop: '16px' }}>
                 {confirmDelete ? (
