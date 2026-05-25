@@ -58,7 +58,7 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     setToast(msg);
     toastUndoRef.current = undo ?? null;
     clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => { setToast(null); toastUndoRef.current = null; }, 2500);
+    toastTimer.current = setTimeout(() => { setToast(null); toastUndoRef.current = null; }, 4000);
   }, []);
 
   const addTimer = useCallback((label: string, seconds: number) => {
@@ -175,6 +175,18 @@ function AppInner({ householdId, onLeave }: { householdId: string; onLeave: () =
     if (step === 'shopping' && !state.shopList && !state.nextWeekShopList && !loading) setStep('plan');
     if (step === 'setup' && !isFirstRun) setStep('prefs');
   }, [step, state.plan, state.nextWeekPlan, state.shopList, loading, isFirstRun]);
+
+  useEffect(() => {
+    const titles: Record<Step, string> = {
+      setup: 'Meal Planner',
+      plan: 'Your plan — Meal Planner',
+      shopping: 'Shopping list — Meal Planner',
+      browse: 'Recipes — Meal Planner',
+      prefs: 'Account — Meal Planner',
+      events: 'Events — Meal Planner',
+    };
+    document.title = titles[step] ?? 'Meal Planner';
+  }, [step]);
 
   if (loading) return <Spinner />;
 

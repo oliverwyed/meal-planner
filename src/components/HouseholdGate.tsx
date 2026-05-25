@@ -143,6 +143,7 @@ export function HouseholdGate({ onReady }: Props) {
             <input
               type="text"
               inputMode="numeric"
+              autoComplete="one-time-code"
               value={otp}
               onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 8))}
               onKeyDown={e => e.key === 'Enter' && handleVerifyOTP()}
@@ -198,6 +199,9 @@ export function HouseholdGate({ onReady }: Props) {
               onKeyDown={e => e.key === 'Enter' && handleJoin()}
               placeholder="A3F9KL"
               maxLength={6}
+              autoCorrect="off"
+              autoCapitalize="characters"
+              spellCheck={false}
               style={{ width: '100%', padding: '12px 14px', border: `2px solid ${P.border}`, borderRadius: '10px',
                 fontSize: '22px', letterSpacing: '6px', fontWeight: 700, textAlign: 'center',
                 background: P.bg, marginBottom: '16px', boxSizing: 'border-box', outline: 'none' }}

@@ -100,7 +100,7 @@ export function MealCard({ meal, day, isFav, isSeasonal, seasonLabel, overviewOp
       {displayMeal.photo && (
         <div style={{ position: 'relative', height: '160px', overflow: 'hidden', cursor: 'pointer' }} onClick={onView ?? onOverview}>
           <img src={displayMeal.photo} alt={displayMeal.name} loading="lazy"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', WebkitTouchCallout: 'none' } as React.CSSProperties} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 100%)' }} />
           {/* Day label overlaid bottom-left */}
           {day && <div style={{ position: 'absolute', bottom: '10px', left: '13px', fontFamily: "'DM Serif Display', serif",
