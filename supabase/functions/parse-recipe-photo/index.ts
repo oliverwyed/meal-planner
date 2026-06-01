@@ -14,6 +14,8 @@ CRITICAL RULES — read these before extracting anything:
 - Only extract what you can actually read in the image. NEVER invent, infer, or substitute ingredients, steps, or quantities.
 - If an ingredient name is partially obscured or unclear, omit it entirely rather than guessing.
 - Ingredient names must be copied exactly as written — do not substitute trade names, brand names, or "equivalent" products (e.g. if it says "peri peri spice mix", do not write "peri peri sauce").
+- Strip any allergen or allergy reference codes from ingredient names. These are short alphanumeric codes like A1, A3, A6, A7, A11 that appear after the ingredient name (e.g. "Soy sauce A1, A6" → "Soy sauce", "Free range egg A3" → "Free range egg", "Toasted sesame oil A11" → "Toasted sesame oil"). Never include these codes in the output.
+- When the recipe shows ingredient quantities in a table with multiple serving columns (e.g. x2, x3, x4), always extract the quantities from the smallest/base column only (usually x2). Do not mix quantities from different columns.
 - If you cannot determine a numeric field, use a reasonable structural default (e.g. minutes=30, serves=4) — never invent ingredients or steps to fill space.
 - Steps must reflect only what is written in the recipe. Do not add steps that aren't there.
 
@@ -27,7 +29,7 @@ Return ONLY valid JSON matching this exact shape, no markdown, no explanation:
   "serves": number,
   "adult": boolean,
   "description": string (2 evocative sentences describing the dish, max 40 words),
-  "ingredients": string[] (each exactly as written: "QTY UNIT ingredient" — copy ingredient names verbatim from the image),
+  "ingredients": string[] (each exactly as written: "QTY UNIT ingredient" — copy ingredient names verbatim, allergen codes stripped),
   "steps": string[] (the steps as written, condensed to 5-7 items, each with sensory doneness cues where visible),
   "kidNote": string | null,
   "tip": string | null (one chef technique tip if present in the recipe, 18-35 words),
