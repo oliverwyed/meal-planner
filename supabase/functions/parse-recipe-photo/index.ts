@@ -8,23 +8,31 @@ const corsHeaders = {
 
 const client = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY')! });
 
-const SYSTEM = `You extract recipe data from one or more photos of a recipe card, cookbook page, or handwritten recipe. The photos may show different pages or sections of the same recipe. Return ONLY valid JSON matching this exact shape:
+const SYSTEM = `You extract recipe data from one or more photos of a recipe card, cookbook page, or handwritten recipe. The photos may show different pages or sections of the same recipe.
+
+CRITICAL RULES — read these before extracting anything:
+- Only extract what you can actually read in the image. NEVER invent, infer, or substitute ingredients, steps, or quantities.
+- If an ingredient name is partially obscured or unclear, omit it entirely rather than guessing.
+- Ingredient names must be copied exactly as written — do not substitute trade names, brand names, or "equivalent" products (e.g. if it says "peri peri spice mix", do not write "peri peri sauce").
+- If you cannot determine a numeric field, use a reasonable structural default (e.g. minutes=30, serves=4) — never invent ingredients or steps to fill space.
+- Steps must reflect only what is written in the recipe. Do not add steps that aren't there.
+
+Return ONLY valid JSON matching this exact shape, no markdown, no explanation:
 {
   "name": string,
   "minutes": number,
   "protein": "chicken"|"beef"|"fish"|"pork"|"lamb"|"seafood"|"eggs"|"veggie",
-  "cuisine": "british"|"italian"|"asian"|"mexican"|"indian"|"american"|"middleeastern"|"other",
+  "cuisine": "british"|"italian"|"french"|"asian"|"mexican"|"indian"|"american"|"middleeastern"|"other",
   "carb": "none"|"pasta"|"rice"|"potato"|"bread"|"noodles",
   "serves": number,
   "adult": boolean,
-  "description": string (2 evocative sentences, max 40 words),
-  "ingredients": string[] (each: "QTY UNIT ingredient", e.g. "400g pasta" or "2 chicken breasts"),
-  "steps": string[] (5-7 concise steps, each with sensory doneness cues),
+  "description": string (2 evocative sentences describing the dish, max 40 words),
+  "ingredients": string[] (each exactly as written: "QTY UNIT ingredient" — copy ingredient names verbatim from the image),
+  "steps": string[] (the steps as written, condensed to 5-7 items, each with sensory doneness cues where visible),
   "kidNote": string | null,
-  "tip": string | null (one chef technique tip, 18-35 words),
+  "tip": string | null (one chef technique tip if present in the recipe, 18-35 words),
   "nutrition": { "calories": number, "protein": number, "carbs": number, "fat": number }
-}
-If you cannot read a field clearly, use a sensible default. Never return markdown or explanation.`;
+}`;
 
 const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
@@ -56,8 +64,8 @@ Deno.serve(async (req: Request) => {
     }));
 
     const message = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 2048,
+      model: 'claude-sonnet-4-6',
+      max_tokens: 4096,
       system: SYSTEM,
       messages: [{
         role: 'user',
